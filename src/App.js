@@ -1,102 +1,136 @@
 import {Client} from 'boardgame.io/react';
 
-import TicTacToeBoard from './TicTacToeBoard';
+import EngineBoard from './engine/Board';
+import RenderBoard from './render/Board';
 
-const rowOffset = 3;
+function doSetup(ctx) {
+  const board = new EngineBoard('0', '1');
+  board.setup();
+  return {
+    board,
+  };
+}
 
-// Return true if `cells` is in a winning configuration.
-function IsVictory(cells) {
-  for (let row = 0; row < 3; row++) {
-    if (
-      isThreeInARow(
-        getCell(cells, row, 0),
-        getCell(cells, row, 1),
-        getCell(cells, row, 2),
-      )
-    ) {
-      return true;
-    }
-  }
-  for (let col = 0; col < 3; col++) {
-    if (
-      isThreeInARow(
-        getCell(cells, 0, col),
-        getCell(cells, 1, col),
-        getCell(cells, 2, col),
-      )
-    ) {
-      return true;
-    }
-  }
+function selectPiece(G, ctx, rank, file) {
+  const currentPlayer = ctx.currentPlayer;
+  console.log('selectPiece', rank, file, currentPlayer);
+  const square = G.board.getSquare(rank, file);
   if (
-    isThreeInARow(
-      getCell(cells, 0, 0),
-      getCell(cells, 1, 1),
-      getCell(cells, 2, 2),
-    )
+    !square ||
+    !square.getPiece() ||
+    square.getPiece().player.boardIoLabel !== currentPlayer
   ) {
-    return true;
+    console.warn(
+      "No square or no piece to select, or opponent's piece selected:",
+      rank,
+      file,
+      currentPlayer,
+    );
+    return;
   }
-  return isThreeInARow(
-    getCell(cells, 0, 2),
-    getCell(cells, 1, 1),
-    getCell(cells, 2, 0),
+
+  G.possibleMoves = [];
+  square.getPiece().possibleMoves(G.board, G.possibleMoves);
+
+  if (!G.possibleMoves || G.possibleMoves.length === 0) {
+    console.log('this piece cannot move');
+    return;
+  }
+
+  G.board.deselectAll();
+  square.selected = true;
+  if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
+    ctx.events.endStage();
+  }
+}
+
+function moveSelectedPiece(G, ctx, rank, file) {
+  console.log('movePiece', rank, file);
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return;
+  }
+  const targetSquare = G.board.getSquare(rank, file);
+  if (!targetSquare) {
+    console.warn('No target square:', rank, file);
+    return;
+  }
+  const targetPiece = targetSquare.getPiece();
+  if (targetPiece && targetPiece.color === ctx.currentPlayer) {
+    console.log('selecting a different piece instead');
+    selectPiece(G, ctx, rank, file);
+    return;
+  }
+
+  if (!G.possibleMoves || G.possibleMoves.length === 0) {
+    console.log('this piece cannot move');
+    return;
+  }
+
+  let move = G.possibleMoves.find(
+    (possibleMove) => possibleMove.to === targetSquare,
   );
+
+  if (!move) {
+    console.log('illegal move');
+    return;
+  }
+
+  if (targetPiece) {
+    console.log('captured', targetPiece);
+  }
+
+  G.board.applyMove(move);
+  G.possibleMoves = [];
+  G.board.deselectAll();
+  ctx.events.endTurn();
 }
 
-function getCell(cells, row, col) {
-  return cells[row * rowOffset + col];
+function deselectPiece(G, ctx) {
+  console.log('deselectPiece');
 }
 
-function isThreeInARow(c1, c2, c3) {
-  return c1 != null && c1 === c2 && c2 === c3;
-}
-
-// Return true if all `cells` are occupied.
-function IsDraw(cells) {
-  return cells.filter((c) => c === null).length === 0;
-}
-
-const TicTacToe = {
-  setup: () => ({cells: Array(9).fill(null)}),
+const LaserChess = {
+  setup: doSetup,
 
   moves: {
-    clickCell: (G, ctx, id) => {
-      if (G.cells[id] === null) {
-        G.cells[id] = ctx.currentPlayer;
-      }
+    selectPiece,
+    moveSelectedPiece,
+    deselectPiece,
+  },
+
+  turn: {
+    onBegin: (G, ctx) => {
+      ctx.events.setStage('selectPieceStage');
+      return G;
+    },
+    stages: {
+      selectPieceStage: {
+        moves: {
+          selectPiece,
+        },
+        next: 'movePieceStage',
+      },
+      movePieceStage: {
+        moves: {
+          moveSelectedPiece,
+          deselectPiece,
+        },
+      },
     },
   },
 
   endIf: (G, ctx) => {
-    if (IsVictory(G.cells)) {
-      return {winner: ctx.currentPlayer};
-    }
-    if (IsDraw(G.cells)) {
-      return {draw: true};
-    }
-  },
-
-  turn: {
-    moveLimit: 1,
-  },
-
-  ai: {
-    enumerate: (G, ctx) => {
-      let moves = [];
-      for (let i = 0; i < 9; i++) {
-        if (G.cells[i] === null) {
-          moves.push({move: 'clickCell', args: [i]});
-        }
-      }
-      return moves;
-    },
   },
 };
 
 const App = Client({
-  game: TicTacToe,
-  board: TicTacToeBoard,
+  game: LaserChess,
+  board: RenderBoard,
 });
 
 export default App;
