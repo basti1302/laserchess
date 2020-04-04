@@ -1,3 +1,4 @@
+import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
 import {KING} from '../PieceType';
 import moveTo from './moveTo';
 

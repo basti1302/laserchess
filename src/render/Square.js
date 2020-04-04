@@ -2,6 +2,8 @@ import React from 'react';
 
 import Piece from './Piece';
 
+import styles from './Square.module.css';
+
 export default class Square extends React.Component {
   onClick() {
     const square = this.props.square;
@@ -27,25 +29,24 @@ export default class Square extends React.Component {
       });
     }
 
-    let border = '1px solid #555';
-    if (square.selected) {
-      border = '2px solid red';
-    } else if (markAsPossibleMove) {
-      border = '2px solid green';
+    const classes = [styles.square];
+
+    if (this.props.darkSquare) {
+      classes.push(styles.dark);
+    } else {
+      classes.push(styles.light);
     }
 
-    const cellStyle = {
-      border,
-      width: '50px',
-      height: '50px',
-      lineHeight: '50px',
-      textAlign: 'center',
-    };
+    if (square.selected) {
+      classes.push(styles.selected);
+    } else if (markAsPossibleMove) {
+      classes.push(styles['possible-move']);
+    }
 
     const id = this.props.square.id;
     const piece = this.props.square.getPiece();
     return (
-      <td style={cellStyle} key={id} onClick={() => this.onClick()}>
+      <td className={classes.join(' ')} key={id} onClick={() => this.onClick()}>
         {piece && <Piece piece={piece} />}
       </td>
     );

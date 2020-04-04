@@ -37,10 +37,18 @@ export default class PieceType {
   }
 }
 
-export const PAWN = new PieceType('♙', '♟', movesPawn);
-export const BISHOP = new PieceType('♗', '♝', movesBishop);
-export const KNIGHT = new PieceType('♘', '♞', movesKnight);
-export const ROOK = new PieceType('♖', '♜', movesRook);
-export const QUEEN = new PieceType('♕', '♛', movesQueen);
-export const KING = new PieceType('♔', '♚', movesKing);
-export const LASER = new PieceType('🔫', '🔫', movesLaser);
+export const PAWN = new PieceType('pawn-white', 'pawn-black', movesPawn);
+export const BISHOP = new PieceType(
+  'bishop-white',
+  'bishop-black',
+  movesBishop,
+);
+export const KNIGHT = new PieceType(
+  'knight-white',
+  'knight-black',
+  movesKnight,
+);
+export const ROOK = new PieceType('rook-white', 'rook-black', movesRook);
+export const QUEEN = new PieceType('queen-white', 'queen-black', movesQueen);
+export const KING = new PieceType('king-white', 'king-black', movesKing);
+export const LASER = new PieceType('laser-white', 'laser-black', movesLaser);

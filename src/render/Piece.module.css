@@ -1,0 +1,75 @@
+.piece {
+  display: inline-block;
+}
+
+.pawn-white:before {
+  content: '♙';
+}
+
+.pawn-black:before {
+  content: '♟';
+}
+
+.bishop-white:before {
+  content: '♗';
+}
+
+.bishop-black:before {
+  content: '♝';
+}
+
+.knight-white:before {
+  content: '♘';
+}
+
+.knight-black:before {
+  content: '♞';
+}
+
+.rook-white:before {
+  content: '♖';
+}
+
+.rook-black:before {
+  content: '♜';
+}
+
+.queen-white:before {
+  content: '♕';
+}
+
+.queen-black:before {
+  content: '♛';
+}
+
+.king-white:before {
+  content: '♔';
+}
+
+.king-black:before {
+  content: '♔';
+}
+
+.laser-white:before {
+  content: '🔫';
+}
+
+.laser-black:before {
+  content: '🔫';
+}
+
+.facing-north {
+  transform: rotate(0deg);
+}
+
+.facing-east {
+  transform: rotate(90deg);
+}
+
+.facing-south {
+  transform: rotate(180deg);
+}
+
+.facing-west {
+  transform: rotate(270deg);
+}
