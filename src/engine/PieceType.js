@@ -32,8 +32,8 @@ export default class PieceType {
     return this.blackChar;
   }
 
-  possibleMoves(board, moves, piece) {
-    this.possibleMovesFn(board, moves, piece);
+  possibleMoves(board, moves, piece, ignoreCastling) {
+    this.possibleMovesFn(board, moves, piece, ignoreCastling);
   }
 }
 

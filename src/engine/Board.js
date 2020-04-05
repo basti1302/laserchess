@@ -9,13 +9,20 @@ export const ranks = 9; // rows: 1 - 8 on a traditional board
 export default class Board {
   constructor() {
     this.squares = [];
-    this.history = [];
+    this.moveHistory = [];
 
     for (let rank = 1; rank <= ranks; rank++) {
       for (let file = 1; file <= files; file++) {
         this.squares[index(rank, file)] = new Square(rank, file);
       }
     }
+
+    this.whiteKingHome = this.getSquare(1, 'e');
+    this.whiteKingSideRookHome = this.getSquare(1, 'a');
+    this.whiteQueenSideRookHome = this.getSquare(1, files);
+    this.blackKingHome = this.getSquare(ranks, 'e');
+    this.blackKingSideRookHome = this.getSquare(ranks, files);
+    this.blackQueenSideRookHome = this.getSquare(ranks, 'a');
   }
 
   getSquare(rank, file) {
@@ -74,45 +81,101 @@ export default class Board {
     const moves = [];
     this.forEachPiece((piece) => {
       if (piece.player === player) {
-        piece.possibleMoves(this, moves);
+        piece.possibleMovesIgnoringCheck(this, moves, false);
+      }
+    });
+    return moves;
+  }
+
+  allMovesIgnoringCheckAndCastling(player) {
+    const moves = [];
+    this.forEachPiece((piece) => {
+      if (piece.player === player) {
+        piece.possibleMovesIgnoringCheck(this, moves, true);
       }
     });
     return moves;
   }
 
   isAttackedBy(square, player) {
-    return !!this.allMovesIgnoringCheck(player)
-      .map((move) => move.to)
-      .find((squ) => squ === square);
+    return this.isAttackedByMoves(
+      square,
+      this.allMovesIgnoringCheckAndCastling(player),
+    );
+  }
+
+  isAttackedByMoves(square, moves) {
+    return !!moves.map((move) => move.to).find((s) => s === square);
   }
 
   applyMove(move) {
     const movingPiece = move.from.getPiece();
+    if (!movingPiece) {
+      throw new Error(`No piece to move at ${move.from}.`);
+    }
+    movingPiece.hasMoved = true;
     move.from.removePiece();
     move.to.setPiece(movingPiece);
-    this.history.push({
+    const historyEntry = {
       player: movingPiece.player,
       from: move.from.asPosition(),
       to: move.to.asPosition(),
       type: movingPiece.type,
-    });
+    };
+
+    if (move.castling) {
+      const castlingRook = move.from2.getPiece();
+      if (!castlingRook) {
+        throw new Error(`No rook for castling at ${move.from2}.`);
+      }
+      castlingRook.hasMoved = true;
+      move.from2.removePiece();
+      move.to2.setPiece(castlingRook);
+      historyEntry.from2 = move.from2;
+      historyEntry.to2 = move.to2;
+      historyEntry.type2 = castlingRook.type;
+    }
+    this.moveHistory.push(historyEntry);
   }
 
   hasKingMoved(player) {
-    for (let i = this.history.length - 1; i >= 0; i--) {
-      if (this.history[i].type === KING && this.history.player === player) {
-        return true;
-      }
-    }
-    return false;
+    return hasPlayersPieceMovedFromHome(
+      player,
+      this.whiteKingHome,
+      this.blackKingHome,
+    );
   }
 
   hasKingSideRookMoved(player) {
-    return false;
+    return hasPlayersPieceMovedFromHome(
+      player,
+      this.whiteKingSideRookHome,
+      this.blackKingSideRookHome,
+    );
   }
 
   hasQueenSideRookMoved(player) {
-    return false;
+    return hasPlayersPieceMovedFromHome(
+      player,
+      this.whiteQueenSideRookHome,
+      this.blackQueenSideRookHome,
+    );
+  }
+
+  getKingSideRook(player) {
+    return getRook(
+      player,
+      this.whiteKingSideRookHome,
+      this.blackKingSideRookHome,
+    );
+  }
+
+  getQueenSideRook(player) {
+    return getRook(
+      player,
+      this.whiteQueenSideRookHome,
+      this.blackQueenSideRookHome,
+    );
   }
 
   findFirstSquare(fn) {
@@ -147,4 +210,31 @@ function index(rank, file) {
     file = file.toLowerCase().charCodeAt(0) - 96; // 97 = 'a'
   }
   return file * files + rank;
+}
+
+function hasPlayersPieceMovedFromHome(player, homeWhite, homeBlack) {
+  let home;
+  if (player === PLAYER_WHITE) {
+    home = homeWhite;
+  } else if (player === PLAYER_BLACK) {
+    home = homeBlack;
+  } else {
+    throw new Error(`Unknown player ${player}.`);
+  }
+  return hasMovedFromHome(home);
+}
+
+function hasMovedFromHome(home) {
+  const piece = home.getPiece();
+  return !piece || piece.hasMoved;
+}
+
+function getRook(player, homeWhite, homeBlack) {
+  if (player === PLAYER_WHITE) {
+    return homeWhite.piece;
+  } else if (player === PLAYER_BLACK) {
+    return homeBlack.piece;
+  } else {
+    throw new Error(`Unknown player ${player}.`);
+  }
 }

@@ -25,7 +25,7 @@ describe('knight moves', () => {
     // capture
     board.setPiece(4, 'd', new Piece(PLAYER_BLACK, PAWN));
 
-    knight.possibleMoves(board, moves);
+    knight.possibleMovesIgnoringCheck(board, moves);
 
     expect(moves.length).toEqual(5);
     checkMove(moves[0], from, 7, 'a');

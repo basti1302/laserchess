@@ -13,13 +13,15 @@ describe('pawn moves', () => {
     moves = [];
   });
 
+  // TODO capture, en passant, promotion, blocked by enemy piece
+
   describe(`white pawn`, () => {
     test('should move one or two squares', () => {
       const from = board.getSquare(2, 'c');
       const pawn = new Piece(PLAYER_WHITE, PAWN);
       from.setPiece(pawn);
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(2);
       checkMove(moves[0], from, 3, 'c');
@@ -33,7 +35,7 @@ describe('pawn moves', () => {
 
       board.setPiece(4, 'c', new Piece(PLAYER_WHITE, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(1);
       checkMove(moves[0], from, 3, 'c');
@@ -46,7 +48,7 @@ describe('pawn moves', () => {
 
       board.setPiece(3, 'c', new Piece(PLAYER_WHITE, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(0);
     });
@@ -58,7 +60,7 @@ describe('pawn moves', () => {
 
       board.setPiece(3, 'c', new Piece(PLAYER_BLACK, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(0);
     });
@@ -70,7 +72,7 @@ describe('pawn moves', () => {
       const pawn = new Piece(PLAYER_BLACK, PAWN);
       from.setPiece(pawn);
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(2);
       checkMove(moves[0], from, ranks - 2, 'c');
@@ -84,7 +86,7 @@ describe('pawn moves', () => {
 
       board.setPiece(ranks - 3, 'c', new Piece(PLAYER_BLACK, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(1);
       checkMove(moves[0], from, ranks - 2, 'c');
@@ -97,7 +99,7 @@ describe('pawn moves', () => {
 
       board.setPiece(ranks - 2, 'c', new Piece(PLAYER_BLACK, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(0);
     });
@@ -109,12 +111,10 @@ describe('pawn moves', () => {
 
       board.setPiece(ranks - 3, 'c', new Piece(PLAYER_WHITE, PAWN));
 
-      pawn.possibleMoves(board, moves);
+      pawn.possibleMovesIgnoringCheck(board, moves);
 
       expect(moves.length).toEqual(1);
       checkMove(moves[0], from, ranks - 2, 'c');
     });
   });
 });
-
-

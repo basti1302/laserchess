@@ -25,7 +25,7 @@ describe('laser moves', () => {
     // capture
     board.setPiece(2, 2, new Piece(PLAYER_BLACK, PAWN));
 
-    laser.possibleMoves(board, moves);
+    laser.possibleMovesIgnoringCheck(board, moves);
 
     expect(moves.length).toEqual(4);
     checkMove(moves[0], from, 2, 'c');

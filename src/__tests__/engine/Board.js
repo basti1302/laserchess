@@ -326,8 +326,22 @@ describe('Board', () => {
     });
   });
 
-  describe('move history', () => {
-    test('should record moves', () => {
+  describe('apply moves', () => {
+    test('should record that piece has moved', () => {
+      const pawn1 = new Piece(PLAYER_WHITE, PAWN);
+      const pawn1Pos = board.getSquare(2, 'a');
+      const pawn2 = new Piece(PLAYER_WHITE, PAWN);
+      const pawn2Pos = board.getSquare(2, 'b');
+      board.setPiece(pawn1Pos.rank, pawn1Pos.file, pawn1);
+      board.setPiece(pawn2Pos.rank, pawn2Pos.file, pawn2);
+
+      board.applyMove(new Move(pawn1Pos, board.getSquare(3, 'a')));
+
+      expect(pawn1.hasMoved).toBe(true);
+      expect(pawn2.hasMoved).toBe(false);
+    });
+
+    test('should record move history', () => {
       const wQueenPos1 = board.getSquare(3, 'b');
       const wQueenPos2 = board.getSquare(5, 'b');
       const wQueenPos3 = board.getSquare(5, 'e');
@@ -359,12 +373,156 @@ describe('Board', () => {
       board.applyMove(new Move(bPawnPos2, bPawnPos3));
       board.applyMove(new Move(wQueenPos2, wQueenPos3));
 
-      expect(board.history.length).toBe(5);
-      verifyHistoryEntry(board.history[0], 3, 2, 5, 2, QUEEN, PLAYER_WHITE);
-      verifyHistoryEntry(board.history[1], 7, 5, 6, 5, PAWN, PLAYER_BLACK);
-      verifyHistoryEntry(board.history[2], 1, 8, 1, 7, LASER, PLAYER_WHITE);
-      verifyHistoryEntry(board.history[3], 6, 5, 5, 5, PAWN, PLAYER_BLACK);
-      verifyHistoryEntry(board.history[4], 5, 2, 5, 5, QUEEN, PLAYER_WHITE);
+      expect(board.moveHistory.length).toBe(5);
+      verifyHistoryEntry(board.moveHistory[0], 3, 2, 5, 2, QUEEN, PLAYER_WHITE);
+      verifyHistoryEntry(board.moveHistory[1], 7, 5, 6, 5, PAWN, PLAYER_BLACK);
+      verifyHistoryEntry(board.moveHistory[2], 1, 8, 1, 7, LASER, PLAYER_WHITE);
+      verifyHistoryEntry(board.moveHistory[3], 6, 5, 5, 5, PAWN, PLAYER_BLACK);
+      verifyHistoryEntry(board.moveHistory[4], 5, 2, 5, 5, QUEEN, PLAYER_WHITE);
+    });
+
+    test('should know that white king has not moved', () => {
+      const piece = new Piece(PLAYER_WHITE, KING);
+      const pos = board.getSquare(1, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasKingMoved(PLAYER_WHITE)).toBe(false);
+    });
+
+    test('should know that white king has moved', () => {
+      const piece = new Piece(PLAYER_WHITE, KING);
+      const pos = board.getSquare(1, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, 'e')));
+      expect(board.hasKingMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that white king has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_WHITE, KING);
+      const pos = board.getSquare(1, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, 'e')));
+      board.applyMove(new Move(board.getSquare(2, 'e'), pos));
+      expect(board.hasKingMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that black king has not moved', () => {
+      const piece = new Piece(PLAYER_BLACK, KING);
+      const pos = board.getSquare(ranks, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasKingMoved(PLAYER_BLACK)).toBe(false);
+    });
+
+    test('should know that black king has moved', () => {
+      const piece = new Piece(PLAYER_BLACK, KING);
+      const pos = board.getSquare(ranks, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, 'e')));
+      expect(board.hasKingMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should know that black king has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_BLACK, KING);
+      const pos = board.getSquare(ranks, 'e');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, 'e')));
+      board.applyMove(new Move(board.getSquare(ranks - 1, 'e'), pos));
+      expect(board.hasKingMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should know that white king side rook has not moved', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasKingSideRookMoved(PLAYER_WHITE)).toBe(false);
+    });
+
+    test('should know that white king side rook has moved', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, 'a')));
+      expect(board.hasKingSideRookMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that white king side rook has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, 'a')));
+      board.applyMove(new Move(board.getSquare(2, 'a'), pos));
+      expect(board.hasKingSideRookMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that black king side rook has not moved', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasKingSideRookMoved(PLAYER_BLACK)).toBe(false);
+    });
+
+    test('should know that black king side rook has moved', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, files)));
+      expect(board.hasKingSideRookMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should know that black king side rook has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, files)));
+      board.applyMove(new Move(board.getSquare(ranks - 1, files), pos));
+      expect(board.hasKingSideRookMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should know that white queen side rook has not moved', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasQueenSideRookMoved(PLAYER_WHITE)).toBe(false);
+    });
+
+    test('should know that white queen side rook has moved', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, files)));
+      expect(board.hasQueenSideRookMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that white queen side rook has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_WHITE, ROOK);
+      const pos = board.getSquare(1, files);
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(2, files)));
+      board.applyMove(new Move(board.getSquare(2, files), pos));
+      expect(board.hasQueenSideRookMoved(PLAYER_WHITE)).toBe(true);
+    });
+
+    test('should know that black queen side rook has not moved', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(false);
+    });
+
+    test('should know that black queen side rook has moved', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, 'a')));
+      expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should know that black queen side rook has moved after coming back to home square', () => {
+      const piece = new Piece(PLAYER_BLACK, ROOK);
+      const pos = board.getSquare(ranks, 'a');
+      board.setPiece(pos.rank, pos.file, piece);
+      board.applyMove(new Move(pos, board.getSquare(ranks - 1, 'a')));
+      board.applyMove(new Move(board.getSquare(ranks - 1, 'a'), pos));
+      expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(true);
     });
 
     function verifyHistoryEntry(

@@ -14,6 +14,7 @@ export default class Piece {
     this.type = type;
     this.rank = null;
     this.file = null;
+    this.hasMoved = false;
   }
 
   setPosition(rank, file) {
@@ -32,7 +33,7 @@ export default class Piece {
     return board.getSquare(this.rank, this.file);
   }
 
-  possibleMoves(board, moves) {
-    this.type.possibleMoves(board, moves, this);
+  possibleMovesIgnoringCheck(board, moves, ignoreCastling = false) {
+    this.type.possibleMoves(board, moves, this, ignoreCastling);
   }
 }

@@ -27,7 +27,7 @@ describe('rook moves', () => {
     // west: 3 moves
     board.setPiece(5, 1, new Piece(PLAYER_WHITE, PAWN));
 
-    rook.possibleMoves(board, moves);
+    rook.possibleMovesIgnoringCheck(board, moves);
 
     expect(moves.length).toEqual(14);
     checkMove(moves[0], from, 6, 'e');

@@ -34,7 +34,7 @@ describe('queen moves', () => {
     board.setPiece(5, 'a', new Piece(PLAYER_WHITE, PAWN));
     // north-east: no obstacle, 4 moves
 
-    queen.possibleMoves(board, moves);
+    queen.possibleMovesIgnoringCheck(board, moves);
 
     expect(moves.length).toEqual(21);
     checkMove(moves[0], from, 6, 'e');

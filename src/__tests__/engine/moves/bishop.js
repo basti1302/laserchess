@@ -28,7 +28,7 @@ describe('bishop moves', () => {
     board.setPiece(4, 'd', new Piece(PLAYER_BLACK, PAWN));
     // north-east: no obstacle, 4 moves
 
-    bishop.possibleMoves(board, moves);
+    bishop.possibleMovesIgnoringCheck(board, moves);
 
     expect(moves.length).toEqual(7);
     checkMove(moves[0], from, 6, 'f');

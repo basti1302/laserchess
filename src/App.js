@@ -30,7 +30,7 @@ function selectPiece(G, ctx, rank, file) {
   }
 
   G.possibleMoves = [];
-  square.getPiece().possibleMoves(G.board, G.possibleMoves);
+  square.getPiece().possibleMovesIgnoringCheck(G.board, G.possibleMoves);
 
   if (!G.possibleMoves || G.possibleMoves.length === 0) {
     console.log('this piece cannot move');
@@ -60,7 +60,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
     return;
   }
   const targetPiece = targetSquare.getPiece();
-  if (targetPiece && targetPiece.color === ctx.currentPlayer) {
+  if (targetPiece && targetPiece.player.boardIoLabel === ctx.currentPlayer) {
     console.log('selecting a different piece instead');
     selectPiece(G, ctx, rank, file);
     return;
