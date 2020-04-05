@@ -22,11 +22,20 @@ export default class Piece {
     this.file = file;
   }
 
+  clearPosition() {
+    this.rank = null;
+    this.file = null;
+  }
+
   getPosition() {
-    return {
-      rank: this.rank,
-      file: this.file,
-    };
+    if (this.rank && this.file) {
+      return {
+        rank: this.rank,
+        file: this.file,
+      };
+    } else {
+      return null;
+    }
   }
 
   getSquare(board) {

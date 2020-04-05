@@ -115,12 +115,14 @@ export default class Board {
     }
     movingPiece.hasMoved = true;
     move.from.removePiece();
+    const captured = move.to.removePiece();
     move.to.setPiece(movingPiece);
     const historyEntry = {
       player: movingPiece.player,
       from: move.from.asPosition(),
       to: move.to.asPosition(),
       type: movingPiece.type,
+      captured,
     };
 
     if (move.castling) {

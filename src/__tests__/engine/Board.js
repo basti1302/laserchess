@@ -327,7 +327,21 @@ describe('Board', () => {
   });
 
   describe('apply moves', () => {
-    test('should record that piece has moved', () => {
+    test('should move the piece', () => {
+      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawnPos1 = board.getSquare(2, 'a');
+      const pawnPos2 = board.getSquare(4, 'a');
+      board.setPiece(pawnPos1.rank, pawnPos1.file, pawn);
+
+      board.applyMove(new Move(pawnPos1, pawnPos2));
+
+      expect(pawnPos1.getPiece()).toBeNull();
+      expect(pawnPos2.getPiece()).toBe(pawn);
+      expect(pawn.getPosition().rank).toBe(pawnPos2.rank);
+      expect(pawn.getPosition().file).toBe(pawnPos2.file);
+    });
+
+    test('should record that a piece has moved', () => {
       const pawn1 = new Piece(PLAYER_WHITE, PAWN);
       const pawn1Pos = board.getSquare(2, 'a');
       const pawn2 = new Piece(PLAYER_WHITE, PAWN);
@@ -339,6 +353,73 @@ describe('Board', () => {
 
       expect(pawn1.hasMoved).toBe(true);
       expect(pawn2.hasMoved).toBe(false);
+    });
+
+    test('should capture a piece', () => {
+      const whiteRook = new Piece(PLAYER_WHITE, ROOK);
+      const blackKnight = new Piece(PLAYER_BLACK, KNIGHT);
+      const whiteRookPos = board.getSquare(1, 'a');
+      const blackKnightPos = board.getSquare(5, 'a');
+      board.setPiece(whiteRookPos.rank, whiteRookPos.file, whiteRook);
+      board.setPiece(blackKnightPos.rank, blackKnightPos.file, blackKnight);
+
+      board.applyMove(new Move(whiteRookPos, blackKnightPos));
+
+      expect(whiteRookPos.getPiece()).toBeNull();
+      expect(blackKnightPos.getPiece()).toBe(whiteRook);
+      expect(whiteRook.getPosition().rank).toBe(blackKnightPos.rank);
+      expect(whiteRook.getPosition().file).toBe(blackKnightPos.file);
+      expect(blackKnight.getPosition()).toBe(null);
+    });
+
+    test('should apply a castling', () => {
+      const whiteKing = new Piece(PLAYER_WHITE, KING);
+      const whiteKingPos = board.getSquare(1, 'e');
+      const whiteKingDest = board.getSquare(1, 'c');
+      const whiteKingSideRook = new Piece(PLAYER_WHITE, ROOK);
+      const whiteKingSideRookPos = board.getSquare(1, 'a');
+      const whiteKingSideRookDest = board.getSquare(1, 'd');
+      board.setPiece(whiteKingPos.rank, whiteKingPos.file, whiteKing);
+      board.setPiece(
+        whiteKingSideRookPos.rank,
+        whiteKingSideRookPos.file,
+        whiteKingSideRook,
+      );
+
+      board.applyMove(
+        new Move(
+          whiteKingPos,
+          whiteKingDest,
+          whiteKingSideRookPos,
+          whiteKingSideRookDest,
+        ),
+      );
+
+      expect(whiteKingPos.getPiece()).toBeNull();
+      expect(whiteKingDest.getPiece()).toBe(whiteKing);
+      expect(whiteKingSideRookPos.getPiece()).toBeNull();
+      expect(whiteKingSideRookDest.getPiece()).toBe(whiteKingSideRook);
+      expect(whiteKing.getPosition().rank).toBe(whiteKingDest.rank);
+      expect(whiteKing.getPosition().file).toBe(whiteKingDest.file);
+      expect(whiteKingSideRook.getPosition().rank).toBe(
+        whiteKingSideRookDest.rank,
+      );
+      expect(whiteKingSideRook.getPosition().file).toBe(
+        whiteKingSideRookDest.file,
+      );
+      expect(board.moveHistory.length).toBe(1);
+      const historyEntry = board.moveHistory[0];
+      expect(historyEntry.from.rank).toBe(whiteKingPos.rank);
+      expect(historyEntry.from.file).toBe(whiteKingPos.file);
+      expect(historyEntry.to.rank).toBe(whiteKingDest.rank);
+      expect(historyEntry.to.file).toBe(whiteKingDest.file);
+      expect(historyEntry.from2.rank).toBe(whiteKingSideRookPos.rank);
+      expect(historyEntry.from2.file).toBe(whiteKingSideRookPos.file);
+      expect(historyEntry.to2.rank).toBe(whiteKingSideRookDest.rank);
+      expect(historyEntry.to2.file).toBe(whiteKingSideRookDest.file);
+      expect(historyEntry.type).toBe(KING);
+      expect(historyEntry.player).toBe(PLAYER_WHITE);
+      expect(historyEntry.captured).toBeNull();
     });
 
     test('should record move history', () => {
@@ -371,6 +452,7 @@ describe('Board', () => {
       board.applyMove(new Move(bPawnPos1, bPawnPos2));
       board.applyMove(new Move(wLaserPos1, wLaserPos2));
       board.applyMove(new Move(bPawnPos2, bPawnPos3));
+      // captures black pawn
       board.applyMove(new Move(wQueenPos2, wQueenPos3));
 
       expect(board.moveHistory.length).toBe(5);
@@ -378,8 +460,43 @@ describe('Board', () => {
       verifyHistoryEntry(board.moveHistory[1], 7, 5, 6, 5, PAWN, PLAYER_BLACK);
       verifyHistoryEntry(board.moveHistory[2], 1, 8, 1, 7, LASER, PLAYER_WHITE);
       verifyHistoryEntry(board.moveHistory[3], 6, 5, 5, 5, PAWN, PLAYER_BLACK);
-      verifyHistoryEntry(board.moveHistory[4], 5, 2, 5, 5, QUEEN, PLAYER_WHITE);
+      verifyHistoryEntry(
+        board.moveHistory[4],
+        5,
+        2,
+        5,
+        5,
+        QUEEN,
+        PLAYER_WHITE,
+        PAWN,
+      );
     });
+
+    function verifyHistoryEntry(
+      historyEntry,
+      fromRank,
+      fromFile,
+      toRank,
+      toFile,
+      pieceType,
+      player,
+      capturedType,
+    ) {
+      expect(historyEntry.from.rank).toBe(fromRank);
+      expect(historyEntry.from.file).toBe(fromFile);
+      expect(historyEntry.to.rank).toBe(toRank);
+      expect(historyEntry.to.file).toBe(toFile);
+      expect(historyEntry.type).toBe(pieceType);
+      expect(historyEntry.player).toBe(player);
+      if (capturedType) {
+        const captured = historyEntry.captured;
+        expect(captured).not.toBeNull();
+        expect(captured.type).toBe(capturedType);
+        expect(captured.getPosition()).toBeNull();
+      } else {
+        expect(historyEntry.captured).toBeNull();
+      }
+    }
 
     test('should know that white king has not moved', () => {
       const piece = new Piece(PLAYER_WHITE, KING);
@@ -524,22 +641,5 @@ describe('Board', () => {
       board.applyMove(new Move(board.getSquare(ranks - 1, 'a'), pos));
       expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(true);
     });
-
-    function verifyHistoryEntry(
-      historyEntry,
-      fromRank,
-      fromFile,
-      toRank,
-      toFile,
-      pieceType,
-      player,
-    ) {
-      expect(historyEntry.from.rank).toBe(fromRank);
-      expect(historyEntry.from.file).toBe(fromFile);
-      expect(historyEntry.to.rank).toBe(toRank);
-      expect(historyEntry.to.file).toBe(toFile);
-      expect(historyEntry.type).toBe(pieceType);
-      expect(historyEntry.player).toBe(player);
-    }
   });
 });

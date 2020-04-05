@@ -27,7 +27,13 @@ export default class Square {
   }
 
   removePiece() {
-    this.piece = null;
+    if (this.piece) {
+      const piece = this.piece;
+      this.piece.clearPosition();
+      this.piece = null;
+      return piece;
+    }
+    return null;
   }
 
   getFileAsLetter() {
