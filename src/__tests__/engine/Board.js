@@ -372,6 +372,30 @@ describe('Board', () => {
       expect(blackKnight.getPosition()).toBe(null);
     });
 
+    test('should capture en passant', () => {
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawnPos1 = board.getSquare(2, 'e');
+      const whitePawnPos2 = board.getSquare(4, 'e');
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawnPos1 = board.getSquare(4, 'f');
+      const blackPawnPos2 = board.getSquare(3, 'e');
+      board.setPiece(whitePawnPos1.rank, whitePawnPos1.file, whitePawn);
+      board.setPiece(blackPawnPos1.rank, blackPawnPos1.file, blackPawn);
+
+      board.applyMove(new Move(whitePawnPos1, whitePawnPos2));
+      board.applyMove(
+        new Move(blackPawnPos1, blackPawnPos2, null, null, null, whitePawnPos2),
+      );
+
+      expect(blackPawnPos1.getPiece()).toBeNull();
+      expect(blackPawnPos2.getPiece()).toBe(blackPawn);
+      expect(whitePawnPos1.getPiece()).toBeNull();
+      expect(whitePawnPos2.getPiece()).toBeNull();
+      expect(blackPawn.getPosition().rank).toBe(blackPawnPos2.rank);
+      expect(blackPawn.getPosition().file).toBe(blackPawnPos2.file);
+      expect(whitePawn.getPosition()).toBe(null);
+    });
+
     test('should apply a castling', () => {
       const whiteKing = new Piece(PLAYER_WHITE, KING);
       const whiteKingPos = board.getSquare(1, 'e');

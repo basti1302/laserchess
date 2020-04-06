@@ -1,8 +1,14 @@
 import {KING, ROOK} from '../PieceType';
 
 export default class Move {
-  constructor(from, to, from2, to2) {
+  constructor(from, to, from2, to2, promotionTo, enPassantCapture) {
     this.castling = false;
+    this.from2 = null;
+    this.to2 = null;
+    this.promotion = false;
+    this.promotionTo = null;
+    this.enPassantCapture = null;
+
     if (from.constructor.name !== 'Square') {
       throw new Error(
         `Illegal argument for from: ${from.constructor.name}: ${from}`,
@@ -15,7 +21,6 @@ export default class Move {
     this.to = to;
 
     if (from2 && to2) {
-      this.castling = true;
       if (from2.constructor.name !== 'Square') {
         throw new Error(
           `Illegal argument for from2: ${from2.constructor.name}: ${from2}`,
@@ -40,9 +45,28 @@ export default class Move {
           }`,
         );
       }
-
+      this.castling = true;
       this.from2 = from2;
       this.to2 = to2;
+    }
+
+    if (promotionTo) {
+      if (promotionTo.constructor.name !== 'PieceType') {
+        throw new Error(
+          `Illegal argument for promotionTo: ${promotionTo.constructor.name}: ${promotionTo}`,
+        );
+      }
+      this.promotion = true;
+      this.promotionTo = promotionTo;
+    }
+
+    if (enPassantCapture) {
+      if (enPassantCapture.constructor.name !== 'Square') {
+        throw new Error(
+          `Illegal argument for enPassantCapture: ${enPassantCapture.constructor.name}: ${enPassantCapture}`,
+        );
+      }
+      this.enPassantCapture = enPassantCapture;
     }
   }
 }

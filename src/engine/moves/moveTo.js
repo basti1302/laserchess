@@ -1,3 +1,4 @@
+import {LASER, QUEEN, ROOK, KNIGHT, BISHOP} from '../PieceType';
 import Move from './Move';
 
 export default function moveTo(
@@ -5,7 +6,8 @@ export default function moveTo(
   moves,
   from,
   to,
-  straightPawnMove = false,
+  captureMode = CAPTURE_MODE_CAN,
+  isPawnPromotion = false,
 ) {
   if (board.constructor.name !== 'Board') {
     throw new Error(
@@ -33,12 +35,42 @@ export default function moveTo(
   if (!movingPiece) {
     return false;
   }
+
   if (
-    !to.hasPiece() ||
-    (!straightPawnMove && from.getPiece().player !== to.getPiece().player)
+    captureMode === CAPTURE_MODE_MUST &&
+    (!to.hasPiece() || from.getPiece().player === to.getPiece().player)
   ) {
-    moves.push(new Move(from, to));
-    return true;
+    return false;
   }
-  return false;
+  if (captureMode === CAPTURE_MODE_MUST_NOT && to.hasPiece()) {
+    return false;
+  }
+  if (
+    captureMode === CAPTURE_MODE_CAN &&
+    to.hasPiece() &&
+    from.getPiece().player === to.getPiece().player
+  ) {
+    return false;
+  }
+
+  if (isPawnPromotion) {
+    moves.push(new Move(from, to, null, null, LASER));
+    moves.push(new Move(from, to, null, null, QUEEN));
+    moves.push(new Move(from, to, null, null, ROOK));
+    moves.push(new Move(from, to, null, null, KNIGHT));
+    moves.push(new Move(from, to, null, null, BISHOP));
+  } else {
+    moves.push(new Move(from, to));
+  }
+  return true;
 }
+
+export class CaptureMode {
+  constructor(label) {
+    this.label = label;
+  }
+}
+
+export const CAPTURE_MODE_CAN = new CaptureMode('can capture');
+export const CAPTURE_MODE_MUST = new CaptureMode('must capture');
+export const CAPTURE_MODE_MUST_NOT = new CaptureMode('must not capture');

@@ -6,6 +6,9 @@ import RenderBoard from './render/Board';
 function doSetup(ctx) {
   const board = new EngineBoard('0', '1');
   board.setup();
+  // board.testSetupCastling();
+  // board.testSetupPromotion();
+  // board.testSetupEnPassant();
   return {
     board,
   };
@@ -30,6 +33,7 @@ function selectPiece(G, ctx, rank, file) {
   }
 
   G.possibleMoves = [];
+  G.possiblePromotions = [];
   square.getPiece().possibleMovesIgnoringCheck(G.board, G.possibleMoves);
 
   if (!G.possibleMoves || G.possibleMoves.length === 0) {
@@ -71,13 +75,21 @@ function moveSelectedPiece(G, ctx, rank, file) {
     return;
   }
 
-  let move = G.possibleMoves.find(
+  let move;
+  const moves = G.possibleMoves.filter(
     (possibleMove) => possibleMove.to === targetSquare,
   );
-
-  if (!move) {
+  if (moves.length === 0) {
     console.log('illegal move');
     return;
+  } else if (moves.length === 1) {
+    move = moves[0];
+  } else if (moves.length > 1 && moves[0].promotion) {
+    G.possiblePromotions = moves;
+    ctx.events.setStage('promotionStage');
+    return;
+  } else if (moves.length > 1) {
+    throw new Error(`Ambigious moves that are not promotions ${moves}`);
   }
 
   if (targetPiece) {
@@ -86,12 +98,17 @@ function moveSelectedPiece(G, ctx, rank, file) {
 
   G.board.applyMove(move);
   G.possibleMoves = [];
+  G.possiblePromotions = [];
   G.board.deselectAll();
   ctx.events.endTurn();
 }
 
-function deselectPiece(G, ctx) {
-  console.log('deselectPiece');
+function applyPromotionMove(G, ctx, promotionMove) {
+  G.board.applyPromotionMove(promotionMove);
+  G.possibleMoves = [];
+  G.possiblePromotions = [];
+  G.board.deselectAll();
+  ctx.events.endTurn();
 }
 
 const LaserChess = {
@@ -100,7 +117,7 @@ const LaserChess = {
   moves: {
     selectPiece,
     moveSelectedPiece,
-    deselectPiece,
+    applyPromotionMove,
   },
 
   turn: {
@@ -118,7 +135,11 @@ const LaserChess = {
       movePieceStage: {
         moves: {
           moveSelectedPiece,
-          deselectPiece,
+        },
+      },
+      promotionStage: {
+        moves: {
+          applyPromotionMove,
         },
       },
     },

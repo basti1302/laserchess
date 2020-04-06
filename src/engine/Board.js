@@ -32,6 +32,14 @@ export default class Board {
     return this.squares[index(rank, file)];
   }
 
+  getPiece(rank, file) {
+    const square = this.getSquare(rank, file);
+    if (!square) {
+      return null;
+    }
+    return square.getPiece();
+  }
+
   setPiece(rank, file, piece) {
     if (file <= 0 || rank <= 0 || file > files || rank > ranks) {
       return;
@@ -59,21 +67,63 @@ export default class Board {
     this.setPiece(1, 'h', new Piece(PLAYER_WHITE, KNIGHT));
     this.setPiece(1, 'i', new Piece(PLAYER_WHITE, ROOK));
 
-    this.setPiece(9, 'a', new Piece(PLAYER_BLACK, ROOK));
-    this.setPiece(9, 'b', new Piece(PLAYER_BLACK, KNIGHT));
-    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, BISHOP));
-    this.setPiece(9, 'd', new Piece(PLAYER_BLACK, QUEEN));
-    this.setPiece(9, 'e', new Piece(PLAYER_BLACK, KING));
-    this.setPiece(9, 'f', new Piece(PLAYER_BLACK, LASER));
-    this.setPiece(9, 'g', new Piece(PLAYER_BLACK, BISHOP));
-    this.setPiece(9, 'h', new Piece(PLAYER_BLACK, KNIGHT));
-    this.setPiece(9, 'i', new Piece(PLAYER_BLACK, ROOK));
+    this.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
+    this.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
+    this.setPiece(ranks, 'c', new Piece(PLAYER_BLACK, BISHOP));
+    this.setPiece(ranks, 'd', new Piece(PLAYER_BLACK, QUEEN));
+    this.setPiece(ranks, 'e', new Piece(PLAYER_BLACK, KING));
+    this.setPiece(ranks, 'f', new Piece(PLAYER_BLACK, LASER));
+    this.setPiece(ranks, 'g', new Piece(PLAYER_BLACK, BISHOP));
+    this.setPiece(ranks, 'h', new Piece(PLAYER_BLACK, KNIGHT));
+    this.setPiece(ranks, 'i', new Piece(PLAYER_BLACK, ROOK));
 
     for (let file = 1; file <= files; file++) {
       const whitePawn = new Piece(PLAYER_WHITE, PAWN);
       this.setPiece(2, file, whitePawn);
       const blackPawn = new Piece(PLAYER_BLACK, PAWN);
       this.setPiece(ranks - 1, file, blackPawn);
+    }
+  }
+
+  testSetupCastling() {
+    this.setPiece(1, 'a', new Piece(PLAYER_WHITE, ROOK));
+    this.setPiece(2, 'e', new Piece(PLAYER_WHITE, LASER));
+    this.setPiece(1, 'e', new Piece(PLAYER_WHITE, KING));
+    this.setPiece(1, 'i', new Piece(PLAYER_WHITE, ROOK));
+
+    this.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
+    this.setPiece(ranks, 'e', new Piece(PLAYER_BLACK, KING));
+    this.setPiece(ranks - 1, 'e', new Piece(PLAYER_BLACK, LASER));
+    this.setPiece(ranks, 'i', new Piece(PLAYER_BLACK, ROOK));
+  }
+
+  testSetupPromotion() {
+    this.setPiece(1, 'b', new Piece(PLAYER_WHITE, KNIGHT));
+    this.setPiece(1, 'h', new Piece(PLAYER_WHITE, KNIGHT));
+    this.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
+    this.setPiece(ranks, 'h', new Piece(PLAYER_BLACK, KNIGHT));
+    this.setPiece(5, 'a', new Piece(PLAYER_WHITE, KING));
+    this.setPiece(5, files, new Piece(PLAYER_BLACK, KING));
+    for (let file = 1; file <= files; file++) {
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      this.setPiece(ranks - 1, file, whitePawn);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      this.setPiece(2, file, blackPawn);
+    }
+  }
+
+  testSetupEnPassant() {
+    for (let file = 2; file <= files; file = file + 2) {
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      this.setPiece(2, file, whitePawn);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      this.setPiece(ranks - 1, file, blackPawn);
+    }
+    for (let file = 1; file <= files; file = file + 2) {
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      this.setPiece(ranks - 3, file, whitePawn);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      this.setPiece(4, file, blackPawn);
     }
   }
 
@@ -115,7 +165,13 @@ export default class Board {
     }
     movingPiece.hasMoved = true;
     move.from.removePiece();
-    const captured = move.to.removePiece();
+
+    let captured;
+    if (move.enPassantCapture) {
+      captured = move.enPassantCapture.removePiece();
+    } else {
+      captured = move.to.removePiece();
+    }
     move.to.setPiece(movingPiece);
     const historyEntry = {
       player: movingPiece.player,
@@ -137,6 +193,26 @@ export default class Board {
       historyEntry.to2 = move.to2;
       historyEntry.type2 = castlingRook.type;
     }
+    this.moveHistory.push(historyEntry);
+  }
+
+  applyPromotionMove(promotionMove) {
+    const promotingPiece = promotionMove.from.getPiece();
+    if (!promotingPiece) {
+      throw new Error(`No piece to move/promote at ${promotionMove.from}.`);
+    }
+    promotionMove.from.removePiece();
+    const player = promotingPiece.player;
+    const promotedPiece = new Piece(player, promotionMove.promotionTo);
+    const captured = promotionMove.to.removePiece();
+    promotionMove.to.setPiece(promotedPiece);
+    const historyEntry = {
+      player: player,
+      from: promotionMove.from.asPosition(),
+      to: promotionMove.to.asPosition(),
+      type: promotingPiece.type,
+      captured,
+    };
     this.moveHistory.push(historyEntry);
   }
 
@@ -178,6 +254,13 @@ export default class Board {
       this.whiteQueenSideRookHome,
       this.blackQueenSideRookHome,
     );
+  }
+
+  getLastMove() {
+    if (this.moveHistory.length === 0) {
+      return null;
+    }
+    return this.moveHistory[this.moveHistory.length - 1];
   }
 
   findFirstSquare(fn) {

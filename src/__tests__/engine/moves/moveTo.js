@@ -3,7 +3,10 @@ import Piece from '../../../engine/Piece';
 import {LASER, PAWN} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 
-import moveTo from '../../../engine/moves/moveTo';
+import moveTo, {
+  CAPTURE_MODE_MUST,
+  CAPTURE_MODE_MUST_NOT,
+} from '../../../engine/moves/moveTo';
 
 describe('moveTo util', () => {
   let board;
@@ -66,12 +69,12 @@ describe('moveTo util', () => {
     expect(moves[0].to).toBe(to);
   });
 
-  test('pawn should not capture', () => {
+  test('pawn should not capture straight', () => {
     const from = board.getSquare(2, 'a');
     const to = board.getSquare(3, 'a');
     from.setPiece(new Piece(PLAYER_WHITE, PAWN));
     to.setPiece(new Piece(PLAYER_BLACK, LASER));
-    moveTo(board, moves, from, to, true);
+    moveTo(board, moves, from, to, CAPTURE_MODE_MUST_NOT);
     expect(moves.length).toEqual(0);
   });
 });
