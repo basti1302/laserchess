@@ -37,7 +37,7 @@ export default class Board extends React.Component {
       );
     }
 
-    let promotionBar = null;
+    let promotionControls = null;
     if (
       this.props.G.possiblePromotions &&
       this.props.G.possiblePromotions.length > 0
@@ -59,15 +59,29 @@ export default class Board extends React.Component {
           </li>
         ),
       );
-      promotionBar = <ul>{promotionPieces}</ul>;
+      promotionControls = <ul>{promotionPieces}</ul>;
     }
+
+    const rotateControls = this.props.ctx.activePlayers[
+      this.props.ctx.currentPlayer
+    ] === 'movePieceStage' && (
+      <ul>
+        <li>
+          <button onClick={() => this.props.moves.rotatePieceLeft()}>⟲</button>
+        </li>
+        <li>
+          <button onClick={() => this.props.moves.rotatePieceRight()}>⟳</button>
+        </li>
+      </ul>
+    );
 
     return (
       <div className={styles['board-outer']}>
         <table id="board" className={styles['board-table']}>
           <tbody>{tbody}</tbody>
         </table>
-        {promotionBar}
+        {promotionControls}
+        {rotateControls}
       </div>
     );
   }

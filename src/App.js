@@ -33,19 +33,48 @@ function selectPiece(G, ctx, rank, file) {
   }
 
   G.possibleMoves = [];
-  G.possiblePromotions = [];
   square.getPiece().possibleMoves(G.board, G.possibleMoves);
-
-  if (!G.possibleMoves || G.possibleMoves.length === 0) {
-    console.log('this piece cannot move');
-    return;
-  }
+  G.possiblePromotions = [];
 
   G.board.deselectAll();
   square.selected = true;
   if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
     ctx.events.endStage();
   }
+}
+
+function rotatePieceLeft(G, ctx) {
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return;
+  }
+  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
+    console.warn('Player has already rotated a different piece.', sourceSquare);
+    return;
+  }
+  sourceSquare.getPiece().rotateLeft();
+  G.rotationPiece = sourceSquare.getPiece();
+}
+
+function rotatePieceRight(G, ctx) {
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return;
+  }
+  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
+    console.warn('Player has already rotated a different piece.', sourceSquare);
+    return;
+  }
+  sourceSquare.getPiece().rotateRight();
+  G.rotationPiece = sourceSquare.getPiece();
 }
 
 function moveSelectedPiece(G, ctx, rank, file) {
@@ -87,6 +116,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
   } else if (moves.length > 1 && moves[0].promotion) {
     G.possiblePromotions = moves;
     ctx.events.setStage('promotionStage');
+    G.rotationPiece = null;
     return;
   } else if (moves.length > 1) {
     throw new Error(`Ambigious moves that are not promotions ${moves}`);
@@ -100,6 +130,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
   G.possibleMoves = [];
   G.possiblePromotions = [];
   G.board.deselectAll();
+  G.rotationPiece = null;
   ctx.events.endTurn();
 }
 
@@ -116,6 +147,8 @@ const LaserChess = {
 
   moves: {
     selectPiece,
+    rotatePieceRight,
+    rotatePieceLeft,
     moveSelectedPiece,
     applyPromotionMove,
   },
@@ -134,6 +167,8 @@ const LaserChess = {
       },
       movePieceStage: {
         moves: {
+          rotatePieceRight,
+          rotatePieceLeft,
           moveSelectedPiece,
         },
       },
