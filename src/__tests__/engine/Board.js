@@ -666,4 +666,154 @@ describe('Board', () => {
       expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(true);
     });
   });
+
+  describe('clone and simulate', () => {
+    beforeEach(() => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, ROOK));
+      board.setPiece(1, 'b', new Piece(PLAYER_WHITE, KNIGHT));
+      board.setPiece(1, 'c', new Piece(PLAYER_WHITE, BISHOP));
+      board.setPiece(2, 'a', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN));
+
+      board.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
+      board.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
+      board.setPiece(ranks, 'c', new Piece(PLAYER_BLACK, BISHOP));
+      board.setPiece(ranks - 1, 'a', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(ranks - 1, 'b', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN));
+    });
+
+    test('should clone the board including squares and pieces', () => {
+      const clonedBoard = board.clone();
+      checkBoard(clonedBoard);
+    });
+
+    test('modification of clone the board should not modify the original', () => {
+      const clonedBoard = board.clone();
+      checkBoard(board);
+      checkBoard(clonedBoard);
+    });
+
+    test('modification of cloned board should not modify the original', () => {
+      const clonedBoard = board.clone();
+      clonedBoard.applyMove(
+        new Move(clonedBoard.getSquare(1, 'b'), clonedBoard.getSquare(3, 'c')),
+      );
+      clonedBoard.applyMove(
+        new Move(
+          clonedBoard.getSquare(ranks, 'c'),
+          clonedBoard.getSquare(ranks - 3, 'f'),
+        ),
+      );
+      clonedBoard.applyMove(
+        new Move(clonedBoard.getSquare(2, 'a'), clonedBoard.getSquare(3, 'a')),
+      );
+      clonedBoard.applyMove(
+        new Move(
+          clonedBoard.getSquare(ranks - 1, 'b'),
+          clonedBoard.getSquare(ranks - 3, 'b'),
+        ),
+      );
+
+      // verify that the original is not modified by the moves
+      checkBoard(board);
+
+      // verify that the moves have been applied on the clone
+      expect(clonedBoard.getPiece(1, 'b')).toBeNull();
+      checkPiece(clonedBoard, 3, 'c', PLAYER_WHITE, KNIGHT);
+      expect(clonedBoard.getPiece(ranks, 'c')).toBeNull();
+      checkPiece(clonedBoard, ranks - 3, 'f', PLAYER_BLACK, BISHOP);
+      expect(clonedBoard.getPiece(2, 'a')).toBeNull();
+      checkPiece(clonedBoard, 3, 'a', PLAYER_WHITE, PAWN);
+      expect(clonedBoard.getPiece(ranks - 1, 'b')).toBeNull();
+      checkPiece(clonedBoard, ranks - 3, 'b', PLAYER_BLACK, PAWN);
+    });
+
+    test('simulating a move should not modify the original', () => {
+      const simulationResult = board.simulateMove(
+        new Move(board.getSquare(1, 'b'), board.getSquare(3, 'c')),
+      );
+
+      // verify that the original is not modified by the moves
+      checkBoard(board);
+
+      // verify that the moves have been applied on the clone
+      expect(simulationResult.getPiece(1, 'b')).toBeNull();
+      checkPiece(simulationResult, 3, 'c', PLAYER_WHITE, KNIGHT);
+    });
+
+    function checkBoard(theBoard) {
+      checkPiece(theBoard, 1, 'a', PLAYER_WHITE, ROOK);
+      checkPiece(theBoard, 1, 'b', PLAYER_WHITE, KNIGHT);
+      checkPiece(theBoard, 1, 'c', PLAYER_WHITE, BISHOP);
+      checkPiece(theBoard, 2, 'a', PLAYER_WHITE, PAWN);
+      checkPiece(theBoard, 2, 'b', PLAYER_WHITE, PAWN);
+      checkPiece(theBoard, 2, 'c', PLAYER_WHITE, PAWN);
+      checkPiece(theBoard, ranks, 'a', PLAYER_BLACK, ROOK);
+      checkPiece(theBoard, ranks, 'b', PLAYER_BLACK, KNIGHT);
+      checkPiece(theBoard, ranks, 'c', PLAYER_BLACK, BISHOP);
+      checkPiece(theBoard, ranks - 1, 'a', PLAYER_BLACK, PAWN);
+      checkPiece(theBoard, ranks - 1, 'b', PLAYER_BLACK, PAWN);
+      checkPiece(theBoard, ranks - 1, 'c', PLAYER_BLACK, PAWN);
+    }
+
+    function checkPiece(theBoard, rank, file, player, type) {
+      expect(theBoard.getPiece(rank, file).player).toBe(player);
+      expect(theBoard.getPiece(rank, file).type).toBe(type);
+    }
+  });
+
+  describe('prune moves leading to check', () => {
+    test('should prune moves', () => {
+      const kingsHome = board.getSquare(ranks, 'e');
+      board.setPiece(
+        kingsHome.rank,
+        kingsHome.file,
+        new Piece(PLAYER_BLACK, KING),
+      );
+      const pawn1Home = board.getSquare(ranks - 1, 'a');
+      board.setPiece(
+        pawn1Home.rank,
+        pawn1Home.file,
+        new Piece(PLAYER_BLACK, PAWN),
+      );
+      const pawn2Home = board.getSquare(ranks - 1, 'f');
+      board.setPiece(
+        pawn2Home.rank,
+        pawn2Home.file,
+        new Piece(PLAYER_BLACK, PAWN),
+      );
+
+      board.setPiece(ranks - 4, 'i', new Piece(PLAYER_WHITE, QUEEN));
+      board.setPiece(ranks - 4, 'd', new Piece(PLAYER_WHITE, ROOK));
+
+      const moves = [
+        // okay
+        new Move(kingsHome, board.getSquare(ranks, 'f')),
+        // check by rook
+        new Move(kingsHome, board.getSquare(ranks - 1, 'd')),
+        // okay
+        new Move(kingsHome, board.getSquare(ranks - 1, 'e')),
+        // check by rook
+        new Move(kingsHome, board.getSquare(ranks, 'd')),
+        // okay
+        new Move(pawn1Home, board.getSquare(ranks - 2, 'a')),
+        // check by queen
+        new Move(pawn2Home, board.getSquare(ranks - 2, 'f')),
+        // check by queen
+        new Move(pawn2Home, board.getSquare(ranks - 3, 'f')),
+        // okay
+        new Move(pawn1Home, board.getSquare(ranks - 3, 'a')),
+      ];
+
+      board.pruneMovesThatLeadToCheckFor(moves, PLAYER_BLACK);
+
+      expect(moves.length).toBe(4);
+      checkMove(moves[0], kingsHome, ranks, 'f');
+      checkMove(moves[1], kingsHome, ranks - 1, 'e');
+      checkMove(moves[2], pawn1Home, ranks - 2, 'a');
+      checkMove(moves[3], pawn1Home, ranks - 3, 'a');
+    });
+  });
 });

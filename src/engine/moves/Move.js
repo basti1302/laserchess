@@ -69,4 +69,41 @@ export default class Move {
       this.enPassantCapture = enPassantCapture;
     }
   }
+
+  transferToClonedBoard(clonedBoard) {
+    const moveForClonedBoard = Object.assign(
+      Object.create(Move.prototype),
+      this,
+    );
+    moveForClonedBoard.from = clonedBoard.getSquare(
+      moveForClonedBoard.from.rank,
+      moveForClonedBoard.from.file,
+    );
+    moveForClonedBoard.to = clonedBoard.getSquare(this.to.rank, this.to.file);
+    if (moveForClonedBoard.from2) {
+      moveForClonedBoard.from2 = clonedBoard.getSquare(
+        moveForClonedBoard.from2.rank,
+        moveForClonedBoard.from2.file,
+      );
+    }
+    if (moveForClonedBoard.to2) {
+      moveForClonedBoard.to2 = clonedBoard.getSquare(
+        moveForClonedBoard.from2.rank,
+        moveForClonedBoard.from2.file,
+      );
+    }
+    if (moveForClonedBoard.promotionTo) {
+      moveForClonedBoard.promotionTo = clonedBoard.getSquare(
+        moveForClonedBoard.promotionTo.rank,
+        moveForClonedBoard.promotionTo.file,
+      );
+    }
+    if (moveForClonedBoard.enPassantCapture) {
+      moveForClonedBoard.enPassantCapture = clonedBoard.getSquare(
+        moveForClonedBoard.enPassantCapture.rank,
+        moveForClonedBoard.enPassantCapture.file,
+      );
+    }
+    return moveForClonedBoard;
+  }
 }

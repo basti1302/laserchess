@@ -34,7 +34,7 @@ function selectPiece(G, ctx, rank, file) {
 
   G.possibleMoves = [];
   G.possiblePromotions = [];
-  square.getPiece().possibleMovesIgnoringCheck(G.board, G.possibleMoves);
+  square.getPiece().possibleMoves(G.board, G.possibleMoves);
 
   if (!G.possibleMoves || G.possibleMoves.length === 0) {
     console.log('this piece cannot move');

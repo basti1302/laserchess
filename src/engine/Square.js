@@ -39,4 +39,12 @@ export default class Square {
   getFileAsLetter() {
     return String.fromCharCode(this.file + 96); // 97 = 'a'
   }
+
+  clone() {
+    const clonedSquare = new Square(this.rank, this.file);
+    if (this.hasPiece()) {
+      clonedSquare.piece = this.piece.clone();
+    }
+    return clonedSquare;
+  }
 }

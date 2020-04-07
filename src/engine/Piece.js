@@ -45,4 +45,17 @@ export default class Piece {
   possibleMovesIgnoringCheck(board, moves, ignoreCastling = false) {
     this.type.possibleMoves(board, moves, this, ignoreCastling);
   }
+
+  possibleMoves(board, moves) {
+    this.possibleMovesIgnoringCheck(board, moves);
+    board.pruneMovesThatLeadToCheckFor(moves, this.player);
+  }
+
+  clone() {
+    const clonedPiece = new Piece(this.player, this.type);
+    clonedPiece.rank = this.rank;
+    clonedPiece.file = this.file;
+    clonedPiece.hasMoved = this.hasMoved;
+    return clonedPiece;
+  }
 }

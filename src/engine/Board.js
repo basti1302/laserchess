@@ -147,6 +147,28 @@ export default class Board {
     return moves;
   }
 
+  pruneMovesThatLeadToCheckFor(moves, player) {
+    for (let i = 0; i < moves.length; i++) {
+      const move = moves[i];
+      const resultingBoard = this.simulateMove(move);
+
+      const kingsSquare = resultingBoard.findFirstSquare(
+        (square) =>
+          square.hasPiece() &&
+          square.getPiece().type === KING &&
+          square.getPiece().player === player,
+      );
+      if (!kingsSquare) {
+        console.warn(`Couldn't find king for player ${player}.`);
+        return;
+      }
+
+      if (resultingBoard.isAttackedBy(kingsSquare, player.enemy())) {
+        moves.splice(i--, 1); // need to adjust i after splicing, thus i--
+      }
+    }
+  }
+
   isAttackedBy(square, player) {
     return this.isAttackedByMoves(
       square,
@@ -211,9 +233,34 @@ export default class Board {
       from: promotionMove.from.asPosition(),
       to: promotionMove.to.asPosition(),
       type: promotingPiece.type,
+      // TODO capture promotion in history, test
       captured,
     };
     this.moveHistory.push(historyEntry);
+  }
+
+  simulateMove(move) {
+    const clonedBoard = this.clone();
+    const moveForClonedBoard = move.transferToClonedBoard(clonedBoard);
+    clonedBoard.applyMove(moveForClonedBoard);
+    return clonedBoard;
+  }
+
+  clone() {
+    const clonedBoard = Object.create(Board.prototype);
+    clonedBoard.squares = this.squares.map((s) => s.clone());
+    // Deliberately not cloning the move history, it is not needed for
+    // simulating moves.
+    clonedBoard.moveHistory = [];
+    [
+      'whiteKingHome',
+      'whiteKingSideRookHome',
+      'whiteQueenSideRookHome',
+      'blackKingHome',
+      'blackKingSideRookHome',
+      'blackQueenSideRookHome',
+    ].forEach((attrib) => (clonedBoard[attrib] = this[attrib]));
+    return clonedBoard;
   }
 
   hasKingMoved(player) {
