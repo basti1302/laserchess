@@ -1,5 +1,7 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
+import {LASER} from './PieceType';
 import {NORTH, SOUTH} from './Orientation';
+import fireLaser from './laser/fireLaser';
 
 export default class Piece {
   constructor(player, type, orientation) {
@@ -79,10 +81,18 @@ export default class Piece {
     this.orientation = this.orientation.rotateRight();
   }
 
+  fire(board) {
+    if (this.type !== LASER) {
+      throw new Error(`Only lasers can fire, this is a ${this.type}.`);
+    }
+    return fireLaser(board, this.getSquare(board), this.orientation);
+  }
+
   clone() {
     const clonedPiece = new Piece(this.player, this.type);
     clonedPiece.rank = this.rank;
     clonedPiece.file = this.file;
+    clonedPiece.orientation = this.orientation;
     clonedPiece.hasMoved = this.hasMoved;
     return clonedPiece;
   }

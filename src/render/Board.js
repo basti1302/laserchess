@@ -13,6 +13,27 @@ export default class Board extends React.Component {
   }
 
   render() {
+    const currentPlayer = this.props.ctx.currentPlayer;
+    if (!currentPlayer) {
+      throw new Error('No current player.');
+    }
+    const stage = this.props.ctx.activePlayers[currentPlayer];
+    if (!stage) {
+      throw new Error(`No active stage for player ${currentPlayer}.`);
+    }
+
+    if (stage === 'renderShotStage') {
+      setTimeout(() => {
+        // TODO This emits an error:
+        // "ERROR: disallowed move: endRenderShotStage"
+        // because apparently everything happening in a setTimout callback
+        // happens outside of the proper context. This needs a bit more
+        // investigation. Maybe rendering the laser shot should not be a stage
+        // in the first place.
+        this.props.moves.endRenderShotStage();
+      }, 2000);
+    }
+
     const board = this.props.G.board;
     let tbody = [];
     for (let rank = ranks; rank > 0; rank--) {
@@ -23,6 +44,7 @@ export default class Board extends React.Component {
           <Square
             G={this.props.G}
             ctx={this.props.ctx}
+            stage={stage}
             moves={this.props.moves}
             events={this.props.events}
             square={board.getSquare(rank, file)}
@@ -62,6 +84,13 @@ export default class Board extends React.Component {
       promotionControls = <ul>{promotionPieces}</ul>;
     }
 
+    const fireButton = (
+      <ul>
+        <li>
+          <button onClick={() => this.props.moves.fireLaser()}>🔫</button>
+        </li>
+      </ul>
+    );
     const rotateControls = this.props.ctx.activePlayers[
       this.props.ctx.currentPlayer
     ] === 'movePieceStage' && (
@@ -81,6 +110,7 @@ export default class Board extends React.Component {
           <tbody>{tbody}</tbody>
         </table>
         {promotionControls}
+        {fireButton}
         {rotateControls}
       </div>
     );

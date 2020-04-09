@@ -1,14 +1,17 @@
 import {Client} from 'boardgame.io/react';
 
+import {LASER} from './engine/PieceType';
 import EngineBoard from './engine/Board';
 import RenderBoard from './render/Board';
 
 function doSetup(ctx) {
+  console.debug('board setup');
   const board = new EngineBoard('0', '1');
   board.setup();
   // board.testSetupCastling();
   // board.testSetupPromotion();
   // board.testSetupEnPassant();
+  // board.testSetupLaser();
   return {
     board,
   };
@@ -16,7 +19,7 @@ function doSetup(ctx) {
 
 function selectPiece(G, ctx, rank, file) {
   const currentPlayer = ctx.currentPlayer;
-  console.log('selectPiece', rank, file, currentPlayer);
+  console.debug('selectPiece', rank, file, currentPlayer);
   const square = G.board.getSquare(rank, file);
   if (
     !square ||
@@ -44,6 +47,7 @@ function selectPiece(G, ctx, rank, file) {
 }
 
 function rotatePieceLeft(G, ctx) {
+  console.debug('rotate selected piece left');
   const sourceSquare = G.board.getSelectedSquare();
   if (!sourceSquare || !sourceSquare.getPiece()) {
     console.warn(
@@ -61,6 +65,7 @@ function rotatePieceLeft(G, ctx) {
 }
 
 function rotatePieceRight(G, ctx) {
+  console.debug('rotate selected piece right');
   const sourceSquare = G.board.getSelectedSquare();
   if (!sourceSquare || !sourceSquare.getPiece()) {
     console.warn(
@@ -78,7 +83,7 @@ function rotatePieceRight(G, ctx) {
 }
 
 function moveSelectedPiece(G, ctx, rank, file) {
-  console.log('movePiece', rank, file);
+  console.debug('move selected piece', rank, file);
   const sourceSquare = G.board.getSelectedSquare();
   if (!sourceSquare || !sourceSquare.getPiece()) {
     console.warn(
@@ -94,7 +99,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
   }
   const targetPiece = targetSquare.getPiece();
   if (targetPiece && targetPiece.player.boardIoLabel === ctx.currentPlayer) {
-    console.log('selecting a different piece instead');
+    console.debug('selecting a different piece instead');
     selectPiece(G, ctx, rank, file);
     return;
   }
@@ -109,7 +114,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
     (possibleMove) => possibleMove.to === targetSquare,
   );
   if (moves.length === 0) {
-    console.log('illegal move');
+    console.warn('illegal move');
     return;
   } else if (moves.length === 1) {
     move = moves[0];
@@ -127,18 +132,51 @@ function moveSelectedPiece(G, ctx, rank, file) {
   }
 
   G.board.applyMove(move);
-  G.possibleMoves = [];
-  G.possiblePromotions = [];
-  G.board.deselectAll();
-  G.rotationPiece = null;
-  ctx.events.endTurn();
+  endTurn(G, ctx);
 }
 
 function applyPromotionMove(G, ctx, promotionMove) {
+  console.debug('apply promotion move');
   G.board.applyPromotionMove(promotionMove);
+  endTurn(G, ctx);
+}
+
+function fireLaser(G, ctx) {
+  console.debug('fire laser');
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return;
+  }
+  const laser = sourceSquare.getPiece();
+  if (laser.type !== LASER) {
+    console.warn('Selected piece is not a laser.', sourceSquare);
+    return;
+  }
+  const shot = laser.fire(G.board);
+  G.shot = shot;
   G.possibleMoves = [];
   G.possiblePromotions = [];
   G.board.deselectAll();
+  ctx.events.setStage('renderShotStage');
+}
+
+function endRenderShotStage(G, ctx) {
+  console.debug('end render shot stage');
+  G.board.applyShot(G.shot);
+  endTurn(G, ctx);
+}
+
+function endTurn(G, ctx) {
+  console.debug('end turn');
+  G.possibleMoves = [];
+  G.possiblePromotions = [];
+  G.board.deselectAll();
+  G.shot = null;
+  G.rotationPiece = null;
   ctx.events.endTurn();
 }
 
@@ -151,6 +189,7 @@ const LaserChess = {
     rotatePieceLeft,
     moveSelectedPiece,
     applyPromotionMove,
+    fireLaser,
   },
 
   turn: {
@@ -169,12 +208,18 @@ const LaserChess = {
         moves: {
           rotatePieceRight,
           rotatePieceLeft,
+          fireLaser,
           moveSelectedPiece,
         },
       },
       promotionStage: {
         moves: {
           applyPromotionMove,
+        },
+      },
+      renderShotStage: {
+        moves: {
+          endRenderShotStage,
         },
       },
     },

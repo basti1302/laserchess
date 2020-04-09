@@ -1,5 +1,22 @@
 .piece {
   display: inline-block;
+  transform: scale(1.5);
+}
+
+.facing-north {
+  transform: rotate(0deg) scale(1.5);
+}
+
+.facing-east {
+  transform: rotate(90deg) scale(1.5);
+}
+
+.facing-south {
+  transform: rotate(180deg) scale(1.5);
+}
+
+.facing-west {
+  transform: rotate(270deg) scale(1.5);
 }
 
 .pawn-white:before {
@@ -56,20 +73,4 @@
 
 .laser-black:before {
   content: '🔫';
-}
-
-.facing-north {
-  transform: rotate(0deg);
-}
-
-.facing-east {
-  transform: rotate(90deg);
-}
-
-.facing-south {
-  transform: rotate(180deg);
-}
-
-.facing-west {
-  transform: rotate(270deg);
 }

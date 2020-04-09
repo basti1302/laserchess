@@ -1,4 +1,5 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
+import {NORTH, EAST, SOUTH, WEST} from './Orientation';
 import {PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING, LASER} from './PieceType';
 import Piece from './Piece';
 import Square from './Square';
@@ -127,6 +128,28 @@ export default class Board {
     }
   }
 
+  testSetupLaser() {
+    this.setPiece(1, 'c', new Piece(PLAYER_WHITE, LASER, NORTH));
+    this.setPiece(7, 'b', new Piece(PLAYER_WHITE, LASER, EAST));
+    this.setPiece(6, 'g', new Piece(PLAYER_WHITE, LASER, SOUTH));
+    this.setPiece(3, 'h', new Piece(PLAYER_WHITE, LASER, WEST));
+
+    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, PAWN, NORTH));
+    this.setPiece(7, 'h', new Piece(PLAYER_BLACK, PAWN, EAST));
+    this.setPiece(2, 'g', new Piece(PLAYER_BLACK, PAWN, SOUTH));
+    this.setPiece(3, 'b', new Piece(PLAYER_BLACK, PAWN, WEST));
+
+    this.setPiece(1, 'f', new Piece(PLAYER_BLACK, LASER, NORTH));
+    this.setPiece(5, 'a', new Piece(PLAYER_BLACK, LASER, EAST));
+    this.setPiece(9, 'd', new Piece(PLAYER_BLACK, LASER, SOUTH));
+    this.setPiece(4, 'i', new Piece(PLAYER_BLACK, LASER, WEST));
+
+    this.setPiece(9, 'f', new Piece(PLAYER_WHITE, PAWN, NORTH));
+    this.setPiece(5, 'i', new Piece(PLAYER_WHITE, PAWN, EAST));
+    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, PAWN, SOUTH));
+    this.setPiece(4, 'a', new Piece(PLAYER_WHITE, PAWN, WEST));
+  }
+
   allMovesIgnoringCheck(player) {
     const moves = [];
     this.forEachPiece((piece) => {
@@ -228,14 +251,45 @@ export default class Board {
     const promotedPiece = new Piece(player, promotionMove.promotionTo);
     const captured = promotionMove.to.removePiece();
     promotionMove.to.setPiece(promotedPiece);
-    const historyEntry = {
+    this.moveHistory.push({
       player: player,
       from: promotionMove.from.asPosition(),
       to: promotionMove.to.asPosition(),
       type: promotingPiece.type,
-      // TODO capture promotion in history, test
+      promotionTo: promotionMove.promotionTo,
       captured,
+    });
+  }
+
+  applyShot(shot) {
+    const firstSegment = shot.segments[0];
+    if (!firstSegment) {
+      throw new Error(`Shot has no segments: ${shot}`);
+    }
+    const shootingFrom = firstSegment.square;
+    if (!shootingFrom) {
+      throw new Error(`First segment of shot has no square: ${shot}`);
+    }
+    const shootingPiece = shootingFrom.getPiece();
+    if (!shootingPiece) {
+      throw new Error(
+        `Square from first segment of shot has no piece on it: ${shot}`,
+      );
+    }
+    const historyEntry = {
+      from: shootingFrom.asPosition(),
+      type: LASER,
+      player: shootingPiece.player,
+      shot: {
+        hit: false,
+      },
     };
+    if (shot && shot.destroyedSquare) {
+      const destroyed = shot.destroyedSquare.removePiece();
+      historyEntry.shot.hit = true;
+      historyEntry.shot.target = shot.destroyedSquare.asPosition();
+      historyEntry.shot.type = destroyed.type;
+    }
     this.moveHistory.push(historyEntry);
   }
 

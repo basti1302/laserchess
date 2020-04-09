@@ -9,11 +9,16 @@ import {
   KING,
   LASER,
 } from '../../engine/PieceType';
+import {NORTH, EAST} from '../../engine/Orientation';
 import Board, {ranks, files} from '../../engine/Board';
-import checkMove from '../../testutil/checkMove';
 import Piece from '../../engine/Piece';
 import Square from '../../engine/Square';
 import Move from '../../engine/moves/Move';
+import Shot from '../../engine/laser/Shot';
+import Segment from '../../engine/laser/Segment';
+import {START, STRAIGHT, DESTROY} from '../../engine/laser/SegmentType';
+
+import checkMove from '../../testutil/checkMove';
 
 describe('Board', () => {
   let board;
@@ -694,6 +699,112 @@ describe('Board', () => {
       board.applyMove(new Move(pos, board.getSquare(ranks - 1, 'a')));
       board.applyMove(new Move(board.getSquare(ranks - 1, 'a'), pos));
       expect(board.hasQueenSideRookMoved(PLAYER_BLACK)).toBe(true);
+    });
+
+    test('should apply a shot that hits nothing', () => {
+      const laserPos = board.getSquare(ranks - 2, 'c');
+      const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
+      board.setPiece(laserPos.rank, laserPos.file, laser);
+      const shot = new Shot([
+        new Segment(laserPos, NORTH, START),
+        new Segment(board.getSquare(ranks - 1, 'c'), NORTH, STRAIGHT),
+        new Segment(board.getSquare(ranks, 'c'), NORTH, STRAIGHT),
+      ]);
+
+      board.applyShot(shot);
+
+      // verify the laser has not moved
+      expect(laserPos.getPiece()).toBe(laser);
+      expect(laser.getPosition().rank).toBe(laserPos.rank);
+      expect(laser.getPosition().file).toBe(laserPos.file);
+      expect(board.moveHistory.length).toBe(1);
+      const historyEntry = board.moveHistory[0];
+      expect(historyEntry.from.rank).toBe(laserPos.rank);
+      expect(historyEntry.from.file).toBe(laserPos.file);
+      expect(historyEntry.to).toBeUndefined();
+      expect(historyEntry.from2).toBeUndefined();
+      expect(historyEntry.to2).toBeUndefined();
+      expect(historyEntry.type).toBe(LASER);
+      expect(historyEntry.player).toBe(PLAYER_WHITE);
+      expect(historyEntry.shot.hit).toBe(false);
+      expect(historyEntry.shot.target).toBeUndefined();
+      expect(historyEntry.shot.type).toBeUndefined();
+    });
+
+    test('should destroy friendly piece when applying a shot', () => {
+      const laserPos = board.getSquare(3, 'c');
+      const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
+      board.setPiece(laserPos.rank, laserPos.file, laser);
+      const pawnPos = board.getSquare(5, 'c');
+      const pawn = new Piece(PLAYER_WHITE, PAWN, NORTH);
+      board.setPiece(pawnPos.rank, pawnPos.file, pawn);
+      const shot = new Shot(
+        [
+          new Segment(laserPos, NORTH, START),
+          new Segment(board.getSquare(6, 'c'), NORTH, START),
+          new Segment(pawnPos, NORTH, DESTROY),
+        ],
+        pawnPos,
+      );
+
+      board.applyShot(shot);
+
+      expect(pawnPos.getPiece()).toBeNull();
+      expect(pawn.getPosition()).toBe(null);
+      // verify the laser has not moved
+      expect(laserPos.getPiece()).toBe(laser);
+      expect(laser.getPosition().rank).toBe(laserPos.rank);
+      expect(laser.getPosition().file).toBe(laserPos.file);
+      expect(board.moveHistory.length).toBe(1);
+      const historyEntry = board.moveHistory[0];
+      expect(historyEntry.from.rank).toBe(laserPos.rank);
+      expect(historyEntry.from.file).toBe(laserPos.file);
+      expect(historyEntry.to).toBeUndefined();
+      expect(historyEntry.from2).toBeUndefined();
+      expect(historyEntry.to2).toBeUndefined();
+      expect(historyEntry.type).toBe(LASER);
+      expect(historyEntry.player).toBe(PLAYER_WHITE);
+      expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
+      expect(historyEntry.shot.target.file).toBe(pawnPos.file);
+      expect(historyEntry.shot.type).toBe(PAWN);
+    });
+
+    test('should destroy enemy piece when applying a shot', () => {
+      const laserPos = board.getSquare(5, 'c');
+      const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+      board.setPiece(laserPos.rank, laserPos.file, laser);
+      const pawnPos = board.getSquare(5, 'e');
+      const pawn = new Piece(PLAYER_BLACK, PAWN, EAST);
+      board.setPiece(pawnPos.rank, pawnPos.file, pawn);
+      const shot = new Shot(
+        [
+          new Segment(laserPos, EAST, START),
+          new Segment(board.getSquare(5, 'd'), EAST, START),
+          new Segment(pawnPos, EAST, DESTROY),
+        ],
+        pawnPos,
+      );
+
+      board.applyShot(shot);
+
+      expect(pawnPos.getPiece()).toBeNull();
+      expect(pawn.getPosition()).toBe(null);
+      // verify the laser has not moved
+      expect(laserPos.getPiece()).toBe(laser);
+      expect(laser.getPosition().rank).toBe(laserPos.rank);
+      expect(laser.getPosition().file).toBe(laserPos.file);
+      expect(board.moveHistory.length).toBe(1);
+      const historyEntry = board.moveHistory[0];
+      expect(historyEntry.from.rank).toBe(laserPos.rank);
+      expect(historyEntry.from.file).toBe(laserPos.file);
+      expect(historyEntry.to).toBeUndefined();
+      expect(historyEntry.from2).toBeUndefined();
+      expect(historyEntry.to2).toBeUndefined();
+      expect(historyEntry.type).toBe(LASER);
+      expect(historyEntry.player).toBe(PLAYER_WHITE);
+      expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
+      expect(historyEntry.shot.target.file).toBe(pawnPos.file);
+      expect(historyEntry.shot.type).toBe(PAWN);
     });
   });
 
