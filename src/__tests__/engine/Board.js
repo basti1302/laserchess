@@ -12,8 +12,8 @@ import {
 import Board, {ranks, files} from '../../engine/Board';
 import checkMove from '../../testutil/checkMove';
 import Piece from '../../engine/Piece';
-import Move from '../../engine/moves/Move';
 import Square from '../../engine/Square';
+import Move from '../../engine/moves/Move';
 
 describe('Board', () => {
   let board;
@@ -442,6 +442,36 @@ describe('Board', () => {
       expect(historyEntry.to2.rank).toBe(whiteKingSideRookDest.rank);
       expect(historyEntry.to2.file).toBe(whiteKingSideRookDest.file);
       expect(historyEntry.type).toBe(KING);
+      expect(historyEntry.player).toBe(PLAYER_WHITE);
+      expect(historyEntry.captured).toBeNull();
+    });
+
+    test('should apply a promotion', () => {
+      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawnPos1 = board.getSquare(ranks - 1, 'e');
+      const pawnPos2 = board.getSquare(ranks, 'e');
+      board.setPiece(pawnPos1.rank, pawnPos1.file, pawn);
+
+      board.applyPromotionMove(new Move(pawnPos1, pawnPos2, null, null, QUEEN));
+
+      expect(pawnPos1.getPiece()).toBeNull();
+      expect(pawnPos2.hasPiece()).toBe(true);
+      expect(pawnPos2.getPiece()).not.toBe(pawn);
+      expect(pawnPos2.getPiece().type).toBe(QUEEN);
+      expect(pawnPos2.getPiece().getPosition().rank).toBe(pawnPos2.rank);
+      expect(pawnPos2.getPiece().getPosition().file).toBe(pawnPos2.file);
+      expect(pawn.getPosition()).toBe(null);
+
+      expect(board.moveHistory.length).toBe(1);
+      const historyEntry = board.moveHistory[0];
+      expect(historyEntry.from.rank).toBe(pawnPos1.rank);
+      expect(historyEntry.from.file).toBe(pawnPos1.file);
+      expect(historyEntry.to.rank).toBe(pawnPos2.rank);
+      expect(historyEntry.to.file).toBe(pawnPos2.file);
+      expect(historyEntry.from2).toBeUndefined();
+      expect(historyEntry.to2).toBeUndefined();
+      expect(historyEntry.type).toBe(PAWN);
+      expect(historyEntry.promotionTo).toBe(QUEEN);
       expect(historyEntry.player).toBe(PLAYER_WHITE);
       expect(historyEntry.captured).toBeNull();
     });
