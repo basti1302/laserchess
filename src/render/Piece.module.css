@@ -27,6 +27,14 @@
   content: '♟';
 }
 
+.pawn-shield-white:before {
+  content: '⊤';
+}
+
+.pawn-shield-black:before {
+  content: '⊤';
+}
+
 .bishop-white:before {
   content: '♗';
 }

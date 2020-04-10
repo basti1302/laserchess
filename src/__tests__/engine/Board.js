@@ -2,6 +2,7 @@ import {WHITE, BLACK} from '../../engine/Color';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../engine/Player';
 import {
   PAWN,
+  PAWN_SHIELD,
   BISHOP,
   KNIGHT,
   ROOK,
@@ -137,11 +138,6 @@ describe('Board', () => {
         }
       }
 
-      for (let file = 1; file <= files; file++) {
-        expect(board.getSquare(2, file).getPiece().type).toEqual(PAWN);
-        expect(board.getSquare(ranks - 1, file).getPiece().type).toEqual(PAWN);
-      }
-
       expect(board.getSquare(1, 'a').getPiece().type).toEqual(ROOK);
       expect(board.getSquare(1, 'b').getPiece().type).toEqual(KNIGHT);
       expect(board.getSquare(1, 'c').getPiece().type).toEqual(BISHOP);
@@ -152,6 +148,16 @@ describe('Board', () => {
       expect(board.getSquare(1, 'h').getPiece().type).toEqual(KNIGHT);
       expect(board.getSquare(1, 'i').getPiece().type).toEqual(ROOK);
 
+      expect(board.getSquare(2, 'a').getPiece().type).toEqual(PAWN_SHIELD);
+      expect(board.getSquare(2, 'b').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'c').getPiece().type).toEqual(PAWN_SHIELD);
+      expect(board.getSquare(2, 'd').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'e').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'f').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'g').getPiece().type).toEqual(PAWN_SHIELD);
+      expect(board.getSquare(2, 'h').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'i').getPiece().type).toEqual(PAWN_SHIELD);
+
       expect(board.getSquare(ranks, 'a').getPiece().type).toEqual(ROOK);
       expect(board.getSquare(ranks, 'b').getPiece().type).toEqual(KNIGHT);
       expect(board.getSquare(ranks, 'c').getPiece().type).toEqual(BISHOP);
@@ -161,6 +167,24 @@ describe('Board', () => {
       expect(board.getSquare(ranks, 'g').getPiece().type).toEqual(BISHOP);
       expect(board.getSquare(ranks, 'h').getPiece().type).toEqual(KNIGHT);
       expect(board.getSquare(ranks, 'i').getPiece().type).toEqual(ROOK);
+
+      expect(board.getSquare(ranks - 1, 'a').getPiece().type).toEqual(
+        PAWN_SHIELD,
+      );
+      expect(board.getSquare(ranks - 1, 'b').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'c').getPiece().type).toEqual(
+        PAWN_SHIELD,
+      );
+      expect(board.getSquare(ranks - 1, 'd').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'e').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'f').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'g').getPiece().type).toEqual(
+        PAWN_SHIELD,
+      );
+      expect(board.getSquare(ranks - 1, 'h').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'i').getPiece().type).toEqual(
+        PAWN_SHIELD,
+      );
 
       // verify empty squares from ranks 3 to rank 7
       for (let rank = 3; rank <= ranks - 2; rank++) {

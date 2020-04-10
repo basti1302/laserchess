@@ -1,5 +1,5 @@
 import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
-import {START, STRAIGHT, DESTROY} from './SegmentType';
+import {START, STRAIGHT, ABSORB, DESTROY} from './SegmentType';
 
 export default class Segment {
   constructor(square, orientation, type) {
@@ -26,7 +26,12 @@ export default class Segment {
         `Illegal argument for type: ${type.constructor.name}: ${type}`,
       );
     }
-    if (type !== START && type !== STRAIGHT && type !== DESTROY) {
+    if (
+      type !== START &&
+      type !== STRAIGHT &&
+      type !== ABSORB &&
+      type !== DESTROY
+    ) {
       throw new Error(`Unknown type: ${type}`);
     }
 

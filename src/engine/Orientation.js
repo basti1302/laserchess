@@ -1,6 +1,7 @@
 export default class Orientation {
-  constructor(label, cssClass) {
+  constructor(label, orientationIndex, cssClass) {
     this.label = label;
+    this.orientationIndex = orientationIndex;
     this.cssClass = cssClass;
   }
 
@@ -33,7 +34,7 @@ export default class Orientation {
   }
 }
 
-export const NORTH = new Orientation('N', 'facing-north');
-export const EAST = new Orientation('E', 'facing-east');
-export const SOUTH = new Orientation('S', 'facing-south');
-export const WEST = new Orientation('W', 'facing-west');
+export const NORTH = new Orientation('N', 0, 'facing-north');
+export const EAST = new Orientation('E', 1, 'facing-east');
+export const SOUTH = new Orientation('S', 2, 'facing-south');
+export const WEST = new Orientation('W', 3, 'facing-west');

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Piece from './Piece';
-import {START, DESTROY} from '../engine/laser/SegmentType';
+import {START, ABSORB, DESTROY} from '../engine/laser/SegmentType';
 
 import styles from './Square.module.css';
 
@@ -55,7 +55,7 @@ export default class Square extends React.Component {
         ];
         if (segment.type === START) {
           shotClasses.push(styles['shot-segment-start']);
-        } else if (segment.type === DESTROY) {
+        } else if (segment.type === DESTROY || segment.type === ABSORB) {
           shotClasses.push(styles['shot-segment-end']);
         }
         renderedShot = <div className={shotClasses.join(' ')} />;

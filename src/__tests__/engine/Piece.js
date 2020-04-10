@@ -1,5 +1,14 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../engine/Player';
-import {ROOK, KING} from '../../engine/PieceType';
+import {
+  KING,
+  LASER,
+  QUEEN,
+  ROOK,
+  KNIGHT,
+  BISHOP,
+  PAWN,
+  PAWN_SHIELD,
+} from '../../engine/PieceType';
 import Board, {ranks, files} from '../../engine/Board';
 import Piece from '../../engine/Piece';
 import checkMove from '../../testutil/checkMove';
@@ -9,6 +18,17 @@ describe('Piece', () => {
 
   beforeEach(() => {
     board = new Board();
+  });
+
+  test('pawn types are pawns', () => {
+    expect(KING.isPawn()).toBe(false);
+    expect(LASER.isPawn()).toBe(false);
+    expect(QUEEN.isPawn()).toBe(false);
+    expect(ROOK.isPawn()).toBe(false);
+    expect(KNIGHT.isPawn()).toBe(false);
+    expect(BISHOP.isPawn()).toBe(false);
+    expect(PAWN.isPawn()).toBe(true);
+    expect(PAWN_SHIELD.isPawn()).toBe(true);
   });
 
   describe('possible moves', () => {

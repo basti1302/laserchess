@@ -1,4 +1,3 @@
-import {PAWN} from '../PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
 import {ranks} from '../Board';
 import moveTo, {CAPTURE_MODE_MUST, CAPTURE_MODE_MUST_NOT} from './moveTo';
@@ -10,7 +9,7 @@ export default function movesPawn(board, moves, pawn) {
       `Illegal argument for piece: ${pawn.constructor.name}: ${pawn}`,
     );
   }
-  if (pawn.type !== PAWN) {
+  if (!pawn.type.isPawn()) {
     throw new Error(`Not a pawn: ${pawn}`);
   }
 

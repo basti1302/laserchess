@@ -6,12 +6,14 @@ import movesBishop from './moves/bishop';
 import movesQueen from './moves/queen';
 import movesKing from './moves/king';
 import movesLaser from './moves/laser';
+import {DEFAULT, SHIELD} from './laser/Surface';
 
 export default class PieceType {
-  constructor(whiteChar, blackChar, possibleMovesFn) {
+  constructor(whiteChar, blackChar, possibleMovesFunction, surfaces) {
     this.whiteChar = whiteChar;
     this.blackChar = blackChar;
-    this.possibleMovesFn = possibleMovesFn;
+    this.possibleMovesFunction = possibleMovesFunction;
+    this.surfaces = surfaces || [DEFAULT, DEFAULT, DEFAULT, DEFAULT];
   }
 
   as(player) {
@@ -33,11 +35,21 @@ export default class PieceType {
   }
 
   possibleMoves(board, moves, piece, ignoreCastling) {
-    this.possibleMovesFn(board, moves, piece, ignoreCastling);
+    this.possibleMovesFunction(board, moves, piece, ignoreCastling);
+  }
+
+  isPawn() {
+    return this === PAWN || this === PAWN_SHIELD;
   }
 }
 
 export const PAWN = new PieceType('pawn-white', 'pawn-black', movesPawn);
+export const PAWN_SHIELD = new PieceType(
+  'pawn-shield-white',
+  'pawn-shield-black',
+  movesPawn,
+  [SHIELD, DEFAULT, DEFAULT, DEFAULT],
+);
 export const BISHOP = new PieceType(
   'bishop-white',
   'bishop-black',

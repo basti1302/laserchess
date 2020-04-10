@@ -1,6 +1,15 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
 import {NORTH, EAST, SOUTH, WEST} from './Orientation';
-import {PAWN, BISHOP, KNIGHT, ROOK, QUEEN, KING, LASER} from './PieceType';
+import {
+  PAWN,
+  PAWN_SHIELD,
+  BISHOP,
+  KNIGHT,
+  ROOK,
+  QUEEN,
+  KING,
+  LASER,
+} from './PieceType';
 import Piece from './Piece';
 import Square from './Square';
 
@@ -68,6 +77,16 @@ export default class Board {
     this.setPiece(1, 'h', new Piece(PLAYER_WHITE, KNIGHT));
     this.setPiece(1, 'i', new Piece(PLAYER_WHITE, ROOK));
 
+    this.setPiece(2, 'a', new Piece(PLAYER_WHITE, PAWN_SHIELD));
+    this.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
+    this.setPiece(2, 'd', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'e', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'f', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'g', new Piece(PLAYER_WHITE, PAWN_SHIELD));
+    this.setPiece(2, 'h', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'i', new Piece(PLAYER_WHITE, PAWN_SHIELD));
+
     this.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
     this.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
     this.setPiece(ranks, 'c', new Piece(PLAYER_BLACK, BISHOP));
@@ -78,12 +97,15 @@ export default class Board {
     this.setPiece(ranks, 'h', new Piece(PLAYER_BLACK, KNIGHT));
     this.setPiece(ranks, 'i', new Piece(PLAYER_BLACK, ROOK));
 
-    for (let file = 1; file <= files; file++) {
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
-      this.setPiece(2, file, whitePawn);
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
-      this.setPiece(ranks - 1, file, blackPawn);
-    }
+    this.setPiece(ranks - 1, 'a', new Piece(PLAYER_BLACK, PAWN_SHIELD));
+    this.setPiece(ranks - 1, 'b', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD));
+    this.setPiece(ranks - 1, 'd', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'e', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'f', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'g', new Piece(PLAYER_BLACK, PAWN_SHIELD));
+    this.setPiece(ranks - 1, 'h', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'i', new Piece(PLAYER_BLACK, PAWN_SHIELD));
   }
 
   testSetupCastling() {
