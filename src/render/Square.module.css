@@ -7,11 +7,11 @@
 }
 
 .dark {
-  background: deeppink;
+  background: black;
 }
 
 .light {
-  background: lightblue;
+  background: white;
 }
 
 .selected {

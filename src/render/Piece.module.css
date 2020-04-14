@@ -19,66 +19,76 @@
   transform: rotate(270deg) scale(1.5);
 }
 
+.white {
+  color: grey;
+}
+
+.black {
+  color: brown;
+}
+
 .pawn-white:before {
-  content: '♙';
+  content: "♙";
+  color: grey;
 }
 
 .pawn-black:before {
-  content: '♟';
+  content: "♟";
+  color: brown;
 }
 
 .pawn-shield-white:before {
-  content: '⊤';
+  content: "⊤";
 }
 
 .pawn-shield-black:before {
-  content: '⊤';
+  content: "⊤";
 }
 
 .bishop-white:before {
-  content: '♗';
+  content: "♗";
 }
 
 .bishop-black:before {
-  content: '♝';
+  content: "♝";
 }
 
 .knight-white:before {
-  content: '♘';
+  content: "♘";
 }
 
 .knight-black:before {
-  content: '♞';
+  content: "♞";
 }
 
 .rook-white:before {
-  content: '♖';
+  content: "♖";
 }
 
 .rook-black:before {
-  content: '♜';
+  content: "♜";
 }
 
 .queen-white:before {
-  content: '♕';
+  content: "♕";
 }
 
 .queen-black:before {
-  content: '♛';
+  content: "♛";
 }
 
 .king-white:before {
-  content: '♔';
+  content: "♔";
 }
 
 .king-black:before {
-  content: '♚';
+  content: "♚";
 }
 
 .laser-white:before {
-  content: '🔫';
+  content: "🔫";
 }
 
 .laser-black:before {
-  content: '🔫';
+  content: "🔫";
 }
