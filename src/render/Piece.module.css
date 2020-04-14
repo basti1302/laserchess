@@ -1,22 +1,23 @@
 .piece {
-  display: inline-block;
-  transform: scale(1.5);
+  width: 76px;
+  height: 76px;
+  font-size: 48px;
 }
 
 .facing-north {
-  transform: rotate(0deg) scale(1.5);
+  transform: rotate(0deg);
 }
 
 .facing-east {
-  transform: rotate(90deg) scale(1.5);
+  transform: rotate(90deg);
 }
 
 .facing-south {
-  transform: rotate(180deg) scale(1.5);
+  transform: rotate(180deg);
 }
 
 .facing-west {
-  transform: rotate(270deg) scale(1.5);
+  transform: rotate(270deg);
 }
 
 .white {
@@ -27,68 +28,66 @@
   color: brown;
 }
 
-.pawn-white:before {
-  content: "♙";
-  color: grey;
+.pawn-white {
+  background-image: url('white_pawn_90_degree.png');
 }
 
-.pawn-black:before {
-  content: "♟";
-  color: brown;
+.pawn-black {
+  background-image: url('black_pawn_90_degree.png');
 }
 
 .pawn-shield-white:before {
-  content: "⊤";
+  content: '⊤';
 }
 
 .pawn-shield-black:before {
-  content: "⊤";
+  content: '⊤';
 }
 
 .bishop-white:before {
-  content: "♗";
+  content: '♗';
 }
 
 .bishop-black:before {
-  content: "♝";
+  content: '♝';
 }
 
 .knight-white:before {
-  content: "♘";
+  content: '♘';
 }
 
 .knight-black:before {
-  content: "♞";
+  content: '♞';
 }
 
 .rook-white:before {
-  content: "♖";
+  content: '♖';
 }
 
 .rook-black:before {
-  content: "♜";
+  content: '♜';
 }
 
 .queen-white:before {
-  content: "♕";
+  content: '♕';
 }
 
 .queen-black:before {
-  content: "♛";
+  content: '♛';
 }
 
 .king-white:before {
-  content: "♔";
+  content: '♔';
 }
 
 .king-black:before {
-  content: "♚";
+  content: '♚';
 }
 
 .laser-white:before {
-  content: "🔫";
+  content: '🔫';
 }
 
 .laser-black:before {
-  content: "🔫";
+  content: '🔫';
 }

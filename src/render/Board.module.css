@@ -4,6 +4,7 @@
 
 .board-table {
   background: #efefef;
+  border-spacing: 0;
 }
 
 .rank {
