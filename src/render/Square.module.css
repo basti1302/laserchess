@@ -55,6 +55,28 @@
   border-bottom: 1px solid white;
 }
 
+.shot-segment-facing-north.shot-segment-reflection-leg-one,
+.shot-segment-facing-south.shot-segment-reflection-leg-two {
+  height: 42px;
+  top: 37px;
+}
+
+.shot-segment-facing-south.shot-segment-reflection-leg-one,
+.shot-segment-facing-north.shot-segment-reflection-leg-two {
+  height: 42px;
+}
+
+.shot-segment-facing-east.shot-segment-reflection-leg-one,
+.shot-segment-facing-west.shot-segment-reflection-leg-two {
+  width: 42px;
+}
+
+.shot-segment-facing-west.shot-segment-reflection-leg-one,
+.shot-segment-facing-east.shot-segment-reflection-leg-two {
+  width: 42px;
+  left: 37px;
+}
+
 .shot-segment-facing-north.shot-segment-start,
 .shot-segment-facing-south.shot-segment-end {
   height: 15px;
@@ -73,6 +95,6 @@
 
 .shot-segment-facing-east.shot-segment-start,
 .shot-segment-facing-west.shot-segment-end {
-  left: 37px;
+  left: 64px;
   width: 15px;
 }

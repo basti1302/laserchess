@@ -1,5 +1,12 @@
 import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
-import {START, STRAIGHT, ABSORB, DESTROY} from './SegmentType';
+import {
+  START,
+  STRAIGHT,
+  REFLECTED_LEFT,
+  REFLECTED_RIGHT,
+  ABSORB,
+  DESTROY,
+} from './SegmentType';
 
 export default class Segment {
   constructor(square, orientation, type) {
@@ -29,10 +36,12 @@ export default class Segment {
     if (
       type !== START &&
       type !== STRAIGHT &&
+      type !== REFLECTED_LEFT &&
+      type !== REFLECTED_RIGHT &&
       type !== ABSORB &&
       type !== DESTROY
     ) {
-      throw new Error(`Unknown type: ${type}`);
+      throw new Error(`Unknown type: ${JSON.stringify(type)}`);
     }
 
     this.square = square;

@@ -2,6 +2,7 @@ import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
 import {NORTH, EAST, SOUTH, WEST} from './Orientation';
 import {
   PAWN,
+  PAWN_90_DEGREES,
   PAWN_SHIELD,
   BISHOP,
   KNIGHT,
@@ -78,13 +79,13 @@ export default class Board {
     this.setPiece(1, 'i', new Piece(PLAYER_WHITE, ROOK));
 
     this.setPiece(2, 'a', new Piece(PLAYER_WHITE, PAWN_SHIELD));
-    this.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH));
     this.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
-    this.setPiece(2, 'd', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'd', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, EAST));
     this.setPiece(2, 'e', new Piece(PLAYER_WHITE, PAWN));
-    this.setPiece(2, 'f', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'f', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, SOUTH));
     this.setPiece(2, 'g', new Piece(PLAYER_WHITE, PAWN_SHIELD));
-    this.setPiece(2, 'h', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'h', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, WEST));
     this.setPiece(2, 'i', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
     this.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
@@ -98,13 +99,29 @@ export default class Board {
     this.setPiece(ranks, 'i', new Piece(PLAYER_BLACK, ROOK));
 
     this.setPiece(ranks - 1, 'a', new Piece(PLAYER_BLACK, PAWN_SHIELD));
-    this.setPiece(ranks - 1, 'b', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(
+      ranks - 1,
+      'b',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, EAST),
+    );
     this.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD));
-    this.setPiece(ranks - 1, 'd', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(
+      ranks - 1,
+      'd',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, NORTH),
+    );
     this.setPiece(ranks - 1, 'e', new Piece(PLAYER_BLACK, PAWN));
-    this.setPiece(ranks - 1, 'f', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(
+      ranks - 1,
+      'f',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, WEST),
+    );
     this.setPiece(ranks - 1, 'g', new Piece(PLAYER_BLACK, PAWN_SHIELD));
-    this.setPiece(ranks - 1, 'h', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(
+      ranks - 1,
+      'h',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, SOUTH),
+    );
     this.setPiece(ranks - 1, 'i', new Piece(PLAYER_BLACK, PAWN_SHIELD));
   }
 

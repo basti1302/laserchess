@@ -1,7 +1,13 @@
 import React from 'react';
 
 import Piece from './Piece';
-import {START, ABSORB, DESTROY} from '../engine/laser/SegmentType';
+import {
+  START,
+  REFLECTED_LEFT,
+  REFLECTED_RIGHT,
+  ABSORB,
+  DESTROY,
+} from '../engine/laser/SegmentType';
 
 import styles from './Square.module.css';
 
@@ -43,22 +49,38 @@ export default class Square extends React.Component {
       classes.push(styles['possible-move']);
     }
 
-    let renderedShot = null;
+    let shotDiv1 = null;
+    let shotDiv2 = null;
     if (this.props.G.shot && this.props.stage === 'renderShotStage') {
       const segment = this.props.G.shot.segments.filter(
         (shotSegment) => shotSegment.square === square,
       )[0];
       if (segment) {
-        const shotClasses = [
+        const shot1Classes = [
           styles['shot-segment'],
           styles[`shot-segment-${segment.orientation.cssClass}`],
         ];
         if (segment.type === START) {
-          shotClasses.push(styles['shot-segment-start']);
+          shot1Classes.push(styles['shot-segment-start']);
         } else if (segment.type === DESTROY || segment.type === ABSORB) {
-          shotClasses.push(styles['shot-segment-end']);
+          shot1Classes.push(styles['shot-segment-end']);
+        } else if (
+          segment.type === REFLECTED_LEFT ||
+          segment.type === REFLECTED_RIGHT
+        ) {
+          shot1Classes.push(styles['shot-segment-reflection-leg-one']);
+          const secondOrientation =
+            segment.type === REFLECTED_LEFT
+              ? segment.orientation.rotateLeft()
+              : segment.orientation.rotateRight();
+          const shot2Classes = [
+            styles['shot-segment'],
+            styles[`shot-segment-${secondOrientation.cssClass}`],
+            styles['shot-segment-reflection-leg-two'],
+          ];
+          shotDiv2 = <div className={shot2Classes.join(' ')} />;
         }
-        renderedShot = <div className={shotClasses.join(' ')} />;
+        shotDiv1 = <div className={shot1Classes.join(' ')} />;
       }
     }
 
@@ -68,7 +90,8 @@ export default class Square extends React.Component {
       <td className={classes.join(' ')} key={id} onClick={() => this.onClick()}>
         <div className={styles['square-div']}>
           {piece && <Piece piece={piece} />}
-          {renderedShot}
+          {shotDiv1}
+          {shotDiv2}
         </div>
       </td>
     );

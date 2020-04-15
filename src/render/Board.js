@@ -10,6 +10,7 @@ import styles from './Board.module.css';
 
 export default class Board extends React.Component {
   isActive(id) {
+    //
   }
 
   render() {
@@ -96,10 +97,10 @@ export default class Board extends React.Component {
     ] === 'movePieceStage' && (
       <ul>
         <li>
-          <button onClick={() => this.props.moves.rotatePieceLeft()}>⟲</button>
+          <button onClick={() => this.props.moves.rotatePieceRight()}>⟳</button>
         </li>
         <li>
-          <button onClick={() => this.props.moves.rotatePieceRight()}>⟳</button>
+          <button onClick={() => this.props.moves.rotatePieceLeft()}>⟲</button>
         </li>
       </ul>
     );

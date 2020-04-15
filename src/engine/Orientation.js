@@ -1,3 +1,5 @@
+import modulo from './modulo';
+
 export default class Orientation {
   constructor(label, orientationIndex, cssClass) {
     this.label = label;
@@ -5,32 +7,12 @@ export default class Orientation {
     this.cssClass = cssClass;
   }
 
-  rotateRight() {
-    if (this === NORTH) {
-      return EAST;
-    } else if (this === EAST) {
-      return SOUTH;
-    } else if (this === SOUTH) {
-      return WEST;
-    } else if (this === WEST) {
-      return NORTH;
-    } else {
-      throw new Error(`Can't rotate right: ${this}.`);
-    }
+  rotateLeft() {
+    return BY_INDEX[modulo(this.orientationIndex - 1, 4)];
   }
 
-  rotateLeft() {
-    if (this === NORTH) {
-      return WEST;
-    } else if (this === WEST) {
-      return SOUTH;
-    } else if (this === SOUTH) {
-      return EAST;
-    } else if (this === EAST) {
-      return NORTH;
-    } else {
-      throw new Error(`Can't rotate left: ${this}.`);
-    }
+  rotateRight() {
+    return BY_INDEX[modulo(this.orientationIndex + 1, 4)];
   }
 }
 
@@ -38,3 +20,5 @@ export const NORTH = new Orientation('N', 0, 'facing-north');
 export const EAST = new Orientation('E', 1, 'facing-east');
 export const SOUTH = new Orientation('S', 2, 'facing-south');
 export const WEST = new Orientation('W', 3, 'facing-west');
+
+const BY_INDEX = [NORTH, EAST, SOUTH, WEST];

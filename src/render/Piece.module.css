@@ -28,11 +28,19 @@
   color: brown;
 }
 
-.pawn-white {
+.pawn-white:before {
+  content: '♙';
+}
+
+.pawn-black:before {
+  content: '♟';
+}
+
+.pawn-90-deg-white {
   background-image: url('white_pawn_90_degree.png');
 }
 
-.pawn-black {
+.pawn-90-deg-black {
   background-image: url('black_pawn_90_degree.png');
 }
 

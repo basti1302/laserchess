@@ -1,6 +1,15 @@
+import modulo from '../modulo';
+
 import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
-import {START, STRAIGHT, ABSORB, DESTROY} from './SegmentType';
-import {DEFAULT, SHIELD} from './Surface';
+import {
+  START,
+  STRAIGHT,
+  REFLECTED_LEFT,
+  REFLECTED_RIGHT,
+  ABSORB,
+  DESTROY,
+} from './SegmentType';
+import {DEFAULT, REFLECT_LEFT, REFLECT_RIGHT, SHIELD} from './Surface';
 import {LASER} from '../PieceType';
 import Segment from './Segment';
 import Shot from './Shot';
@@ -47,6 +56,12 @@ export default function fireLaser(board, from, orientation) {
           destroyedSquare = nextSquare;
           segments.push(new Segment(nextSquare, orientation, DESTROY));
           stop = true;
+        } else if (surface === REFLECT_LEFT) {
+          segments.push(new Segment(nextSquare, orientation, REFLECTED_LEFT));
+          orientation = orientation.rotateLeft();
+        } else if (surface === REFLECT_RIGHT) {
+          segments.push(new Segment(nextSquare, orientation, REFLECTED_RIGHT));
+          orientation = orientation.rotateRight();
         } else if (surface === SHIELD) {
           segments.push(new Segment(nextSquare, orientation, ABSORB));
           stop = true;
@@ -92,21 +107,17 @@ function getSurfaceFromPiece(piece, shotOrientation) {
   // to south. We first add 2 to the shot's orientation to turn it around. A
   // shot that is oriented SOUTH is actually coming from NORTH (more generally,
   // it is coming from the opposite of its its orientation). That gives us
-  // (shot orientation + 2) % 4 = (2 + 2) % 4 = 4 % 4 = 0,
+  // (shot orientation + 2) mod 4 = (2 + 2) mod 4 = 4 mod 4 = 0,
   // which would be the piece's northern surface.
   //
   // Then we add the piece's orientation to the index. This gives
-  // (shot orientation + 2 - piece orientation) % 4 = (2 + 2 - 3) % 4
-  //    = 1 % 4 = 1,
+  // (shot orientation + 2 - piece orientation) mod 4 = (2 + 2 - 3) mod 4
+  //    = 1 mod 4 = 1,
   // which is the piece's eastern surface. This is the correct surface for
   // a shot going north to south, hitting a piece facing westwards.
 
   // prettier-ignore
-  const surfaceIndex = Math.abs(
-    (shotOrientation.orientationIndex + 2
-       - piece.orientation.orientationIndex
-    )
-    % 4
-  );
+  const surfaceIndex =
+    modulo((shotOrientation.orientationIndex + 2 - piece.orientation.orientationIndex),  4);
   return piece.type.surfaces[surfaceIndex];
 }

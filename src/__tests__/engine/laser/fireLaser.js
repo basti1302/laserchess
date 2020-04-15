@@ -1,6 +1,12 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {LASER, PAWN, PAWN_SHIELD} from '../../../engine/PieceType';
+import {
+  KING,
+  LASER,
+  PAWN,
+  PAWN_90_DEGREES,
+  PAWN_SHIELD,
+} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import {NORTH, EAST, SOUTH, WEST} from '../../../engine/Orientation';
 
@@ -8,6 +14,8 @@ import fireLaser from '../../../engine/laser/fireLaser';
 import {
   START,
   STRAIGHT,
+  REFLECTED_LEFT,
+  REFLECTED_RIGHT,
   ABSORB,
   DESTROY,
 } from '../../../engine/laser/SegmentType';
@@ -230,6 +238,89 @@ describe('fire laser', () => {
           verifySegment(segments[i], 5, i + 3, EAST, STRAIGHT);
         }
         verifySegment(segments[4], 5, 'g', EAST, ABSORB);
+      });
+    });
+
+    describe('90-degree pawn', () => {
+      test('should reflect south-bound shot left/east', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, SOUTH);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const ninetyDegPawnPos = board.getSquare(3, 'd');
+        const ninetyDegPawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH);
+        board.setPiece(
+          ninetyDegPawnPos.rank,
+          ninetyDegPawnPos.file,
+          ninetyDegPawn,
+        );
+        const targetPos = board.getSquare(3, 'f');
+        const target = new Piece(PLAYER_BLACK, KING, NORTH);
+        board.setPiece(targetPos.rank, targetPos.file, target);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(targetPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 5, 'd', SOUTH, START);
+        verifySegment(segments[1], 4, 'd', SOUTH, STRAIGHT);
+        verifySegment(segments[2], 3, 'd', SOUTH, REFLECTED_LEFT);
+        verifySegment(segments[3], 3, 'e', EAST, STRAIGHT);
+        verifySegment(segments[4], 3, 'f', EAST, DESTROY);
+      });
+
+      test('should reflect west-bound shot right/north', () => {
+        const laserPos = board.getSquare(3, 'f');
+        const laser = new Piece(PLAYER_WHITE, LASER, WEST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const ninetyDegPawnPos = board.getSquare(3, 'd');
+        const ninetyDegPawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH);
+        board.setPiece(
+          ninetyDegPawnPos.rank,
+          ninetyDegPawnPos.file,
+          ninetyDegPawn,
+        );
+        const targetPos = board.getSquare(5, 'd');
+        const target = new Piece(PLAYER_BLACK, KING, NORTH);
+        board.setPiece(targetPos.rank, targetPos.file, target);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(targetPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 3, 'f', WEST, START);
+        verifySegment(segments[1], 3, 'e', WEST, STRAIGHT);
+        verifySegment(segments[2], 3, 'd', WEST, REFLECTED_RIGHT);
+        verifySegment(segments[3], 4, 'd', NORTH, STRAIGHT);
+        verifySegment(segments[4], 5, 'd', NORTH, DESTROY);
+      });
+
+      test('should reflect west-bound shot left/shouth', () => {
+        const laserPos = board.getSquare(5, 'f');
+        const laser = new Piece(PLAYER_WHITE, LASER, WEST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const ninetyDegPawnPos = board.getSquare(5, 'd');
+        const ninetyDegPawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES, EAST);
+        board.setPiece(
+          ninetyDegPawnPos.rank,
+          ninetyDegPawnPos.file,
+          ninetyDegPawn,
+        );
+        const targetPos = board.getSquare(3, 'd');
+        const target = new Piece(PLAYER_BLACK, KING, NORTH);
+        board.setPiece(targetPos.rank, targetPos.file, target);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(targetPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 5, 'f', WEST, START);
+        verifySegment(segments[1], 5, 'e', WEST, STRAIGHT);
+        verifySegment(segments[2], 5, 'd', WEST, REFLECTED_LEFT);
+        verifySegment(segments[3], 4, 'd', SOUTH, STRAIGHT);
+        verifySegment(segments[4], 3, 'd', SOUTH, DESTROY);
       });
     });
   });
