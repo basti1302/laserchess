@@ -1,6 +1,6 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {PAWN, QUEEN} from '../../../engine/PieceType';
+import {KNIGHT, QUEEN} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import checkMove from '../../../testutil/checkMove';
 
@@ -21,17 +21,17 @@ describe('queen moves', () => {
     // Set up some pieces that block the queen's movement.
 
     // north: 3 moves
-    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, KNIGHT));
     // north-east: 2 moves
-    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, KNIGHT));
     // east: no obstacle, 4 moves
     // south-east: 0 moves
-    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, KNIGHT));
     // south: no obstacle, 4 moves
     // south-west: 1 move
-    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, KNIGHT));
     // west: 3 moves
-    board.setPiece(5, 'a', new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(5, 'a', new Piece(PLAYER_WHITE, KNIGHT));
     // north-east: no obstacle, 4 moves
 
     queen.possibleMovesIgnoringCheck(board, moves);

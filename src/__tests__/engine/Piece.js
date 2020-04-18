@@ -6,8 +6,9 @@ import {
   ROOK,
   KNIGHT,
   BISHOP,
-  PAWN,
   PAWN_SHIELD,
+  PAWN_90_DEGREES,
+  PAWN_THREEWAY,
 } from '../../engine/PieceType';
 import Board, {ranks, files} from '../../engine/Board';
 import Piece from '../../engine/Piece';
@@ -27,8 +28,9 @@ describe('Piece', () => {
     expect(ROOK.isPawn()).toBe(false);
     expect(KNIGHT.isPawn()).toBe(false);
     expect(BISHOP.isPawn()).toBe(false);
-    expect(PAWN.isPawn()).toBe(true);
     expect(PAWN_SHIELD.isPawn()).toBe(true);
+    expect(PAWN_90_DEGREES.isPawn()).toBe(true);
+    expect(PAWN_THREEWAY.isPawn()).toBe(true);
   });
 
   describe('possible moves', () => {

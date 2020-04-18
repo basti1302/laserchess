@@ -1,13 +1,12 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
 import {
-  PAWN,
-  ROOK,
-  KNIGHT,
   BISHOP,
-  LASER,
   KING,
+  KNIGHT,
+  LASER,
   QUEEN,
+  ROOK,
 } from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import Move from '../../../engine/moves/Move';
@@ -30,9 +29,9 @@ describe('king moves', () => {
     // Set up some pieces that block the king's movement.
 
     // block
-    board.setPiece(2, 4, new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(2, 4, new Piece(PLAYER_WHITE, KNIGHT));
     // capture
-    board.setPiece(2, 2, new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(2, 2, new Piece(PLAYER_BLACK, KNIGHT));
 
     king.possibleMovesIgnoringCheck(board, moves);
 

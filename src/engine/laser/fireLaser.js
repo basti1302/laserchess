@@ -6,10 +6,17 @@ import {
   STRAIGHT,
   REFLECTED_LEFT,
   REFLECTED_RIGHT,
+  REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
 } from './SegmentType';
-import {DEFAULT, REFLECT_LEFT, REFLECT_RIGHT, SHIELD} from './Surface';
+import {
+  DEFAULT,
+  REFLECT_LEFT,
+  REFLECT_RIGHT,
+  REFLECT_STRAIGHT,
+  SHIELD,
+} from './Surface';
 import {LASER} from '../PieceType';
 import Segment from './Segment';
 import Shot from './Shot';
@@ -62,6 +69,23 @@ export default function fireLaser(board, from, orientation) {
         } else if (surface === REFLECT_RIGHT) {
           segments.push(new Segment(nextSquare, orientation, REFLECTED_RIGHT));
           orientation = orientation.rotateRight();
+        } else if (surface === REFLECT_STRAIGHT) {
+          // Check for infinetly reflected shots: Check whether the current
+          // square is already contained with type reflected-straight, if so,
+          // absorb.
+          if (
+            segments.find(
+              (s) => s.square === nextSquare && s.type === REFLECTED_STRAIGHT,
+            )
+          ) {
+            segments.push(new Segment(nextSquare, orientation, ABSORB));
+            stop = true;
+          } else {
+            segments.push(
+              new Segment(nextSquare, orientation, REFLECTED_STRAIGHT),
+            );
+            orientation = orientation.rotateRight().rotateRight();
+          }
         } else if (surface === SHIELD) {
           segments.push(new Segment(nextSquare, orientation, ABSORB));
           stop = true;

@@ -1,9 +1,9 @@
 import {WHITE, BLACK} from '../../engine/Color';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../engine/Player';
 import {
-  PAWN,
-  PAWN_90_DEGREES,
   PAWN_SHIELD,
+  PAWN_90_DEGREES,
+  PAWN_THREEWAY,
   BISHOP,
   KNIGHT,
   ROOK,
@@ -82,7 +82,7 @@ describe('Board', () => {
       // set up some dummy pieces
       for (let rank = 1; rank <= ranks; rank++) {
         for (let file = 1; file <= files; file++) {
-          board.setPiece(rank, file, new Piece(PLAYER_WHITE, PAWN));
+          board.setPiece(rank, file, new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
         }
       }
 
@@ -99,7 +99,7 @@ describe('Board', () => {
           expect(piece.player).toBe(PLAYER_WHITE);
           expect(piece.player.color).toBe(WHITE);
           expect(piece.player.boardIoLabel).toBe('0');
-          expect(piece.type).toBe(PAWN);
+          expect(piece.type).toBe(PAWN_90_DEGREES);
           const position = piece.getPosition();
           expect(position.rank).toBe(rank);
           expect(position.file).toBe(file);
@@ -161,7 +161,7 @@ describe('Board', () => {
       expect(board.getSquare(2, 'c').getPiece().orientation).toEqual(NORTH);
       expect(board.getSquare(2, 'd').getPiece().type).toEqual(PAWN_90_DEGREES);
       expect(board.getSquare(2, 'd').getPiece().orientation).toEqual(EAST);
-      expect(board.getSquare(2, 'e').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(2, 'e').getPiece().type).toEqual(PAWN_THREEWAY);
       expect(board.getSquare(2, 'e').getPiece().orientation).toEqual(NORTH);
       expect(board.getSquare(2, 'f').getPiece().type).toEqual(PAWN_90_DEGREES);
       expect(board.getSquare(2, 'f').getPiece().orientation).toEqual(SOUTH);
@@ -204,7 +204,9 @@ describe('Board', () => {
       expect(board.getSquare(ranks - 1, 'd').getPiece().orientation).toBe(
         NORTH,
       );
-      expect(board.getSquare(ranks - 1, 'e').getPiece().type).toEqual(PAWN);
+      expect(board.getSquare(ranks - 1, 'e').getPiece().type).toEqual(
+        PAWN_THREEWAY,
+      );
       expect(board.getSquare(ranks - 1, 'e').getPiece().orientation).toBe(
         SOUTH,
       );
@@ -251,8 +253,8 @@ describe('Board', () => {
       const rookFrom = board.getSquare(6, 'e');
       board.setPiece(6, 'e', new Piece(PLAYER_WHITE, ROOK));
 
-      board.setPiece(7, 'e', new Piece(PLAYER_BLACK, PAWN));
-      board.setPiece(6, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(7, 'e', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
+      board.setPiece(6, 'c', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
 
       const moves = board.allMovesIgnoringCheck(PLAYER_WHITE);
 
@@ -324,8 +326,8 @@ describe('Board', () => {
       const rookFrom = board.getSquare(6, 'e');
       board.setPiece(6, 'e', new Piece(PLAYER_WHITE, ROOK));
 
-      board.setPiece(7, 'e', new Piece(PLAYER_BLACK, PAWN));
-      board.setPiece(6, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(7, 'e', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
+      board.setPiece(6, 'c', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
 
       const moves = board.allMovesIgnoringCheck(PLAYER_WHITE);
 
@@ -402,7 +404,7 @@ describe('Board', () => {
 
   describe('apply moves', () => {
     test('should move the piece', () => {
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       const pawnPos1 = board.getSquare(2, 'a');
       const pawnPos2 = board.getSquare(4, 'a');
       board.setPiece(pawnPos1.rank, pawnPos1.file, pawn);
@@ -416,9 +418,9 @@ describe('Board', () => {
     });
 
     test('should record that a piece has moved', () => {
-      const pawn1 = new Piece(PLAYER_WHITE, PAWN);
+      const pawn1 = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       const pawn1Pos = board.getSquare(2, 'a');
-      const pawn2 = new Piece(PLAYER_WHITE, PAWN);
+      const pawn2 = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       const pawn2Pos = board.getSquare(2, 'b');
       board.setPiece(pawn1Pos.rank, pawn1Pos.file, pawn1);
       board.setPiece(pawn2Pos.rank, pawn2Pos.file, pawn2);
@@ -447,10 +449,10 @@ describe('Board', () => {
     });
 
     test('should capture en passant', () => {
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       const whitePawnPos1 = board.getSquare(2, 'e');
       const whitePawnPos2 = board.getSquare(4, 'e');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_90_DEGREES);
       const blackPawnPos1 = board.getSquare(4, 'f');
       const blackPawnPos2 = board.getSquare(3, 'e');
       board.setPiece(whitePawnPos1.rank, whitePawnPos1.file, whitePawn);
@@ -521,7 +523,7 @@ describe('Board', () => {
     });
 
     test('should apply a promotion', () => {
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       const pawnPos1 = board.getSquare(ranks - 1, 'e');
       const pawnPos2 = board.getSquare(ranks, 'e');
       board.setPiece(pawnPos1.rank, pawnPos1.file, pawn);
@@ -544,7 +546,7 @@ describe('Board', () => {
       expect(historyEntry.to.file).toBe(pawnPos2.file);
       expect(historyEntry.from2).toBeUndefined();
       expect(historyEntry.to2).toBeUndefined();
-      expect(historyEntry.type).toBe(PAWN);
+      expect(historyEntry.type).toBe(PAWN_90_DEGREES);
       expect(historyEntry.promotionTo).toBe(QUEEN);
       expect(historyEntry.player).toBe(PLAYER_WHITE);
       expect(historyEntry.captured).toBeNull();
@@ -573,7 +575,7 @@ describe('Board', () => {
       board.setPiece(
         bPawnPos1.rank,
         bPawnPos1.file,
-        new Piece(PLAYER_BLACK, PAWN),
+        new Piece(PLAYER_BLACK, PAWN_90_DEGREES),
       );
 
       board.applyMove(new Move(wQueenPos1, wQueenPos2));
@@ -585,9 +587,25 @@ describe('Board', () => {
 
       expect(board.moveHistory.length).toBe(5);
       verifyHistoryEntry(board.moveHistory[0], 3, 2, 5, 2, QUEEN, PLAYER_WHITE);
-      verifyHistoryEntry(board.moveHistory[1], 7, 5, 6, 5, PAWN, PLAYER_BLACK);
+      verifyHistoryEntry(
+        board.moveHistory[1],
+        7,
+        5,
+        6,
+        5,
+        PAWN_90_DEGREES,
+        PLAYER_BLACK,
+      );
       verifyHistoryEntry(board.moveHistory[2], 1, 8, 1, 7, LASER, PLAYER_WHITE);
-      verifyHistoryEntry(board.moveHistory[3], 6, 5, 5, 5, PAWN, PLAYER_BLACK);
+      verifyHistoryEntry(
+        board.moveHistory[3],
+        6,
+        5,
+        5,
+        5,
+        PAWN_90_DEGREES,
+        PLAYER_BLACK,
+      );
       verifyHistoryEntry(
         board.moveHistory[4],
         5,
@@ -596,7 +614,7 @@ describe('Board', () => {
         5,
         QUEEN,
         PLAYER_WHITE,
-        PAWN,
+        PAWN_90_DEGREES,
       );
     });
 
@@ -805,7 +823,7 @@ describe('Board', () => {
       const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
       board.setPiece(laserPos.rank, laserPos.file, laser);
       const pawnPos = board.getSquare(5, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN, NORTH);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH);
       board.setPiece(pawnPos.rank, pawnPos.file, pawn);
       const shot = new Shot(
         [
@@ -835,7 +853,7 @@ describe('Board', () => {
       expect(historyEntry.player).toBe(PLAYER_WHITE);
       expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
       expect(historyEntry.shot.target.file).toBe(pawnPos.file);
-      expect(historyEntry.shot.type).toBe(PAWN);
+      expect(historyEntry.shot.type).toBe(PAWN_90_DEGREES);
     });
 
     test('should destroy enemy piece when applying a shot', () => {
@@ -843,7 +861,7 @@ describe('Board', () => {
       const laser = new Piece(PLAYER_WHITE, LASER, EAST);
       board.setPiece(laserPos.rank, laserPos.file, laser);
       const pawnPos = board.getSquare(5, 'e');
-      const pawn = new Piece(PLAYER_BLACK, PAWN, EAST);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_90_DEGREES, EAST);
       board.setPiece(pawnPos.rank, pawnPos.file, pawn);
       const shot = new Shot(
         [
@@ -873,7 +891,7 @@ describe('Board', () => {
       expect(historyEntry.player).toBe(PLAYER_WHITE);
       expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
       expect(historyEntry.shot.target.file).toBe(pawnPos.file);
-      expect(historyEntry.shot.type).toBe(PAWN);
+      expect(historyEntry.shot.type).toBe(PAWN_90_DEGREES);
     });
   });
 
@@ -882,16 +900,16 @@ describe('Board', () => {
       board.setPiece(1, 'a', new Piece(PLAYER_WHITE, ROOK));
       board.setPiece(1, 'b', new Piece(PLAYER_WHITE, KNIGHT));
       board.setPiece(1, 'c', new Piece(PLAYER_WHITE, BISHOP));
-      board.setPiece(2, 'a', new Piece(PLAYER_WHITE, PAWN));
-      board.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN));
-      board.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(2, 'a', new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
+      board.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
+      board.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
 
       board.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, ROOK));
       board.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
       board.setPiece(ranks, 'c', new Piece(PLAYER_BLACK, BISHOP));
-      board.setPiece(ranks - 1, 'a', new Piece(PLAYER_BLACK, PAWN));
-      board.setPiece(ranks - 1, 'b', new Piece(PLAYER_BLACK, PAWN));
-      board.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(ranks - 1, 'a', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
+      board.setPiece(ranks - 1, 'b', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
+      board.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN_90_DEGREES));
     });
 
     test('should clone the board including squares and pieces', () => {
@@ -935,9 +953,9 @@ describe('Board', () => {
       expect(clonedBoard.getPiece(ranks, 'c')).toBeNull();
       checkPiece(clonedBoard, ranks - 3, 'f', PLAYER_BLACK, BISHOP);
       expect(clonedBoard.getPiece(2, 'a')).toBeNull();
-      checkPiece(clonedBoard, 3, 'a', PLAYER_WHITE, PAWN);
+      checkPiece(clonedBoard, 3, 'a', PLAYER_WHITE, PAWN_90_DEGREES);
       expect(clonedBoard.getPiece(ranks - 1, 'b')).toBeNull();
-      checkPiece(clonedBoard, ranks - 3, 'b', PLAYER_BLACK, PAWN);
+      checkPiece(clonedBoard, ranks - 3, 'b', PLAYER_BLACK, PAWN_90_DEGREES);
     });
 
     test('simulating a move should not modify the original', () => {
@@ -957,15 +975,15 @@ describe('Board', () => {
       checkPiece(theBoard, 1, 'a', PLAYER_WHITE, ROOK);
       checkPiece(theBoard, 1, 'b', PLAYER_WHITE, KNIGHT);
       checkPiece(theBoard, 1, 'c', PLAYER_WHITE, BISHOP);
-      checkPiece(theBoard, 2, 'a', PLAYER_WHITE, PAWN);
-      checkPiece(theBoard, 2, 'b', PLAYER_WHITE, PAWN);
-      checkPiece(theBoard, 2, 'c', PLAYER_WHITE, PAWN);
+      checkPiece(theBoard, 2, 'a', PLAYER_WHITE, PAWN_90_DEGREES);
+      checkPiece(theBoard, 2, 'b', PLAYER_WHITE, PAWN_90_DEGREES);
+      checkPiece(theBoard, 2, 'c', PLAYER_WHITE, PAWN_90_DEGREES);
       checkPiece(theBoard, ranks, 'a', PLAYER_BLACK, ROOK);
       checkPiece(theBoard, ranks, 'b', PLAYER_BLACK, KNIGHT);
       checkPiece(theBoard, ranks, 'c', PLAYER_BLACK, BISHOP);
-      checkPiece(theBoard, ranks - 1, 'a', PLAYER_BLACK, PAWN);
-      checkPiece(theBoard, ranks - 1, 'b', PLAYER_BLACK, PAWN);
-      checkPiece(theBoard, ranks - 1, 'c', PLAYER_BLACK, PAWN);
+      checkPiece(theBoard, ranks - 1, 'a', PLAYER_BLACK, PAWN_90_DEGREES);
+      checkPiece(theBoard, ranks - 1, 'b', PLAYER_BLACK, PAWN_90_DEGREES);
+      checkPiece(theBoard, ranks - 1, 'c', PLAYER_BLACK, PAWN_90_DEGREES);
     }
 
     function checkPiece(theBoard, rank, file, player, type) {
@@ -986,13 +1004,13 @@ describe('Board', () => {
       board.setPiece(
         pawn1Home.rank,
         pawn1Home.file,
-        new Piece(PLAYER_BLACK, PAWN),
+        new Piece(PLAYER_BLACK, PAWN_90_DEGREES),
       );
       const pawn2Home = board.getSquare(ranks - 1, 'f');
       board.setPiece(
         pawn2Home.rank,
         pawn2Home.file,
-        new Piece(PLAYER_BLACK, PAWN),
+        new Piece(PLAYER_BLACK, PAWN_90_DEGREES),
       );
 
       board.setPiece(ranks - 4, 'i', new Piece(PLAYER_WHITE, QUEEN));

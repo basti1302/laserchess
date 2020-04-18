@@ -28,12 +28,12 @@
   color: brown;
 }
 
-.pawn-white:before {
-  content: '♙';
+.pawn-shield-white {
+  background-image: url('white_pawn_shield.png');
 }
 
-.pawn-black:before {
-  content: '♟';
+.pawn-shield-black {
+  background-image: url('black_pawn_shield.png');
 }
 
 .pawn-90-deg-white {
@@ -44,12 +44,12 @@
   background-image: url('black_pawn_90_degree.png');
 }
 
-.pawn-shield-white:before {
-  content: '⊤';
+.pawn-threeway-white {
+  background-image: url('white_pawn_threeway.png');
 }
 
-.pawn-shield-black:before {
-  content: '⊤';
+.pawn-threeway-black {
+  background-image: url('black_pawn_threeway.png');
 }
 
 .bishop-white:before {

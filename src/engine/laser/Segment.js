@@ -4,6 +4,7 @@ import {
   STRAIGHT,
   REFLECTED_LEFT,
   REFLECTED_RIGHT,
+  REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
 } from './SegmentType';
@@ -38,6 +39,7 @@ export default class Segment {
       type !== STRAIGHT &&
       type !== REFLECTED_LEFT &&
       type !== REFLECTED_RIGHT &&
+      type !== REFLECTED_STRAIGHT &&
       type !== ABSORB &&
       type !== DESTROY
     ) {

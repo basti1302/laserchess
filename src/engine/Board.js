@@ -1,9 +1,9 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
 import {NORTH, EAST, SOUTH, WEST} from './Orientation';
 import {
-  PAWN,
-  PAWN_90_DEGREES,
   PAWN_SHIELD,
+  PAWN_90_DEGREES,
+  PAWN_THREEWAY,
   BISHOP,
   KNIGHT,
   ROOK,
@@ -82,7 +82,7 @@ export default class Board {
     this.setPiece(2, 'b', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH));
     this.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
     this.setPiece(2, 'd', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, EAST));
-    this.setPiece(2, 'e', new Piece(PLAYER_WHITE, PAWN));
+    this.setPiece(2, 'e', new Piece(PLAYER_WHITE, PAWN_THREEWAY));
     this.setPiece(2, 'f', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, SOUTH));
     this.setPiece(2, 'g', new Piece(PLAYER_WHITE, PAWN_SHIELD));
     this.setPiece(2, 'h', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, WEST));
@@ -110,7 +110,7 @@ export default class Board {
       'd',
       new Piece(PLAYER_BLACK, PAWN_90_DEGREES, NORTH),
     );
-    this.setPiece(ranks - 1, 'e', new Piece(PLAYER_BLACK, PAWN));
+    this.setPiece(ranks - 1, 'e', new Piece(PLAYER_BLACK, PAWN_THREEWAY));
     this.setPiece(
       ranks - 1,
       'f',
@@ -145,24 +145,24 @@ export default class Board {
     this.setPiece(5, 'a', new Piece(PLAYER_WHITE, KING));
     this.setPiece(5, files, new Piece(PLAYER_BLACK, KING));
     for (let file = 1; file <= files; file++) {
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       this.setPiece(ranks - 1, file, whitePawn);
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       this.setPiece(2, file, blackPawn);
     }
   }
 
   testSetupEnPassant() {
     for (let file = 2; file <= files; file = file + 2) {
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       this.setPiece(2, file, whitePawn);
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_90_DEGREES);
       this.setPiece(ranks - 1, file, blackPawn);
     }
     for (let file = 1; file <= files; file = file + 2) {
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_90_DEGREES);
       this.setPiece(ranks - 3, file, whitePawn);
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_90_DEGREES);
       this.setPiece(4, file, blackPawn);
     }
   }
@@ -173,20 +173,20 @@ export default class Board {
     this.setPiece(6, 'g', new Piece(PLAYER_WHITE, LASER, SOUTH));
     this.setPiece(3, 'h', new Piece(PLAYER_WHITE, LASER, WEST));
 
-    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, PAWN, NORTH));
-    this.setPiece(7, 'h', new Piece(PLAYER_BLACK, PAWN, EAST));
-    this.setPiece(2, 'g', new Piece(PLAYER_BLACK, PAWN, SOUTH));
-    this.setPiece(3, 'b', new Piece(PLAYER_BLACK, PAWN, WEST));
+    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, KNIGHT, NORTH));
+    this.setPiece(7, 'h', new Piece(PLAYER_BLACK, KNIGHT, EAST));
+    this.setPiece(2, 'g', new Piece(PLAYER_BLACK, KNIGHT, SOUTH));
+    this.setPiece(3, 'b', new Piece(PLAYER_BLACK, KNIGHT, WEST));
 
     this.setPiece(1, 'f', new Piece(PLAYER_BLACK, LASER, NORTH));
     this.setPiece(5, 'a', new Piece(PLAYER_BLACK, LASER, EAST));
     this.setPiece(9, 'd', new Piece(PLAYER_BLACK, LASER, SOUTH));
     this.setPiece(4, 'i', new Piece(PLAYER_BLACK, LASER, WEST));
 
-    this.setPiece(9, 'f', new Piece(PLAYER_WHITE, PAWN, NORTH));
-    this.setPiece(5, 'i', new Piece(PLAYER_WHITE, PAWN, EAST));
-    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, PAWN, SOUTH));
-    this.setPiece(4, 'a', new Piece(PLAYER_WHITE, PAWN, WEST));
+    this.setPiece(9, 'f', new Piece(PLAYER_WHITE, KNIGHT, NORTH));
+    this.setPiece(5, 'i', new Piece(PLAYER_WHITE, KNIGHT, EAST));
+    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, KNIGHT, SOUTH));
+    this.setPiece(4, 'a', new Piece(PLAYER_WHITE, KNIGHT, WEST));
   }
 
   allMovesIgnoringCheck(player) {

@@ -1,6 +1,6 @@
 import Board from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {LASER, PAWN} from '../../../engine/PieceType';
+import {LASER, KNIGHT, PAWN_90_DEGREES} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 
 import moveTo, {
@@ -53,7 +53,7 @@ describe('moveTo util', () => {
     const from = board.getSquare(1, 'a');
     const to = board.getSquare(2, 'b');
     from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    to.setPiece(new Piece(PLAYER_WHITE, PAWN));
+    to.setPiece(new Piece(PLAYER_WHITE, KNIGHT));
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(0);
   });
@@ -62,7 +62,7 @@ describe('moveTo util', () => {
     const from = board.getSquare(1, 'a');
     const to = board.getSquare(2, 'b');
     from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    to.setPiece(new Piece(PLAYER_BLACK, PAWN));
+    to.setPiece(new Piece(PLAYER_BLACK, KNIGHT));
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(1);
     expect(moves[0].from).toBe(from);
@@ -72,7 +72,7 @@ describe('moveTo util', () => {
   test('pawn should not capture straight', () => {
     const from = board.getSquare(2, 'a');
     const to = board.getSquare(3, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, PAWN));
+    from.setPiece(new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
     to.setPiece(new Piece(PLAYER_BLACK, LASER));
     moveTo(board, moves, from, to, CAPTURE_MODE_MUST_NOT);
     expect(moves.length).toEqual(0);

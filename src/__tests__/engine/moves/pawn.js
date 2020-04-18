@@ -1,7 +1,7 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
 import {
-  PAWN,
+  PAWN_SHIELD,
   ROOK,
   KNIGHT,
   BISHOP,
@@ -24,7 +24,7 @@ describe('pawn moves', () => {
   describe(`white pawn`, () => {
     test('should move one or two squares from home rank', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -36,7 +36,7 @@ describe('pawn moves', () => {
 
     test('should move only one square when not on home rank', () => {
       const from = board.getSquare(3, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -47,9 +47,9 @@ describe('pawn moves', () => {
 
     test('should move one square when blocked', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(4, 'c', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(4, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -59,9 +59,9 @@ describe('pawn moves', () => {
 
     test('should not move when blocked', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(3, 'c', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(3, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -70,9 +70,9 @@ describe('pawn moves', () => {
 
     test('does not capture straight', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(3, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(3, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -81,9 +81,9 @@ describe('pawn moves', () => {
 
     test('captures north-east', () => {
       const from = board.getSquare(5, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(6, 'd', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(6, 'd', new Piece(PLAYER_BLACK, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -94,9 +94,9 @@ describe('pawn moves', () => {
 
     test('captures north-west', () => {
       const from = board.getSquare(5, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(6, 'd', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(6, 'd', new Piece(PLAYER_BLACK, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -107,11 +107,11 @@ describe('pawn moves', () => {
 
     test('captures en passant north-east', () => {
       const whitePawnFrom = board.getSquare(ranks - 3, 'c');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       const blackPawnFrom = board.getSquare(ranks - 1, 'd');
       const blackPawnTo = board.getSquare(ranks - 3, 'd');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       board.applyMove(new Move(blackPawnFrom, blackPawnTo));
 
@@ -125,11 +125,11 @@ describe('pawn moves', () => {
 
     test('captures en passant north-west', () => {
       const whitePawnFrom = board.getSquare(ranks - 3, 'c');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       const blackPawnFrom = board.getSquare(ranks - 1, 'b');
       const blackPawnTo = board.getSquare(ranks - 3, 'b');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       board.applyMove(new Move(blackPawnFrom, blackPawnTo));
 
@@ -143,11 +143,11 @@ describe('pawn moves', () => {
 
     test('should not capture en passant after a one-square move', () => {
       const whitePawnFrom = board.getSquare(ranks - 3, 'c');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       const blackPawnFrom = board.getSquare(ranks - 2, 'd');
       const blackPawnTo = board.getSquare(ranks - 3, 'd');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       board.applyMove(new Move(blackPawnFrom, blackPawnTo));
 
@@ -159,7 +159,7 @@ describe('pawn moves', () => {
 
     test('should promote without capturing', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -174,7 +174,7 @@ describe('pawn moves', () => {
 
     test('should promote while capturing north-east', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
       board.setPiece(ranks, 'd', new Piece(PLAYER_BLACK, QUEEN));
       // block non-capturing promotion
@@ -192,7 +192,7 @@ describe('pawn moves', () => {
 
     test('should promote while capturing north-west', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN);
+      const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       from.setPiece(pawn);
       board.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, KNIGHT));
       // block non-capturing promotion
@@ -212,7 +212,7 @@ describe('pawn moves', () => {
   describe(`black pawn`, () => {
     test('should move one or two squares from home rank', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -224,7 +224,7 @@ describe('pawn moves', () => {
 
     test('should move only one square when not on home rank', () => {
       const from = board.getSquare(ranks - 2, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -235,9 +235,9 @@ describe('pawn moves', () => {
 
     test('should move one square when blocked', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(ranks - 3, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(ranks - 3, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -247,9 +247,9 @@ describe('pawn moves', () => {
 
     test('should not move when blocked', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(ranks - 2, 'c', new Piece(PLAYER_BLACK, PAWN));
+      board.setPiece(ranks - 2, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -258,9 +258,9 @@ describe('pawn moves', () => {
 
     test('does not capture straight', () => {
       const from = board.getSquare(ranks - 1, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(ranks - 3, 'c', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(ranks - 3, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -270,9 +270,9 @@ describe('pawn moves', () => {
 
     test('captures south-east', () => {
       const from = board.getSquare(5, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(4, 'd', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(4, 'd', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -283,9 +283,9 @@ describe('pawn moves', () => {
 
     test('captures south-west', () => {
       const from = board.getSquare(5, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
-      board.setPiece(4, 'b', new Piece(PLAYER_WHITE, PAWN));
+      board.setPiece(4, 'b', new Piece(PLAYER_WHITE, PAWN_SHIELD));
 
       pawn.possibleMovesIgnoringCheck(board, moves);
 
@@ -296,11 +296,11 @@ describe('pawn moves', () => {
 
     test('captures en passant south-east', () => {
       const blackPawnFrom = board.getSquare(4, 'c');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       const whitePawnFrom = board.getSquare(2, 'd');
       const whitePawnTo = board.getSquare(4, 'd');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       board.applyMove(new Move(whitePawnFrom, whitePawnTo));
 
@@ -314,11 +314,11 @@ describe('pawn moves', () => {
 
     test('captures en passant south-west', () => {
       const blackPawnFrom = board.getSquare(4, 'c');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       const whitePawnFrom = board.getSquare(2, 'b');
       const whitePawnTo = board.getSquare(4, 'b');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       board.applyMove(new Move(whitePawnFrom, whitePawnTo));
 
@@ -332,11 +332,11 @@ describe('pawn moves', () => {
 
     test('should not capture en passant after a one-square move', () => {
       const blackPawnFrom = board.getSquare(4, 'c');
-      const blackPawn = new Piece(PLAYER_BLACK, PAWN);
+      const blackPawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       blackPawnFrom.setPiece(blackPawn);
       const whitePawnFrom = board.getSquare(3, 'd');
       const whitePawnTo = board.getSquare(4, 'd');
-      const whitePawn = new Piece(PLAYER_WHITE, PAWN);
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
       whitePawnFrom.setPiece(whitePawn);
       board.applyMove(new Move(whitePawnFrom, whitePawnTo));
 
@@ -348,7 +348,7 @@ describe('pawn moves', () => {
 
     test('should promote without capturing', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
 
       pawn.possibleMovesIgnoringCheck(board, moves);
@@ -363,7 +363,7 @@ describe('pawn moves', () => {
 
     test('should promote while capturing south-east', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
       board.setPiece(1, 'd', new Piece(PLAYER_WHITE, LASER));
       // block non-capturing promotion
@@ -381,7 +381,7 @@ describe('pawn moves', () => {
 
     test('should promote while capturing south-west', () => {
       const from = board.getSquare(2, 'c');
-      const pawn = new Piece(PLAYER_BLACK, PAWN);
+      const pawn = new Piece(PLAYER_BLACK, PAWN_SHIELD);
       from.setPiece(pawn);
       board.setPiece(1, 'b', new Piece(PLAYER_WHITE, KNIGHT));
       // block non-capturing promotion

@@ -1,6 +1,6 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {PAWN, LASER} from '../../../engine/PieceType';
+import {KNIGHT, LASER} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import checkMove from '../../../testutil/checkMove';
 
@@ -21,9 +21,9 @@ describe('laser moves', () => {
     // Set up some pieces that block the laser's movement.
 
     // block
-    board.setPiece(2, 4, new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(2, 4, new Piece(PLAYER_WHITE, KNIGHT));
     // capture
-    board.setPiece(2, 2, new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(2, 2, new Piece(PLAYER_BLACK, KNIGHT));
 
     laser.possibleMovesIgnoringCheck(board, moves);
 

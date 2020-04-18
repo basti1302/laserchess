@@ -5,6 +5,7 @@ import {
   START,
   REFLECTED_LEFT,
   REFLECTED_RIGHT,
+  REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
 } from '../engine/laser/SegmentType';
@@ -62,7 +63,11 @@ export default class Square extends React.Component {
         ];
         if (segment.type === START) {
           shot1Classes.push(styles['shot-segment-start']);
-        } else if (segment.type === DESTROY || segment.type === ABSORB) {
+        } else if (
+          segment.type === DESTROY ||
+          segment.type === ABSORB ||
+          segment.type === REFLECTED_STRAIGHT
+        ) {
           shot1Classes.push(styles['shot-segment-end']);
         } else if (
           segment.type === REFLECTED_LEFT ||

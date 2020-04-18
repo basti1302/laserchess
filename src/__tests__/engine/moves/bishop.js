@@ -1,6 +1,6 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {PAWN, BISHOP} from '../../../engine/PieceType';
+import {KNIGHT, BISHOP} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import checkMove from '../../../testutil/checkMove';
 
@@ -21,11 +21,11 @@ describe('bishop moves', () => {
     // Set up some pieces that block the bishop's movement.
 
     // north-east: 2 moves
-    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, KNIGHT));
     // south-east: 0 moves
-    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, KNIGHT));
     // south-west: 1 move
-    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, KNIGHT));
     // north-east: no obstacle, 4 moves
 
     bishop.possibleMovesIgnoringCheck(board, moves);

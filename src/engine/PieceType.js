@@ -6,7 +6,13 @@ import movesBishop from './moves/bishop';
 import movesQueen from './moves/queen';
 import movesKing from './moves/king';
 import movesLaser from './moves/laser';
-import {DEFAULT, REFLECT_LEFT, REFLECT_RIGHT, SHIELD} from './laser/Surface';
+import {
+  DEFAULT,
+  REFLECT_LEFT,
+  REFLECT_RIGHT,
+  REFLECT_STRAIGHT,
+  SHIELD,
+} from './laser/Surface';
 
 export default class PieceType {
   constructor(whiteChar, blackChar, possibleMovesFunction, surfaces) {
@@ -39,22 +45,29 @@ export default class PieceType {
   }
 
   isPawn() {
-    return this === PAWN || this === PAWN_90_DEGREES || this === PAWN_SHIELD;
+    return (
+      this === PAWN_SHIELD || this === PAWN_90_DEGREES || this === PAWN_THREEWAY
+    );
   }
 }
 
-export const PAWN = new PieceType('pawn-white', 'pawn-black', movesPawn);
+export const PAWN_SHIELD = new PieceType(
+  'pawn-shield-white',
+  'pawn-shield-black',
+  movesPawn,
+  [SHIELD, DEFAULT, DEFAULT, DEFAULT],
+);
 export const PAWN_90_DEGREES = new PieceType(
   'pawn-90-deg-white',
   'pawn-90-deg-black',
   movesPawn,
   [REFLECT_LEFT, REFLECT_RIGHT, DEFAULT, DEFAULT],
 );
-export const PAWN_SHIELD = new PieceType(
-  'pawn-shield-white',
-  'pawn-shield-black',
+export const PAWN_THREEWAY = new PieceType(
+  'pawn-threeway-white',
+  'pawn-threeway-black',
   movesPawn,
-  [SHIELD, DEFAULT, DEFAULT, DEFAULT],
+  [REFLECT_STRAIGHT, REFLECT_RIGHT, DEFAULT, REFLECT_LEFT],
 );
 export const BISHOP = new PieceType(
   'bishop-white',

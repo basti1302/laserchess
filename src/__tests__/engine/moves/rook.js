@@ -1,6 +1,6 @@
 import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
-import {PAWN, ROOK} from '../../../engine/PieceType';
+import {KNIGHT, ROOK} from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import checkMove from '../../../testutil/checkMove';
 
@@ -21,11 +21,11 @@ describe('rook moves', () => {
     // Set up some pieces that block the rook's movement.
 
     // north: 3 moves
-    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, PAWN));
+    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, KNIGHT));
     // east: no obstacle, 4 moves
     // south: no obstacle, 4 moves
     // west: 3 moves
-    board.setPiece(5, 1, new Piece(PLAYER_WHITE, PAWN));
+    board.setPiece(5, 1, new Piece(PLAYER_WHITE, KNIGHT));
 
     rook.possibleMovesIgnoringCheck(board, moves);
 

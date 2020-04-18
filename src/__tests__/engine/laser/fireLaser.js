@@ -2,10 +2,11 @@ import Board, {ranks, files} from '../../../engine/Board';
 import Piece from '../../../engine/Piece';
 import {
   KING,
+  KNIGHT,
   LASER,
-  PAWN,
-  PAWN_90_DEGREES,
   PAWN_SHIELD,
+  PAWN_90_DEGREES,
+  PAWN_THREEWAY,
 } from '../../../engine/PieceType';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
 import {NORTH, EAST, SOUTH, WEST} from '../../../engine/Orientation';
@@ -16,6 +17,7 @@ import {
   STRAIGHT,
   REFLECTED_LEFT,
   REFLECTED_RIGHT,
+  REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
 } from '../../../engine/laser/SegmentType';
@@ -124,7 +126,7 @@ describe('fire laser', () => {
       const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
       board.setPiece(laserPos.rank, laserPos.file, laser);
       const pawnPos = board.getSquare(7, 'c');
-      const pawn = new Piece(PLAYER_WHITE, PAWN, NORTH);
+      const pawn = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
       board.setPiece(pawnPos.rank, pawnPos.file, pawn);
 
       const shot = laser.fire(board);
@@ -144,7 +146,7 @@ describe('fire laser', () => {
       const laser = new Piece(PLAYER_WHITE, LASER, EAST);
       board.setPiece(laserPos.rank, laserPos.file, laser);
       const pawnPos = board.getSquare(5, 'g');
-      const pawn = new Piece(PLAYER_BLACK, PAWN, NORTH);
+      const pawn = new Piece(PLAYER_BLACK, KNIGHT, NORTH);
       board.setPiece(pawnPos.rank, pawnPos.file, pawn);
 
       const shot = laser.fire(board);
@@ -159,7 +161,7 @@ describe('fire laser', () => {
       verifySegment(segments[5], 5, 'g', EAST, DESTROY);
     });
 
-    describe('shield surface', () => {
+    describe('shield pawn', () => {
       test('shield surface shoult stop a shot from north to south', () => {
         const laserPos = board.getSquare(7, 'e');
         const laser = new Piece(PLAYER_WHITE, LASER, SOUTH);
@@ -321,6 +323,120 @@ describe('fire laser', () => {
         verifySegment(segments[2], 5, 'd', WEST, REFLECTED_LEFT);
         verifySegment(segments[3], 4, 'd', SOUTH, STRAIGHT);
         verifySegment(segments[4], 3, 'd', SOUTH, DESTROY);
+      });
+    });
+
+    describe('threeway pawn', () => {
+      test('should reflect straight', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const threewayPawnPos = board.getSquare(5, 'f');
+        const threewayPawn = new Piece(PLAYER_WHITE, PAWN_THREEWAY, WEST);
+        board.setPiece(
+          threewayPawnPos.rank,
+          threewayPawnPos.file,
+          threewayPawn,
+        );
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(laserPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, REFLECTED_STRAIGHT);
+        verifySegment(segments[3], 5, 'e', WEST, STRAIGHT);
+        verifySegment(segments[4], 5, 'd', WEST, DESTROY);
+      });
+
+      test('should reflect left', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const threewayPawnPos = board.getSquare(5, 'f');
+        const threewayPawn = new Piece(PLAYER_WHITE, PAWN_THREEWAY, NORTH);
+        board.setPiece(
+          threewayPawnPos.rank,
+          threewayPawnPos.file,
+          threewayPawn,
+        );
+        const targetPos = board.getSquare(7, 'f');
+        const target = new Piece(PLAYER_BLACK, KING, NORTH);
+        board.setPiece(targetPos.rank, targetPos.file, target);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(targetPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, REFLECTED_LEFT);
+        verifySegment(segments[3], 6, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[4], 7, 'f', NORTH, DESTROY);
+      });
+
+      test('should reflect right', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const threewayPawnPos = board.getSquare(5, 'f');
+        const threewayPawn = new Piece(PLAYER_WHITE, PAWN_THREEWAY, SOUTH);
+        board.setPiece(
+          threewayPawnPos.rank,
+          threewayPawnPos.file,
+          threewayPawn,
+        );
+        const targetPos = board.getSquare(3, 'f');
+        const target = new Piece(PLAYER_BLACK, KING, NORTH);
+        board.setPiece(targetPos.rank, targetPos.file, target);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBe(targetPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(5);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, REFLECTED_RIGHT);
+        verifySegment(segments[3], 4, 'f', SOUTH, STRAIGHT);
+        verifySegment(segments[4], 3, 'f', SOUTH, DESTROY);
+      });
+
+      test('must detect and stop shots that are reflected infinitely ', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const threewayPawn1Pos = board.getSquare(5, 'f');
+        const threewayPawn1 = new Piece(PLAYER_WHITE, PAWN_THREEWAY, NORTH);
+        board.setPiece(
+          threewayPawn1Pos.rank,
+          threewayPawn1Pos.file,
+          threewayPawn1,
+        );
+        const threewayPawn2Pos = board.getSquare(7, 'f');
+        const threewayPawn2 = new Piece(PLAYER_WHITE, PAWN_THREEWAY, SOUTH);
+        board.setPiece(
+          threewayPawn2Pos.rank,
+          threewayPawn2Pos.file,
+          threewayPawn2,
+        );
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquare).toBeUndefined();
+        const segments = shot.segments;
+        expect(segments.length).toBe(9);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, REFLECTED_LEFT);
+        verifySegment(segments[3], 6, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[4], 7, 'f', NORTH, REFLECTED_STRAIGHT);
+        verifySegment(segments[5], 6, 'f', SOUTH, STRAIGHT);
+        verifySegment(segments[6], 5, 'f', SOUTH, REFLECTED_STRAIGHT);
+        verifySegment(segments[7], 6, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[8], 7, 'f', NORTH, ABSORB);
       });
     });
   });
