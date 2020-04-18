@@ -14,8 +14,8 @@ import {
 import Piece from './Piece';
 import Square from './Square';
 
-export const files = 9; // columns: a - h on a traditional board
 export const ranks = 9; // rows: 1 - 8 on a traditional board
+export const files = 9; // columns: a - h on a traditional board
 
 export default class Board {
   constructor() {

@@ -60,12 +60,12 @@
   content: '♝';
 }
 
-.knight-white:before {
-  content: '♘';
+.knight-white {
+  background-image: url('white_knight.png');
 }
 
-.knight-black:before {
-  content: '♞';
+.knight-black {
+  background-image: url('black_knight.png');
 }
 
 .rook-white:before {
