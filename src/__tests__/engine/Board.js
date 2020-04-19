@@ -813,9 +813,7 @@ describe('Board', () => {
       expect(historyEntry.to2).toBeUndefined();
       expect(historyEntry.type).toBe(LASER);
       expect(historyEntry.player).toBe(PLAYER_WHITE);
-      expect(historyEntry.shot.hit).toBe(false);
-      expect(historyEntry.shot.target).toBeUndefined();
-      expect(historyEntry.shot.type).toBeUndefined();
+      expect(historyEntry.shot.targets.length).toBe(0);
     });
 
     test('should destroy friendly piece when applying a shot', () => {
@@ -831,7 +829,7 @@ describe('Board', () => {
           new Segment(board.getSquare(6, 'c'), NORTH, START),
           new Segment(pawnPos, NORTH, DESTROY),
         ],
-        pawnPos,
+        [pawnPos],
       );
 
       board.applyShot(shot);
@@ -851,9 +849,11 @@ describe('Board', () => {
       expect(historyEntry.to2).toBeUndefined();
       expect(historyEntry.type).toBe(LASER);
       expect(historyEntry.player).toBe(PLAYER_WHITE);
-      expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
-      expect(historyEntry.shot.target.file).toBe(pawnPos.file);
-      expect(historyEntry.shot.type).toBe(PAWN_90_DEGREES);
+      expect(historyEntry.shot.targets.length).toBe(1);
+      expect(historyEntry.shot.targets[0].square.rank).toBe(pawnPos.rank);
+      expect(historyEntry.shot.targets[0].square.file).toBe(pawnPos.file);
+      expect(historyEntry.shot.targets[0].player).toBe(PLAYER_WHITE);
+      expect(historyEntry.shot.targets[0].type).toBe(PAWN_90_DEGREES);
     });
 
     test('should destroy enemy piece when applying a shot', () => {
@@ -869,7 +869,7 @@ describe('Board', () => {
           new Segment(board.getSquare(5, 'd'), EAST, START),
           new Segment(pawnPos, EAST, DESTROY),
         ],
-        pawnPos,
+        [pawnPos],
       );
 
       board.applyShot(shot);
@@ -889,9 +889,11 @@ describe('Board', () => {
       expect(historyEntry.to2).toBeUndefined();
       expect(historyEntry.type).toBe(LASER);
       expect(historyEntry.player).toBe(PLAYER_WHITE);
-      expect(historyEntry.shot.target.rank).toBe(pawnPos.rank);
-      expect(historyEntry.shot.target.file).toBe(pawnPos.file);
-      expect(historyEntry.shot.type).toBe(PAWN_90_DEGREES);
+      expect(historyEntry.shot.targets.length).toBe(1);
+      expect(historyEntry.shot.targets[0].square.rank).toBe(pawnPos.rank);
+      expect(historyEntry.shot.targets[0].square.file).toBe(pawnPos.file);
+      expect(historyEntry.shot.targets[0].player).toBe(PLAYER_BLACK);
+      expect(historyEntry.shot.targets[0].type).toBe(PAWN_90_DEGREES);
     });
   });
 

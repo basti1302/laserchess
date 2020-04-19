@@ -173,20 +173,47 @@ export default class Board {
     this.setPiece(6, 'g', new Piece(PLAYER_WHITE, LASER, SOUTH));
     this.setPiece(3, 'h', new Piece(PLAYER_WHITE, LASER, WEST));
 
-    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, KNIGHT, NORTH));
-    this.setPiece(7, 'h', new Piece(PLAYER_BLACK, KNIGHT, EAST));
-    this.setPiece(2, 'g', new Piece(PLAYER_BLACK, KNIGHT, SOUTH));
-    this.setPiece(3, 'b', new Piece(PLAYER_BLACK, KNIGHT, WEST));
+    this.setPiece(9, 'c', new Piece(PLAYER_BLACK, KING, NORTH));
+    this.setPiece(7, 'h', new Piece(PLAYER_BLACK, KING, EAST));
+    this.setPiece(2, 'g', new Piece(PLAYER_BLACK, KING, SOUTH));
+    this.setPiece(3, 'b', new Piece(PLAYER_BLACK, KING, WEST));
 
     this.setPiece(1, 'f', new Piece(PLAYER_BLACK, LASER, NORTH));
     this.setPiece(5, 'a', new Piece(PLAYER_BLACK, LASER, EAST));
     this.setPiece(9, 'd', new Piece(PLAYER_BLACK, LASER, SOUTH));
     this.setPiece(4, 'i', new Piece(PLAYER_BLACK, LASER, WEST));
 
-    this.setPiece(9, 'f', new Piece(PLAYER_WHITE, KNIGHT, NORTH));
-    this.setPiece(5, 'i', new Piece(PLAYER_WHITE, KNIGHT, EAST));
-    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, KNIGHT, SOUTH));
-    this.setPiece(4, 'a', new Piece(PLAYER_WHITE, KNIGHT, WEST));
+    this.setPiece(9, 'f', new Piece(PLAYER_WHITE, KING, NORTH));
+    this.setPiece(5, 'i', new Piece(PLAYER_WHITE, KING, EAST));
+    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, KING, SOUTH));
+    this.setPiece(4, 'a', new Piece(PLAYER_WHITE, KING, WEST));
+  }
+
+  testSetupKnight() {
+    this.setPiece(1, 'd', new Piece(PLAYER_WHITE, LASER));
+    this.setPiece(5, 'd', new Piece(PLAYER_WHITE, KNIGHT));
+
+    this.setPiece(5, 'b', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, NORTH));
+    this.setPiece(2, 'c', new Piece(PLAYER_WHITE, PAWN_SHIELD, WEST));
+    this.setPiece(2, 'g', new Piece(PLAYER_WHITE, PAWN_THREEWAY, EAST));
+    this.setPiece(2, 'h', new Piece(PLAYER_WHITE, PAWN_90_DEGREES, WEST));
+
+    this.setPiece(ranks - 2, 'c', new Piece(PLAYER_BLACK, KNIGHT, WEST));
+    this.setPiece(ranks, 'f', new Piece(PLAYER_BLACK, LASER));
+    this.setPiece(ranks - 4, 'h', new Piece(PLAYER_BLACK, KNIGHT, EAST));
+
+    this.setPiece(
+      ranks - 2,
+      'b',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, EAST),
+    );
+    this.setPiece(ranks - 1, 'c', new Piece(PLAYER_BLACK, PAWN_SHIELD, WEST));
+    this.setPiece(ranks - 1, 'g', new Piece(PLAYER_BLACK, PAWN_THREEWAY, EAST));
+    this.setPiece(
+      ranks - 1,
+      'h',
+      new Piece(PLAYER_BLACK, PAWN_90_DEGREES, SOUTH),
+    );
   }
 
   allMovesIgnoringCheck(player) {
@@ -320,14 +347,24 @@ export default class Board {
       type: LASER,
       player: shootingPiece.player,
       shot: {
-        hit: false,
+        targets: [],
       },
     };
-    if (shot && shot.destroyedSquare) {
-      const destroyed = shot.destroyedSquare.removePiece();
-      historyEntry.shot.hit = true;
-      historyEntry.shot.target = shot.destroyedSquare.asPosition();
-      historyEntry.shot.type = destroyed.type;
+    for (let i = 0; i < shot.destroyedSquares.length; i++) {
+      const destroyed = shot.destroyedSquares[i].removePiece();
+      if (destroyed) {
+        historyEntry.shot.targets[i] = {
+          square: shot.destroyedSquares[i].asPosition(),
+          player: destroyed.player,
+          type: destroyed.type,
+        };
+      } else {
+        console.warn(
+          `Laser shot has a destroyed square without a piece on it: (${
+            shot.destroyedSquares[i].rank
+          }, ${shot.destroyedSquares[i].getFileAsLetter()}).`,
+        );
+      }
     }
     this.moveHistory.push(historyEntry);
   }

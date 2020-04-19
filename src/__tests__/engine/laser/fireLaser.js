@@ -48,7 +48,7 @@ describe('fire laser', () => {
 
       const shot = fireLaser(board, laserPos, NORTH);
 
-      expect(shot.destroyedSquare).toBeUndefined();
+      expect(shot.destroyedSquares.length).toBe(0);
       const segments = shot.segments;
       expect(segments.length).toBe(ranks);
       verifySegment(segments[0], 1, 'c', NORTH, START);
@@ -64,7 +64,7 @@ describe('fire laser', () => {
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBeUndefined();
+      expect(shot.destroyedSquares.length).toBe(0);
       const segments = shot.segments;
       expect(segments.length).toBe(ranks);
       verifySegment(segments[0], 1, 'c', NORTH, START);
@@ -80,7 +80,7 @@ describe('fire laser', () => {
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBeUndefined();
+      expect(shot.destroyedSquares.length).toBe(0);
       const segments = shot.segments;
       expect(segments.length).toBe(files);
       verifySegment(segments[0], 5, 'a', EAST, START);
@@ -96,7 +96,7 @@ describe('fire laser', () => {
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBeUndefined();
+      expect(shot.destroyedSquares.length).toBe(0);
       const segments = shot.segments;
       expect(segments.length).toBe(ranks);
       verifySegment(segments[0], ranks, 'f', SOUTH, START);
@@ -112,7 +112,7 @@ describe('fire laser', () => {
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBeUndefined();
+      expect(shot.destroyedSquares.length).toBe(0);
       const segments = shot.segments;
       expect(segments.length).toBe(files);
       verifySegment(segments[0], 7, files, WEST, START);
@@ -125,13 +125,14 @@ describe('fire laser', () => {
       const laserPos = board.getSquare(1, 'c');
       const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
       board.setPiece(laserPos.rank, laserPos.file, laser);
-      const pawnPos = board.getSquare(7, 'c');
-      const pawn = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
-      board.setPiece(pawnPos.rank, pawnPos.file, pawn);
+      const targetPos = board.getSquare(7, 'c');
+      const target = new Piece(PLAYER_WHITE, KING, NORTH);
+      board.setPiece(targetPos.rank, targetPos.file, target);
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBe(pawnPos);
+      expect(shot.destroyedSquares.length).toBe(1);
+      expect(shot.destroyedSquares[0]).toBe(targetPos);
       const segments = shot.segments;
       expect(segments.length).toBe(7);
       verifySegment(segments[0], 1, 'c', NORTH, START);
@@ -145,13 +146,14 @@ describe('fire laser', () => {
       const laserPos = board.getSquare(5, 'b');
       const laser = new Piece(PLAYER_WHITE, LASER, EAST);
       board.setPiece(laserPos.rank, laserPos.file, laser);
-      const pawnPos = board.getSquare(5, 'g');
-      const pawn = new Piece(PLAYER_BLACK, KNIGHT, NORTH);
-      board.setPiece(pawnPos.rank, pawnPos.file, pawn);
+      const targetPos = board.getSquare(5, 'g');
+      const target = new Piece(PLAYER_BLACK, KING, NORTH);
+      board.setPiece(targetPos.rank, targetPos.file, target);
 
       const shot = laser.fire(board);
 
-      expect(shot.destroyedSquare).toBe(pawnPos);
+      expect(shot.destroyedSquares.length).toBe(1);
+      expect(shot.destroyedSquares[0]).toBe(targetPos);
       const segments = shot.segments;
       expect(segments.length).toBe(6);
       verifySegment(segments[0], 5, 'b', EAST, START);
@@ -172,7 +174,7 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBeUndefined();
+        expect(shot.destroyedSquares.length).toBe(0);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 7, 'e', SOUTH, START);
@@ -192,7 +194,7 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBeUndefined();
+        expect(shot.destroyedSquares.length).toBe(0);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'g', WEST, START);
@@ -212,7 +214,7 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBeUndefined();
+        expect(shot.destroyedSquares.length).toBe(0);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 3, 'e', NORTH, START);
@@ -232,7 +234,7 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBeUndefined();
+        expect(shot.destroyedSquares.length).toBe(0);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'c', EAST, START);
@@ -261,7 +263,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(targetPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(targetPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'd', SOUTH, START);
@@ -288,7 +291,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(targetPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(targetPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 3, 'f', WEST, START);
@@ -315,7 +319,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(targetPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(targetPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'f', WEST, START);
@@ -341,7 +346,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(laserPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(laserPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'd', EAST, START);
@@ -368,7 +374,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(targetPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(targetPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'd', EAST, START);
@@ -395,7 +402,8 @@ describe('fire laser', () => {
 
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBe(targetPos);
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(targetPos);
         const segments = shot.segments;
         expect(segments.length).toBe(5);
         verifySegment(segments[0], 5, 'd', EAST, START);
@@ -425,7 +433,7 @@ describe('fire laser', () => {
         );
         const shot = laser.fire(board);
 
-        expect(shot.destroyedSquare).toBeUndefined();
+        expect(shot.destroyedSquares.length).toBe(0);
         const segments = shot.segments;
         expect(segments.length).toBe(9);
         verifySegment(segments[0], 5, 'd', EAST, START);
@@ -437,6 +445,181 @@ describe('fire laser', () => {
         verifySegment(segments[6], 5, 'f', SOUTH, REFLECTED_STRAIGHT);
         verifySegment(segments[7], 6, 'f', NORTH, STRAIGHT);
         verifySegment(segments[8], 7, 'f', NORTH, ABSORB);
+      });
+    });
+
+    describe('knight', () => {
+      test('knight facing north should split shots from south', () => {
+        const laserPos = board.getSquare(4, 'e');
+        const laser = new Piece(PLAYER_WHITE, LASER, NORTH);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(6, 'e');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const target1Pos = board.getSquare(6, 'g');
+        const target1 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target1Pos.rank, target1Pos.file, target1);
+        const target2Pos = board.getSquare(6, 'c');
+        const target2 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target2Pos.rank, target2Pos.file, target2);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(2);
+        expect(shot.destroyedSquares[0]).toBe(target1Pos);
+        expect(shot.destroyedSquares[1]).toBe(target2Pos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(9);
+        verifySegment(segments[0], 4, 'e', NORTH, START);
+        verifySegment(segments[1], 5, 'e', NORTH, STRAIGHT);
+        verifySegment(segments[2], 6, 'e', NORTH, ABSORB);
+        verifySegment(segments[3], 6, 'e', EAST, START);
+        verifySegment(segments[4], 6, 'f', EAST, STRAIGHT);
+        verifySegment(segments[5], 6, 'g', EAST, DESTROY);
+        verifySegment(segments[6], 6, 'e', WEST, START);
+        verifySegment(segments[7], 6, 'd', WEST, STRAIGHT);
+        verifySegment(segments[8], 6, 'c', WEST, DESTROY);
+      });
+
+      test('knight facing north should split shots from north', () => {
+        const laserPos = board.getSquare(6, 'e');
+        const laser = new Piece(PLAYER_WHITE, LASER, SOUTH);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(4, 'e');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const target1Pos = board.getSquare(4, 'g');
+        const target1 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target1Pos.rank, target1Pos.file, target1);
+        const target2Pos = board.getSquare(4, 'c');
+        const target2 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target2Pos.rank, target2Pos.file, target2);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(2);
+        expect(shot.destroyedSquares[0]).toBe(target2Pos);
+        expect(shot.destroyedSquares[1]).toBe(target1Pos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(9);
+        verifySegment(segments[0], 6, 'e', SOUTH, START);
+        verifySegment(segments[1], 5, 'e', SOUTH, STRAIGHT);
+        verifySegment(segments[2], 4, 'e', SOUTH, ABSORB);
+        verifySegment(segments[3], 4, 'e', WEST, START);
+        verifySegment(segments[4], 4, 'd', WEST, STRAIGHT);
+        verifySegment(segments[5], 4, 'c', WEST, DESTROY);
+        verifySegment(segments[6], 4, 'e', EAST, START);
+        verifySegment(segments[7], 4, 'f', EAST, STRAIGHT);
+        verifySegment(segments[8], 4, 'g', EAST, DESTROY);
+      });
+
+      test('knight facing north should be shot from west', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(5, 'f');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(knightPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(3);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, DESTROY);
+      });
+
+      test('knight facing north should be shot from east', () => {
+        const laserPos = board.getSquare(5, 'f');
+        const laser = new Piece(PLAYER_WHITE, LASER, WEST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(5, 'd');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, NORTH);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(knightPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(3);
+        verifySegment(segments[0], 5, 'f', WEST, START);
+        verifySegment(segments[1], 5, 'e', WEST, STRAIGHT);
+        verifySegment(segments[2], 5, 'd', WEST, DESTROY);
+      });
+
+      test('knight facing east should split shots from west', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(5, 'f');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, EAST);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const target1Pos = board.getSquare(3, 'f');
+        const target1 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target1Pos.rank, target1Pos.file, target1);
+        const target2Pos = board.getSquare(7, 'f');
+        const target2 = new Piece(PLAYER_BLACK, KING);
+        board.setPiece(target2Pos.rank, target2Pos.file, target2);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(2);
+        expect(shot.destroyedSquares[0]).toBe(target1Pos);
+        expect(shot.destroyedSquares[1]).toBe(target2Pos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(9);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, ABSORB);
+        verifySegment(segments[3], 5, 'f', SOUTH, START);
+        verifySegment(segments[4], 4, 'f', SOUTH, STRAIGHT);
+        verifySegment(segments[5], 3, 'f', SOUTH, DESTROY);
+        verifySegment(segments[6], 5, 'f', NORTH, START);
+        verifySegment(segments[7], 6, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[8], 7, 'f', NORTH, DESTROY);
+      });
+
+      test('a piece hit by multiple shot legs should only be listed as destroyed once', () => {
+        const laserPos = board.getSquare(5, 'd');
+        const laser = new Piece(PLAYER_WHITE, LASER, EAST);
+        board.setPiece(laserPos.rank, laserPos.file, laser);
+        const knightPos = board.getSquare(5, 'f');
+        const knight = new Piece(PLAYER_WHITE, KNIGHT, EAST);
+        board.setPiece(knightPos.rank, knightPos.file, knight);
+
+        const shieldPawn1Pos = board.getSquare(3, 'f');
+        const shieldPawn1 = new Piece(PLAYER_BLACK, PAWN_THREEWAY, NORTH);
+        board.setPiece(shieldPawn1Pos.rank, shieldPawn1Pos.file, shieldPawn1);
+        const shieldPawn2Pos = board.getSquare(7, 'f');
+        const shieldPawn2 = new Piece(PLAYER_BLACK, PAWN_THREEWAY, SOUTH);
+        board.setPiece(shieldPawn2Pos.rank, shieldPawn2Pos.file, shieldPawn2);
+
+        const shot = laser.fire(board);
+
+        expect(shot.destroyedSquares.length).toBe(1);
+        expect(shot.destroyedSquares[0]).toBe(knightPos);
+        const segments = shot.segments;
+        expect(segments.length).toBe(13);
+        verifySegment(segments[0], 5, 'd', EAST, START);
+        verifySegment(segments[1], 5, 'e', EAST, STRAIGHT);
+        verifySegment(segments[2], 5, 'f', EAST, ABSORB);
+        verifySegment(segments[3], 5, 'f', SOUTH, START);
+        verifySegment(segments[4], 4, 'f', SOUTH, STRAIGHT);
+        verifySegment(segments[5], 3, 'f', SOUTH, REFLECTED_STRAIGHT);
+        verifySegment(segments[6], 4, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[7], 5, 'f', NORTH, DESTROY);
+        verifySegment(segments[8], 5, 'f', NORTH, START);
+        verifySegment(segments[9], 6, 'f', NORTH, STRAIGHT);
+        verifySegment(segments[10], 7, 'f', NORTH, REFLECTED_STRAIGHT);
+        verifySegment(segments[11], 6, 'f', SOUTH, STRAIGHT);
+        verifySegment(segments[12], 5, 'f', SOUTH, DESTROY);
       });
     });
   });

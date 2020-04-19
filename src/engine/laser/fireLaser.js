@@ -16,11 +16,15 @@ import {
   REFLECT_RIGHT,
   REFLECT_STRAIGHT,
   SHIELD,
+  SPLIT,
 } from './Surface';
 import {LASER} from '../PieceType';
 import Segment from './Segment';
 import Shot from './Shot';
 
+/**
+ * Starts the laser shot from the firing laser piece.
+ */
 export default function fireLaser(board, from, orientation) {
   if (from.constructor.name !== 'Square') {
     throw new Error(
@@ -46,23 +50,31 @@ export default function fireLaser(board, from, orientation) {
     return new Shot([]);
   }
 
-  const segments = [new Segment(from, orientation, START)];
-  let destroyedSquare;
+  const segments = [];
+  const destroyedSquares = [];
+  startShotLeg(board, from, orientation, segments, destroyedSquares);
+  return new Shot(segments, destroyedSquares);
+}
 
-  let stop = false;
+/**
+ * Starts one leg of a shot, either from the firing laser piece or one of the
+ * two individual legs after a split at a knight piece.
+ */
+function startShotLeg(board, from, orientation, segments, destroyedSquares) {
+  segments.push(new Segment(from, orientation, START));
   let nextSquare = from;
   do {
     nextSquare = oneStep(nextSquare, board, orientation);
     if (!nextSquare) {
       // end of board reached
-      stop = true;
+      return;
     } else {
       if (nextSquare.hasPiece()) {
         const surface = getSurfaceFromPiece(nextSquare.getPiece(), orientation);
         if (surface === DEFAULT) {
-          destroyedSquare = nextSquare;
+          addToDestroyedSquares(destroyedSquares, nextSquare);
           segments.push(new Segment(nextSquare, orientation, DESTROY));
-          stop = true;
+          return;
         } else if (surface === REFLECT_LEFT) {
           segments.push(new Segment(nextSquare, orientation, REFLECTED_LEFT));
           orientation = orientation.rotateLeft();
@@ -73,13 +85,14 @@ export default function fireLaser(board, from, orientation) {
           // Check for infinetly reflected shots: Check whether the current
           // square is already contained with type reflected-straight, if so,
           // absorb.
+          const current = nextSquare;
           if (
             segments.find(
-              (s) => s.square === nextSquare && s.type === REFLECTED_STRAIGHT,
+              (s) => s.square === current && s.type === REFLECTED_STRAIGHT,
             )
           ) {
             segments.push(new Segment(nextSquare, orientation, ABSORB));
-            stop = true;
+            return;
           } else {
             segments.push(
               new Segment(nextSquare, orientation, REFLECTED_STRAIGHT),
@@ -88,7 +101,26 @@ export default function fireLaser(board, from, orientation) {
           }
         } else if (surface === SHIELD) {
           segments.push(new Segment(nextSquare, orientation, ABSORB));
-          stop = true;
+          return;
+        } else if (surface === SPLIT) {
+          const splitOrientation1 = orientation.rotateRight();
+          const splitOrientation2 = orientation.rotateLeft();
+          segments.push(new Segment(nextSquare, orientation, ABSORB));
+          startShotLeg(
+            board,
+            nextSquare,
+            splitOrientation1,
+            segments,
+            destroyedSquares,
+          );
+          startShotLeg(
+            board,
+            nextSquare,
+            splitOrientation2,
+            segments,
+            destroyedSquares,
+          );
+          return;
         } else {
           throw new Error(`Surface type is not implemented yet: ${surface}`);
         }
@@ -96,8 +128,7 @@ export default function fireLaser(board, from, orientation) {
         segments.push(new Segment(nextSquare, orientation, STRAIGHT));
       }
     }
-  } while (!stop);
-  return new Shot(segments, destroyedSquare);
+  } while (true);
 }
 
 function oneStep(square, board, orientation) {
@@ -144,4 +175,14 @@ function getSurfaceFromPiece(piece, shotOrientation) {
   const surfaceIndex =
     modulo((shotOrientation.orientationIndex + 2 - piece.orientation.orientationIndex),  4);
   return piece.type.surfaces[surfaceIndex];
+}
+
+function addToDestroyedSquares(destroyedSquares, square) {
+  // Due to shots being split by knights a piece may be hit by multiple legs of
+  // a shot. We only add it to destroyedSquares once, that is, before we add it,
+  // we check if it is already listed as a destroyed square.
+  const alreadyListedAsDestroyed = !!destroyedSquares.find((s) => s === square);
+  if (!alreadyListedAsDestroyed) {
+    destroyedSquares.push(square);
+  }
 }

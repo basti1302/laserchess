@@ -12,6 +12,7 @@ function doSetup(ctx) {
   // board.testSetupPromotion();
   // board.testSetupEnPassant();
   // board.testSetupLaser();
+  // board.testSetupKnight();
   return {
     board,
   };

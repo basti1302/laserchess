@@ -12,6 +12,7 @@ import {
   REFLECT_RIGHT,
   REFLECT_STRAIGHT,
   SHIELD,
+  SPLIT,
 } from './laser/Surface';
 
 export default class PieceType {
@@ -78,6 +79,7 @@ export const KNIGHT = new PieceType(
   'knight-white',
   'knight-black',
   movesKnight,
+  [SPLIT, DEFAULT, SPLIT, DEFAULT],
 );
 export const ROOK = new PieceType('rook-white', 'rook-black', movesRook);
 export const QUEEN = new PieceType('queen-white', 'queen-black', movesQueen);
