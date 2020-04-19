@@ -50,13 +50,13 @@ export default class Square extends React.Component {
       classes.push(styles['possible-move']);
     }
 
-    let shotDiv1 = null;
-    let shotDiv2 = null;
+    let shotDivs = [];
     if (this.props.G.shot && this.props.stage === 'renderShotStage') {
-      const segment = this.props.G.shot.segments.filter(
+      const shotSegmentsOnThisSquare = this.props.G.shot.segments.filter(
         (shotSegment) => shotSegment.square === square,
-      )[0];
-      if (segment) {
+      );
+      for (let i = 0; i < shotSegmentsOnThisSquare.length; i++) {
+        const segment = shotSegmentsOnThisSquare[i];
         const shot1Classes = [
           styles['shot-segment'],
           styles[`shot-segment-${segment.orientation.cssClass}`],
@@ -83,9 +83,13 @@ export default class Square extends React.Component {
             styles[`shot-segment-${secondOrientation.cssClass}`],
             styles['shot-segment-reflection-leg-two'],
           ];
-          shotDiv2 = <div className={shot2Classes.join(' ')} />;
+          shotDivs.push(
+            <div key={`${i}-2`} className={shot2Classes.join(' ')} />,
+          );
         }
-        shotDiv1 = <div className={shot1Classes.join(' ')} />;
+        shotDivs.push(
+          <div key={`${i}-1`} className={shot1Classes.join(' ')} />,
+        );
       }
     }
 
@@ -95,8 +99,7 @@ export default class Square extends React.Component {
       <td className={classes.join(' ')} key={id} onClick={() => this.onClick()}>
         <div className={styles['square-div']}>
           {piece && <Piece piece={piece} />}
-          {shotDiv1}
-          {shotDiv2}
+          {shotDivs.map((shotDiv) => shotDiv)}
         </div>
       </td>
     );
