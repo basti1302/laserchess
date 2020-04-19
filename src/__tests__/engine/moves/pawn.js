@@ -157,6 +157,22 @@ describe('pawn moves', () => {
       checkMove(moves[0], whitePawnFrom, ranks - 2, 'c');
     });
 
+    test('should not capture a piece that is not a pawn en passant', () => {
+      const whitePawnFrom = board.getSquare(ranks - 3, 'c');
+      const whitePawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);
+      whitePawnFrom.setPiece(whitePawn);
+      const blackRookFrom = board.getSquare(ranks - 1, 'd');
+      const blackRookTo = board.getSquare(ranks - 3, 'd');
+      const blackRook = new Piece(PLAYER_BLACK, ROOK);
+      blackRookFrom.setPiece(blackRook);
+      board.applyMove(new Move(blackRookFrom, blackRookTo));
+
+      whitePawn.possibleMovesIgnoringCheck(board, moves);
+
+      expect(moves.length).toEqual(1);
+      checkMove(moves[0], whitePawnFrom, ranks - 2, 'c');
+    });
+
     test('should promote without capturing', () => {
       const from = board.getSquare(ranks - 1, 'c');
       const pawn = new Piece(PLAYER_WHITE, PAWN_SHIELD);

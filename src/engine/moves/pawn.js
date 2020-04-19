@@ -78,6 +78,7 @@ export default function movesPawn(board, moves, pawn) {
     const lastMove = board.getLastMove();
     if (lastMove) {
       if (
+        lastMove.type.isPawn() &&
         lastMove.from.rank === enemyPawnHomeRank &&
         lastMove.to.rank === enemyEnPassantDestinationRank
       ) {
