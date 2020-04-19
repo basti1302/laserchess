@@ -7,11 +7,11 @@
 }
 
 .dark {
-  background-image: url('dark_square.png');
+  background-image: url('img/dark_square.png');
 }
 
 .light {
-  background-image: url('light_square.png');
+  background-image: url('img/light_square.png');
 }
 
 .selected {

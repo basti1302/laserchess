@@ -29,27 +29,27 @@
 }
 
 .pawn-shield-white {
-  background-image: url('white_pawn_shield.png');
+  background-image: url('img/white_pawn_shield.png');
 }
 
 .pawn-shield-black {
-  background-image: url('black_pawn_shield.png');
+  background-image: url('img/black_pawn_shield.png');
 }
 
 .pawn-90-deg-white {
-  background-image: url('white_pawn_90_degree.png');
+  background-image: url('img/white_pawn_90_degree.png');
 }
 
 .pawn-90-deg-black {
-  background-image: url('black_pawn_90_degree.png');
+  background-image: url('img/black_pawn_90_degree.png');
 }
 
 .pawn-threeway-white {
-  background-image: url('white_pawn_threeway.png');
+  background-image: url('img/white_pawn_threeway.png');
 }
 
 .pawn-threeway-black {
-  background-image: url('black_pawn_threeway.png');
+  background-image: url('img/black_pawn_threeway.png');
 }
 
 .bishop-white:before {
@@ -61,11 +61,11 @@
 }
 
 .knight-white {
-  background-image: url('white_knight.png');
+  background-image: url('img/white_knight.png');
 }
 
 .knight-black {
-  background-image: url('black_knight.png');
+  background-image: url('img/black_knight.png');
 }
 
 .rook-white:before {
