@@ -2,19 +2,20 @@ import modulo from '../modulo';
 
 import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
 import {
-  START,
-  STRAIGHT,
+  ABSORB,
+  DESTROY,
   REFLECTED_LEFT,
   REFLECTED_RIGHT,
   REFLECTED_STRAIGHT,
-  ABSORB,
-  DESTROY,
+  START,
+  STRAIGHT,
 } from './SegmentType';
 import {
   DEFAULT,
   REFLECT_LEFT,
   REFLECT_RIGHT,
   REFLECT_STRAIGHT,
+  RELAY,
   SHIELD,
   SPLIT,
 } from './Surface';
@@ -99,6 +100,9 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
             );
             orientation = orientation.rotateRight().rotateRight();
           }
+        } else if (surface === RELAY) {
+          segments.push(new Segment(nextSquare, orientation, ABSORB));
+          segments.push(new Segment(nextSquare, orientation, START));
         } else if (surface === SHIELD) {
           segments.push(new Segment(nextSquare, orientation, ABSORB));
           return;

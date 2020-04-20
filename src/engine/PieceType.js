@@ -11,6 +11,7 @@ import {
   REFLECT_LEFT,
   REFLECT_RIGHT,
   REFLECT_STRAIGHT,
+  RELAY,
   SHIELD,
   SPLIT,
 } from './laser/Surface';
@@ -74,6 +75,7 @@ export const BISHOP = new PieceType(
   'bishop-white',
   'bishop-black',
   movesBishop,
+  [REFLECT_STRAIGHT, REFLECT_LEFT, DEFAULT, REFLECT_RIGHT],
 );
 export const KNIGHT = new PieceType(
   'knight-white',
@@ -81,7 +83,17 @@ export const KNIGHT = new PieceType(
   movesKnight,
   [SPLIT, DEFAULT, SPLIT, DEFAULT],
 );
-export const ROOK = new PieceType('rook-white', 'rook-black', movesRook);
-export const QUEEN = new PieceType('queen-white', 'queen-black', movesQueen);
+export const ROOK = new PieceType('rook-white', 'rook-black', movesRook, [
+  SHIELD,
+  SHIELD,
+  SHIELD,
+  SHIELD,
+]);
+export const QUEEN = new PieceType('queen-white', 'queen-black', movesQueen, [
+  RELAY,
+  DEFAULT,
+  DEFAULT,
+  DEFAULT,
+]);
 export const KING = new PieceType('king-white', 'king-black', movesKing);
 export const LASER = new PieceType('laser-white', 'laser-black', movesLaser);
