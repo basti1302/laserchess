@@ -52,12 +52,12 @@
   background-image: url('img/black_pawn_threeway.png');
 }
 
-.bishop-white:before {
-  content: '♗';
+.bishop-white {
+  background-image: url('img/white_bishop.png');
 }
 
-.bishop-black:before {
-  content: '♝';
+.bishop-black {
+  background-image: url('img/black_bishop.png');
 }
 
 .knight-white {
