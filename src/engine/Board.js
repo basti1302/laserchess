@@ -433,6 +433,20 @@ export default class Board {
     );
   }
 
+  getLaserPieces(playerBoardIoLabel) {
+    const laserPieces = [];
+    this.forEachPiece((piece) => {
+      if (
+        piece.type === LASER &&
+        piece.player &&
+        piece.player.boardIoLabel === playerBoardIoLabel
+      ) {
+        laserPieces.push(piece);
+      }
+    });
+    return laserPieces;
+  }
+
   getLastMove() {
     if (this.moveHistory.length === 0) {
       return null;

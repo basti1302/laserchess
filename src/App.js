@@ -144,18 +144,24 @@ function applyPromotionMove(G, ctx, promotionMove) {
 
 function fireLaser(G, ctx) {
   console.debug('fire laser');
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
-    console.warn(
-      'No source square or no piece on source square.',
-      sourceSquare,
-    );
-    return;
-  }
-  const laser = sourceSquare.getPiece();
-  if (laser.type !== LASER) {
-    console.warn('Selected piece is not a laser.', sourceSquare);
-    return;
+  let laser;
+  const allLaserPieces = G.board.getLaserPieces(ctx.currentPlayer);
+  if (allLaserPieces.length === 1) {
+    laser = allLaserPieces[0];
+  } else {
+    const sourceSquare = G.board.getSelectedSquare();
+    if (!sourceSquare || !sourceSquare.getPiece()) {
+      console.warn(
+        'No source square or no piece on source square.',
+        sourceSquare,
+      );
+      return;
+    }
+    laser = sourceSquare.getPiece();
+    if (laser.type !== LASER) {
+      console.warn('Selected piece is not a laser.', sourceSquare);
+      return;
+    }
   }
   const shot = laser.fire(G.board);
   G.shot = shot;
@@ -202,6 +208,7 @@ const LaserChess = {
       selectPieceStage: {
         moves: {
           selectPiece,
+          fireLaser,
         },
         next: 'movePieceStage',
       },
