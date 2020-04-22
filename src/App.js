@@ -1,7 +1,14 @@
 import {Client} from 'boardgame.io/react';
 
-import {LASER} from './engine/PieceType';
 import EngineBoard from './engine/Board';
+import {
+  CHECKMATE,
+  IN_PROGRESS,
+  KING_LOST,
+  KING_SUICIDE,
+  STALEMATE,
+} from './engine/GameState';
+import {LASER} from './engine/PieceType';
 import RenderBoard from './render/Board';
 
 function doSetup(ctx) {
@@ -11,8 +18,9 @@ function doSetup(ctx) {
   // board.testSetupCastling();
   // board.testSetupPromotion();
   // board.testSetupEnPassant();
+  // board.testSetupCheckmate();
   // board.testSetupLaser();
-  // board.testSetupKnight();
+  // board.testSetupKnightSplitLaser();
   return {
     board,
   };
@@ -145,7 +153,8 @@ function applyPromotionMove(G, ctx, promotionMove) {
 function fireLaser(G, ctx) {
   console.debug('fire laser');
   let laser;
-  const allLaserPieces = G.board.getLaserPieces(ctx.currentPlayer);
+  const player = G.board.getPlayerByBoardIoLabel(ctx.currentPlayer);
+  const allLaserPieces = G.board.getLaserPieces(player);
   if (allLaserPieces.length === 1) {
     laser = allLaserPieces[0];
   } else {
@@ -234,6 +243,43 @@ const LaserChess = {
   },
 
   endIf: (G, ctx) => {
+    if (
+      ctx.activePlayers == null ||
+      ctx.currentPlayer == null ||
+      ctx.activePlayers[ctx.currentPlayer] !== 'selectPieceStage'
+    ) {
+      // only check at the start of the turn for each player
+      return null;
+    }
+    const player = G.board.getPlayerByBoardIoLabel(ctx.currentPlayer);
+    const gameState = G.board.computeGameState(player);
+    if (gameState === KING_LOST) {
+      return {
+        winner: player.enemy(),
+        result: `The ${player.color.label} king has been shot.`,
+      };
+    } else if (gameState === KING_SUICIDE) {
+      return {
+        winner: player,
+        result: `The ${
+          player.enemy().color.label
+        } king has been shot by its own troops.`,
+      };
+    } else if (gameState === CHECKMATE) {
+      return {
+        winner: player.enemy(),
+        result: `Player ${player.color.label} is in checkmate.`,
+      };
+    } else if (gameState === STALEMATE) {
+      return {
+        draw: true,
+        result: `Player ${player.color.label} is in stalemate.`,
+      };
+    } else if (gameState === IN_PROGRESS) {
+      return null;
+    } else {
+      throw new Error(`Unknown game state: ${JSON.stringify(gameState)}`);
+    }
   },
 };
 

@@ -1,5 +1,12 @@
-import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
+import {
+  IN_PROGRESS,
+  CHECKMATE,
+  KING_LOST,
+  KING_SUICIDE,
+  STALEMATE,
+} from './GameState';
 import {NORTH, EAST, SOUTH, WEST} from './Orientation';
+import Piece from './Piece';
 import {
   PAWN_SHIELD,
   PAWN_90_DEGREES,
@@ -11,7 +18,7 @@ import {
   KING,
   LASER,
 } from './PieceType';
-import Piece from './Piece';
+import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
 import Square from './Square';
 
 export const ranks = 9; // rows: 1 - 8 on a traditional board
@@ -167,6 +174,15 @@ export default class Board {
     }
   }
 
+  testSetupCheckmate() {
+    this.setPiece(2, 'b', new Piece(PLAYER_WHITE, ROOK));
+    this.setPiece(3, 'c', new Piece(PLAYER_WHITE, ROOK));
+    this.setPiece(1, 'i', new Piece(PLAYER_WHITE, KING));
+
+    this.setPiece(ranks, 'a', new Piece(PLAYER_BLACK, KING));
+    this.setPiece(ranks, 'h', new Piece(PLAYER_BLACK, ROOK));
+  }
+
   testSetupLaser() {
     this.setPiece(1, 'c', new Piece(PLAYER_WHITE, LASER, NORTH));
     this.setPiece(7, 'b', new Piece(PLAYER_WHITE, LASER, EAST));
@@ -189,7 +205,7 @@ export default class Board {
     this.setPiece(4, 'a', new Piece(PLAYER_WHITE, KING, WEST));
   }
 
-  testSetupKnight() {
+  testSetupKnightSplitLaser() {
     this.setPiece(1, 'd', new Piece(PLAYER_WHITE, LASER));
     this.setPiece(5, 'd', new Piece(PLAYER_WHITE, KNIGHT));
 
@@ -216,6 +232,15 @@ export default class Board {
     );
   }
 
+  getPlayerByBoardIoLabel(playerBoardIoLabel) {
+    if (playerBoardIoLabel === PLAYER_WHITE.boardIoLabel) {
+      return PLAYER_WHITE;
+    } else if (playerBoardIoLabel === PLAYER_BLACK.boardIoLabel) {
+      return PLAYER_BLACK;
+    }
+    return null;
+  }
+
   allMovesIgnoringCheck(player) {
     const moves = [];
     this.forEachPiece((piece) => {
@@ -236,19 +261,26 @@ export default class Board {
     return moves;
   }
 
+  allMoves(player) {
+    const moves = [];
+    this.forEachPiece((piece) => {
+      if (piece.player === player) {
+        piece.possibleMoves(this, moves);
+      }
+    });
+    return moves;
+  }
+
   pruneMovesThatLeadToCheckFor(moves, player) {
     for (let i = 0; i < moves.length; i++) {
       const move = moves[i];
       const resultingBoard = this.simulateMove(move);
 
-      const kingsSquare = resultingBoard.findFirstSquare(
-        (square) =>
-          square.hasPiece() &&
-          square.getPiece().type === KING &&
-          square.getPiece().player === player,
-      );
+      const kingsSquare = resultingBoard.getKingsSquare(player);
       if (!kingsSquare) {
-        console.warn(`Couldn't find king for player ${player}.`);
+        console.warn(
+          `pruneMovesThatLeadToCheckFor: Couldn't find king for player ${player}.`,
+        );
         return;
       }
 
@@ -433,18 +465,80 @@ export default class Board {
     );
   }
 
-  getLaserPieces(playerBoardIoLabel) {
+  getKingsSquare(player) {
+    return this.findFirstSquare(
+      (square) =>
+        square.hasPiece() &&
+        square.getPiece().type === KING &&
+        square.getPiece().player === player,
+    );
+  }
+
+  getKing(player) {
+    const kingsSquare = this.getKingsSquare(player);
+    if (!kingsSquare) {
+      console.warn(`getKing: Couldn't find king for player ${player}.`);
+      return null;
+    }
+    return kingsSquare.getPiece();
+  }
+
+  getLaserPieces(player) {
     const laserPieces = [];
     this.forEachPiece((piece) => {
-      if (
-        piece.type === LASER &&
-        piece.player &&
-        piece.player.boardIoLabel === playerBoardIoLabel
-      ) {
+      if (piece.type === LASER && piece.player === player) {
         laserPieces.push(piece);
       }
     });
     return laserPieces;
+  }
+
+  /**
+   * Computes whether this game has ended (checkmate, stalemate) or is still in
+   * progress.
+   */
+  computeGameState(player) {
+    const king = this.getKing(player);
+    if (!king) {
+      return KING_LOST;
+    }
+    const enemyKing = this.getKing(player.enemy());
+    if (!enemyKing) {
+      // We check this at the start of the turn for the player that is about to
+      // start their turn. This means that if we cannot find the enemy king,
+      // the enemy of the current player has shot their own king in the previous
+      // move.
+      return KING_SUICIDE;
+    }
+
+    const allMoves = this.allMoves(player);
+    const playerIsInCheck = this._isPlayerInCheck(player);
+    if (allMoves.length === 0 && playerIsInCheck) {
+      return CHECKMATE;
+    } else if (allMoves.length === 0 && !playerIsInCheck) {
+      return STALEMATE;
+    }
+    return IN_PROGRESS;
+  }
+
+  /**
+   * Computes whether a player is in check.
+   */
+  _isPlayerInCheck(player) {
+    const kingsSquare = this.getKingsSquare(player);
+    if (!kingsSquare) {
+      console.warn(`isPlayerInCheck: Couldn't find king for player ${player}.`);
+      return false;
+    }
+
+    const allMovesForEnemyIgnoringCheckAndCastling = this.allMovesIgnoringCheckAndCastling(
+      player.enemy(),
+    );
+
+    return this.isAttackedByMoves(
+      kingsSquare,
+      allMovesForEnemyIgnoringCheckAndCastling,
+    );
   }
 
   getLastMove() {

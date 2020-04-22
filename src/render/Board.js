@@ -14,12 +14,29 @@ export default class Board extends React.Component {
   }
 
   render() {
-    const currentPlayer = this.props.ctx.currentPlayer;
+    const {ctx, G, moves, events} = this.props;
+    const {activePlayers, currentPlayer, gameover} = ctx;
+
     if (!currentPlayer) {
       throw new Error('No current player.');
     }
-    const stage = this.props.ctx.activePlayers[currentPlayer];
-    if (!stage) {
+
+    let gameHasEnded = null;
+    if (gameover) {
+      if (gameover.winner) {
+        gameHasEnded = (
+          <div>
+            Game has ended, player {gameover.winner.color.label} has won.{' '}
+            {gameover.result}
+          </div>
+        );
+      } else {
+        gameHasEnded = <div>Game has ended in draw. {gameover.result}</div>;
+      }
+    }
+
+    const stage = activePlayers && activePlayers[currentPlayer];
+    if (!stage && !gameover) {
       throw new Error(`No active stage for player ${currentPlayer}.`);
     }
 
@@ -31,11 +48,11 @@ export default class Board extends React.Component {
         // happens outside of the proper context. This needs a bit more
         // investigation. Maybe rendering the laser shot should not be a stage
         // in the first place.
-        this.props.moves.endRenderShotStage();
+        moves.endRenderShotStage();
       }, 2000);
     }
 
-    const board = this.props.G.board;
+    const board = G.board;
     let tbody = [];
     for (let rank = ranks; rank > 0; rank--) {
       let squaresForOneRank = [];
@@ -43,11 +60,11 @@ export default class Board extends React.Component {
       for (let file = 1; file <= files; file++) {
         squaresForOneRank.push(
           <Square
-            G={this.props.G}
-            ctx={this.props.ctx}
+            G={G}
+            ctx={ctx}
             stage={stage}
-            moves={this.props.moves}
-            events={this.props.events}
+            moves={moves}
+            events={events}
             square={board.getSquare(rank, file)}
             darkSquare={file % 2 !== 0 ? darkSquare : !darkSquare}
           />,
@@ -61,55 +78,50 @@ export default class Board extends React.Component {
     }
 
     let promotionControls = null;
-    if (
-      this.props.G.possiblePromotions &&
-      this.props.G.possiblePromotions.length > 0
-    ) {
-      const promotionPieces = this.props.G.possiblePromotions.map(
-        (promotionMove, idx) => (
-          <li>
-            <button onClick={() => applyPromotionMove(this, promotionMove)}>
-              <Piece
-                key={idx}
-                piece={
-                  new EnginePiece(
-                    promotionMove.from.getPiece().player,
-                    promotionMove.promotionTo,
-                  )
-                }
-              />
-            </button>
-          </li>
-        ),
-      );
+    if (G.possiblePromotions && G.possiblePromotions.length > 0) {
+      const promotionPieces = G.possiblePromotions.map((promotionMove, idx) => (
+        <li>
+          <button onClick={() => applyPromotionMove(moves, promotionMove)}>
+            <Piece
+              key={idx}
+              piece={
+                new EnginePiece(
+                  promotionMove.from.getPiece().player,
+                  promotionMove.promotionTo,
+                )
+              }
+            />
+          </button>
+        </li>
+      ));
       promotionControls = <ul>{promotionPieces}</ul>;
     }
 
-    const fireButton = (
+    const fireButton = !gameHasEnded && (
       <ul>
         <li>
-          <button onClick={() => this.props.moves.fireLaser()}>🔫</button>
+          <button onClick={() => moves.fireLaser()}>🔫</button>
         </li>
       </ul>
     );
-    const rotateControls = this.props.ctx.activePlayers[
-      this.props.ctx.currentPlayer
-    ] === 'movePieceStage' && (
-      <ul>
-        <li>
-          <button onClick={() => this.props.moves.rotatePieceRight()}>⟳</button>
-        </li>
-        <li>
-          <button onClick={() => this.props.moves.rotatePieceLeft()}>⟲</button>
-        </li>
-      </ul>
-    );
+    const rotateControls = !gameHasEnded &&
+      activePlayers[currentPlayer] === 'movePieceStage' && (
+        <ul>
+          <li>
+            <button onClick={() => moves.rotatePieceRight()}>⟳</button>
+          </li>
+          <li>
+            <button onClick={() => moves.rotatePieceLeft()}>⟲</button>
+          </li>
+        </ul>
+      );
 
     return (
       <div className={styles['board-outer']}>
         <table id="board" className={styles['board-table']}>
           <tbody>{tbody}</tbody>
         </table>
+        {gameHasEnded}
         {promotionControls}
         {fireButton}
         {rotateControls}
@@ -118,6 +130,6 @@ export default class Board extends React.Component {
   }
 }
 
-function applyPromotionMove(that, promotionMove) {
-  that.props.moves.applyPromotionMove(promotionMove);
+function applyPromotionMove(moves, promotionMove) {
+  moves.applyPromotionMove(promotionMove);
 }

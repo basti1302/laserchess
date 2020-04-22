@@ -14,5 +14,5 @@ export default class Color {
   }
 }
 
-export const WHITE = new Color("white");
-export const BLACK = new Color("black");
+export const WHITE = new Color('white');
+export const BLACK = new Color('black');
