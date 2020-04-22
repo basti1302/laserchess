@@ -92,10 +92,10 @@
   content: '♚';
 }
 
-.laser-white:before {
-  content: '🔫';
+.laser-white {
+  background-image: url('img/white_laser.png');
 }
 
-.laser-black:before {
-  content: '🔫';
+.laser-black {
+  background-image: url('img/black_laser.png');
 }
