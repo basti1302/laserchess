@@ -37,11 +37,11 @@
 }
 
 .pawn-90-deg-white {
-  background-image: url('img/white_pawn_90_degree.png');
+  background-image: url('img/white_pawn_90_degrees.png');
 }
 
 .pawn-90-deg-black {
-  background-image: url('img/black_pawn_90_degree.png');
+  background-image: url('img/black_pawn_90_degrees.png');
 }
 
 .pawn-threeway-white {
@@ -68,28 +68,28 @@
   background-image: url('img/black_knight.png');
 }
 
-.rook-white:before {
-  content: '♖';
+.rook-white {
+  background-image: url('img/white_rook.png');
 }
 
-.rook-black:before {
-  content: '♜';
+.rook-black {
+  background-image: url('img/black_rook.png');
 }
 
-.queen-white:before {
-  content: '♕';
+.queen-white {
+  background-image: url('img/white_queen.png');
 }
 
-.queen-black:before {
-  content: '♛';
+.queen-black {
+  background-image: url('img/black_queen.png');
 }
 
-.king-white:before {
-  content: '♔';
+.king-white {
+  background-image: url('img/white_king.png');
 }
 
-.king-black:before {
-  content: '♚';
+.king-black {
+  background-image: url('img/black_king.png');
 }
 
 .laser-white {
