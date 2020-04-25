@@ -27,6 +27,8 @@ export default class Square extends React.Component {
 
   render() {
     const square = this.props.square;
+    const overlays = [];
+
     let markAsPossibleMove = false;
     if (this.props.G.possibleMoves) {
       this.props.G.possibleMoves.forEach((mv) => {
@@ -45,12 +47,21 @@ export default class Square extends React.Component {
     }
 
     if (square.selected) {
-      classes.push(styles.selected);
+      overlays.push(
+        <div
+          key="selected"
+          className={styles.overlay + ' ' + styles.selected}
+        />,
+      );
     } else if (markAsPossibleMove) {
-      classes.push(styles['possible-move']);
+      overlays.push(
+        <div
+          key="possible-move"
+          className={styles.overlay + ' ' + styles['possible-move']}
+        />,
+      );
     }
 
-    let shotDivs = [];
     if (this.props.G.shot && this.props.stage === 'renderShotStage') {
       const shotSegmentsOnThisSquare = this.props.G.shot.segments.filter(
         (shotSegment) => shotSegment.square === square,
@@ -83,11 +94,11 @@ export default class Square extends React.Component {
             styles[`shot-segment-${secondOrientation.cssClass}`],
             styles['shot-segment-reflection-leg-two'],
           ];
-          shotDivs.push(
+          overlays.push(
             <div key={`${i}-2`} className={shot2Classes.join(' ')} />,
           );
         }
-        shotDivs.push(
+        overlays.push(
           <div key={`${i}-1`} className={shot1Classes.join(' ')} />,
         );
       }
@@ -99,7 +110,7 @@ export default class Square extends React.Component {
       <td className={classes.join(' ')} key={id} onClick={() => this.onClick()}>
         <div className={styles['square-div']}>
           {piece && <Piece piece={piece} />}
-          {shotDivs.map((shotDiv) => shotDiv)}
+          {overlays.map((shotDiv) => shotDiv)}
         </div>
       </td>
     );
