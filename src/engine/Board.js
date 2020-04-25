@@ -409,6 +409,28 @@ export default class Board {
     return clonedBoard;
   }
 
+  laserCanFire(laser) {
+    const player = laser.player;
+    const resultingBoard = this.simulateShot(laser);
+    const kingsSquare = resultingBoard.getKingsSquare(player);
+    if (!kingsSquare) {
+      console.warn(
+        `laserCanFire: Couldn't find king for player ${player.label.color}.`,
+      );
+      return;
+    }
+
+    return !resultingBoard.isAttackedBy(kingsSquare, player.enemy());
+  }
+
+  simulateShot(laser) {
+    const clonedBoard = this.clone();
+    const laserOnClonedBoard = clonedBoard.getPiece(laser.rank, laser.file);
+    const shot = laserOnClonedBoard.fire(clonedBoard);
+    clonedBoard.applyShot(shot);
+    return clonedBoard;
+  }
+
   clone() {
     const clonedBoard = Object.create(Board.prototype);
     clonedBoard.squares = this.squares.map((s) => s.clone());

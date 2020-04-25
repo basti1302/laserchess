@@ -173,6 +173,14 @@ function fireLaser(G, ctx) {
       return;
     }
   }
+
+  if (!G.board.laserCanFire(laser)) {
+    console.warn(
+      'Firing this laser is not allowed (king in check after shot?)',
+    );
+    return;
+  }
+
   const shot = laser.fire(G.board);
   G.shot = shot;
   G.possibleMoves = [];

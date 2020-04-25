@@ -28,16 +28,14 @@ import {SHIELD} from '../../../engine/laser/Surface';
 
 describe('fire laser', () => {
   let board;
-  let moves;
 
   beforeEach(() => {
     board = new Board();
-    moves = [];
   });
 
   test('should not create segments without a source piece', () => {
     const shot = fireLaser(board, board.getSquare(1, 'a'), NORTH);
-    expect(moves.length).toEqual(0);
+    expect(shot.segments.length).toEqual(0);
   });
 
   describe('straight shots', () => {
