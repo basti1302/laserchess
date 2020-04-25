@@ -12,6 +12,14 @@ import {
   LASER,
 } from '../../engine/PieceType';
 import {NORTH, EAST, SOUTH, WEST} from '../../engine/Orientation';
+import {
+  BOTH_KINGS_LOST,
+  CHECKMATE,
+  IN_PROGRESS,
+  KING_LOST,
+  KING_SUICIDE,
+  STALEMATE,
+} from '../../engine/GameState';
 import Board, {ranks, files} from '../../engine/Board';
 import Piece from '../../engine/Piece';
 import Square from '../../engine/Square';
@@ -1044,6 +1052,58 @@ describe('Board', () => {
       checkMove(moves[1], kingsHome, ranks - 1, 'e');
       checkMove(moves[2], pawn1Home, ranks - 2, 'a');
       checkMove(moves[3], pawn1Home, ranks - 3, 'a');
+    });
+  });
+
+  describe('compute game state', () => {
+    it('king lost', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, KING));
+      const gameState = board.computeGameState(PLAYER_BLACK);
+      expect(gameState).toBe(KING_LOST);
+    });
+
+    it('enemy king lost', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, KING));
+      const gameState = board.computeGameState(PLAYER_WHITE);
+      expect(gameState).toBe(KING_SUICIDE);
+    });
+
+    it('both kings lost', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, LASER));
+      board.setPiece(2, 'a', new Piece(PLAYER_BLACK, LASER));
+      const gameState = board.computeGameState(PLAYER_WHITE);
+      expect(gameState).toBe(BOTH_KINGS_LOST);
+    });
+
+    it('checkmate', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, KING));
+      board.setPiece(ranks, files, new Piece(PLAYER_BLACK, KING));
+      board.setPiece(2, 'b', new Piece(PLAYER_BLACK, QUEEN));
+      board.setPiece(3, 'c', new Piece(PLAYER_BLACK, BISHOP));
+
+      const gameState = board.computeGameState(PLAYER_WHITE);
+
+      expect(gameState).toBe(CHECKMATE);
+    });
+
+    it('stalemate', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, KING));
+      board.setPiece(ranks, files, new Piece(PLAYER_BLACK, KING));
+      board.setPiece(ranks, 'b', new Piece(PLAYER_BLACK, ROOK));
+      board.setPiece(2, files, new Piece(PLAYER_BLACK, ROOK));
+
+      const gameState = board.computeGameState(PLAYER_WHITE);
+
+      expect(gameState).toBe(STALEMATE);
+    });
+
+    it('in progress', () => {
+      board.setPiece(1, 'a', new Piece(PLAYER_WHITE, KING));
+      board.setPiece(ranks, files, new Piece(PLAYER_BLACK, KING));
+
+      const gameState = board.computeGameState(PLAYER_WHITE);
+
+      expect(gameState).toBe(IN_PROGRESS);
     });
   });
 });

@@ -1,6 +1,7 @@
 import {
-  IN_PROGRESS,
+  BOTH_KINGS_LOST,
   CHECKMATE,
+  IN_PROGRESS,
   KING_LOST,
   KING_SUICIDE,
   STALEMATE,
@@ -477,7 +478,9 @@ export default class Board {
   getKing(player) {
     const kingsSquare = this.getKingsSquare(player);
     if (!kingsSquare) {
-      console.warn(`getKing: Couldn't find king for player ${player}.`);
+      console.warn(
+        `getKing: Couldn't find king for player ${player.color.label}.`,
+      );
       return null;
     }
     return kingsSquare.getPiece();
@@ -499,16 +502,17 @@ export default class Board {
    */
   computeGameState(player) {
     const king = this.getKing(player);
-    if (!king) {
-      return KING_LOST;
-    }
     const enemyKing = this.getKing(player.enemy());
-    if (!enemyKing) {
+    if (enemyKing && !king) {
+      return KING_LOST;
+    } else if (king && !enemyKing) {
       // We check this at the start of the turn for the player that is about to
       // start their turn. This means that if we cannot find the enemy king,
       // the enemy of the current player has shot their own king in the previous
       // move.
       return KING_SUICIDE;
+    } else if (!king && !enemyKing) {
+      return BOTH_KINGS_LOST;
     }
 
     const allMoves = this.allMoves(player);

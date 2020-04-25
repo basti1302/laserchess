@@ -2,6 +2,7 @@ import {Client} from 'boardgame.io/react';
 
 import EngineBoard from './engine/Board';
 import {
+  BOTH_KINGS_LOST,
   CHECKMATE,
   IN_PROGRESS,
   KING_LOST,
@@ -264,6 +265,11 @@ const LaserChess = {
         result: `The ${
           player.enemy().color.label
         } king has been shot by its own troops.`,
+      };
+    } else if (gameState === BOTH_KINGS_LOST) {
+      return {
+        draw: true,
+        result: 'Both kings have been shot.',
       };
     } else if (gameState === CHECKMATE) {
       return {
