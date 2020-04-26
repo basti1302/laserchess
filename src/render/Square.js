@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import Piece from './Piece';
 import {
@@ -38,26 +39,18 @@ export default class Square extends React.Component {
       });
     }
 
-    const classes = [styles.square];
-
-    if (this.props.darkSquare) {
-      classes.push(styles.dark);
-    } else {
-      classes.push(styles.light);
-    }
-
     if (square.selected) {
       overlays.push(
         <div
           key="selected"
-          className={styles.overlay + ' ' + styles.selected}
+          className={classNames(styles.overlay, styles.selected)}
         />,
       );
     } else if (markAsPossibleMove) {
       overlays.push(
         <div
           key="possible-move"
-          className={styles.overlay + ' ' + styles['possible-move']}
+          className={classNames(styles.overlay, styles['possible-move'])}
         />,
       );
     }
@@ -68,46 +61,58 @@ export default class Square extends React.Component {
       );
       for (let i = 0; i < shotSegmentsOnThisSquare.length; i++) {
         const segment = shotSegmentsOnThisSquare[i];
-        const shot1Classes = [
-          styles['shot-segment'],
-          styles[`shot-segment-${segment.orientation.cssClass}`],
-        ];
-        if (segment.type === START) {
-          shot1Classes.push(styles['shot-segment-start']);
-        } else if (
-          segment.type === DESTROY ||
-          segment.type === ABSORB ||
-          segment.type === REFLECTED_STRAIGHT
-        ) {
-          shot1Classes.push(styles['shot-segment-end']);
-        } else if (
+
+        overlays.push(
+          <div
+            key={`${i}-1`}
+            className={classNames({
+              [styles['shot-segment']]: true,
+              [styles[`shot-segment-${segment.orientation.cssClass}`]]: true,
+              [styles['shot-segment-start']]: segment.type === START,
+              [styles['shot-segment-end']]:
+                segment.type === DESTROY ||
+                segment.type === ABSORB ||
+                segment.type === REFLECTED_STRAIGHT,
+              [styles['shot-segment-reflection-leg-one']]:
+                segment.type === REFLECTED_LEFT ||
+                segment.type === REFLECTED_RIGHT,
+            })}
+          />,
+        );
+
+        if (
           segment.type === REFLECTED_LEFT ||
           segment.type === REFLECTED_RIGHT
         ) {
-          shot1Classes.push(styles['shot-segment-reflection-leg-one']);
           const secondOrientation =
             segment.type === REFLECTED_LEFT
               ? segment.orientation.rotateLeft()
               : segment.orientation.rotateRight();
-          const shot2Classes = [
-            styles['shot-segment'],
-            styles[`shot-segment-${secondOrientation.cssClass}`],
-            styles['shot-segment-reflection-leg-two'],
-          ];
           overlays.push(
-            <div key={`${i}-2`} className={shot2Classes.join(' ')} />,
+            <div
+              key={`${i}-2`}
+              className={classNames(
+                styles['shot-segment'],
+                styles[`shot-segment-${secondOrientation.cssClass}`],
+                styles['shot-segment-reflection-leg-two'],
+              )}
+            />,
           );
         }
-        overlays.push(
-          <div key={`${i}-1`} className={shot1Classes.join(' ')} />,
-        );
       }
     }
 
     const id = this.props.square.id;
     const piece = this.props.square.getPiece();
     return (
-      <td className={classes.join(' ')} key={id} onClick={() => this.onClick()}>
+      <td
+        className={classNames({
+          [styles.square]: true,
+          [styles.dark]: this.props.darkSquare,
+          [styles.light]: !this.props.darkSquare,
+        })}
+        key={id}
+        onClick={() => this.onClick()}>
         <div className={styles['square-div']}>
           {piece && <Piece piece={piece} />}
           {overlays.map((shotDiv) => shotDiv)}
