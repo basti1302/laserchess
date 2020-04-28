@@ -58,14 +58,16 @@ export default class Board extends React.Component {
       let squaresForOneRank = [];
       let darkSquare = rank % 2 !== 0;
       for (let file = 1; file <= files; file++) {
+        const square = board.getSquare(rank, file);
         squaresForOneRank.push(
           <Square
+            key={square.id}
             G={G}
             ctx={ctx}
             stage={stage}
             moves={moves}
             events={events}
-            square={board.getSquare(rank, file)}
+            square={square}
             darkSquare={file % 2 !== 0 ? darkSquare : !darkSquare}
           />,
         );
