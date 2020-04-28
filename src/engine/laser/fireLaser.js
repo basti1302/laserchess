@@ -1,6 +1,6 @@
 import modulo from '../modulo';
 
-import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
+import Orientation, {NORTH, EAST, SOUTH, WEST} from '../Orientation';
 import {
   ABSORB,
   DESTROY,
@@ -20,6 +20,7 @@ import {
   SPLIT,
 } from './Surface';
 import {LASER} from '../PieceType';
+import Square from '../Square';
 import Segment from './Segment';
 import Shot from './Shot';
 
@@ -27,14 +28,12 @@ import Shot from './Shot';
  * Starts the laser shot from the firing laser piece.
  */
 export default function fireLaser(board, from, orientation) {
-  if (from.constructor.name !== 'Square') {
-    throw new Error(
-      `Illegal argument for from: ${from.constructor.name}: ${from}`,
-    );
+  if (from.constructor !== Square) {
+    throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
   }
-  if (orientation.constructor.name !== 'Orientation') {
+  if (orientation.constructor !== Orientation) {
     throw new Error(
-      `Illegal argument for orientation: ${orientation.constructor.name}: ${orientation}`,
+      `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
     );
   }
   if (

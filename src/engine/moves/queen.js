@@ -1,3 +1,4 @@
+import Piece from '../Piece';
 import {QUEEN} from '../PieceType';
 import {
   NORTH,
@@ -12,9 +13,9 @@ import {
 import movesStraightLine from './movesStraightLine';
 
 export default function movesQueen(board, moves, queen) {
-  if (queen.constructor.name !== 'Piece') {
+  if (queen.constructor !== Piece) {
     throw new Error(
-      `Illegal argument for piece: ${queen.constructor.name}: ${queen}`,
+      `Illegal argument for piece: ${JSON.stringify(queen)}`,
     );
   }
   if (queen.type !== QUEEN) {

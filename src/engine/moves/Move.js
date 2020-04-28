@@ -1,4 +1,5 @@
-import {KING, ROOK} from '../PieceType';
+import Square from '../Square';
+import PieceType, {KING, ROOK} from '../PieceType';
 
 export default class Move {
   constructor(from, to, from2, to2, promotionTo, enPassantCapture) {
@@ -9,27 +10,21 @@ export default class Move {
     this.promotionTo = null;
     this.enPassantCapture = null;
 
-    if (from.constructor.name !== 'Square') {
-      throw new Error(
-        `Illegal argument for from: ${from.constructor.name}: ${from}`,
-      );
+    if (from.constructor !== Square) {
+      throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
     }
-    if (to.constructor.name !== 'Square') {
-      throw new Error(`Illegal argument for to: ${to.constructor.name}: ${to}`);
+    if (to.constructor !== Square) {
+      throw new Error(`Illegal argument for to: ${JSON.stringify(to)}`);
     }
     this.from = from;
     this.to = to;
 
     if (from2 && to2) {
-      if (from2.constructor.name !== 'Square') {
-        throw new Error(
-          `Illegal argument for from2: ${from2.constructor.name}: ${from2}`,
-        );
+      if (from2.constructor !== Square) {
+        throw new Error(`Illegal argument for from2: ${JSON.stringify(from2)}`);
       }
-      if (to2.constructor.name !== 'Square') {
-        throw new Error(
-          `Illegal argument for to2: ${to2.constructor.name}: ${to2}`,
-        );
+      if (to2.constructor !== Square) {
+        throw new Error(`Illegal argument for to2: ${JSON.stringify(to2)}`);
       }
       if (from.getPiece().type !== KING) {
         throw new Error(
@@ -51,9 +46,9 @@ export default class Move {
     }
 
     if (promotionTo) {
-      if (promotionTo.constructor.name !== 'PieceType') {
+      if (promotionTo.constructor !== PieceType) {
         throw new Error(
-          `Illegal argument for promotionTo: ${promotionTo.constructor.name}: ${promotionTo}`,
+          `Illegal argument for promotionTo: ${JSON.stringify(promotionTo)}`,
         );
       }
       this.promotion = true;
@@ -61,9 +56,11 @@ export default class Move {
     }
 
     if (enPassantCapture) {
-      if (enPassantCapture.constructor.name !== 'Square') {
+      if (enPassantCapture.constructor !== Square) {
         throw new Error(
-          `Illegal argument for enPassantCapture: ${enPassantCapture.constructor.name}: ${enPassantCapture}`,
+          `Illegal argument for enPassantCapture: ${JSON.stringify(
+            enPassantCapture,
+          )}`,
         );
       }
       this.enPassantCapture = enPassantCapture;

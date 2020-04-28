@@ -1,4 +1,4 @@
-import {WHITE, BLACK} from './Color';
+import Color, {WHITE, BLACK} from './Color';
 
 export default class Player {
   constructor(boardIoLabel, color) {
@@ -7,10 +7,8 @@ export default class Player {
         `Illegal argument for boardIoLabel: ${typeof boardIoLabel}: ${boardIoLabel}`,
       );
     }
-    if (color.constructor.name !== 'Color') {
-      throw new Error(
-        `Illegal argument for color: ${color.constructor.name}: ${color}`,
-      );
+    if (color.constructor !== Color) {
+      throw new Error(`Illegal argument for color: ${JSON.stringify(color)}`);
     }
     this.boardIoLabel = boardIoLabel;
     this.color = color;

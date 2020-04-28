@@ -1,3 +1,5 @@
+import Square from '../Square';
+
 export default class Shot {
   constructor(segments, destroyedSquares) {
     if (!Array.isArray(segments)) {
@@ -18,9 +20,11 @@ export default class Shot {
       );
     }
     for (let i = 0; i < destroyedSquares.length; i++) {
-      if (destroyedSquares[i].constructor.name !== 'Square') {
+      if (destroyedSquares[i].constructor !== Square) {
         throw new Error(
-          `Illegal argument for destroyedSquare at index ${i}: ${destroyedSquares[i].constructor.name}: ${destroyedSquares[i]}`,
+          `Illegal argument for destroyedSquare at index ${i}: ${JSON.stringify(
+            destroyedSquares[i],
+          )}`,
         );
       }
     }

@@ -1,26 +1,22 @@
-import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
-import {LASER} from './PieceType';
-import {NORTH, SOUTH} from './Orientation';
+import Player, {PLAYER_WHITE, PLAYER_BLACK} from './Player';
+import PieceType, {LASER} from './PieceType';
+import Orientation, {NORTH, SOUTH} from './Orientation';
 import fireLaser from './laser/fireLaser';
 
 export default class Piece {
   constructor(player, type, orientation) {
-    if (player.constructor.name !== 'Player') {
-      throw new Error(
-        `Illegal argument for player: ${player.constructor.name}: ${player}`,
-      );
+    if (player.constructor !== Player) {
+      throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
     }
     if (player !== PLAYER_WHITE && player !== PLAYER_BLACK) {
-      throw new Error(`Illegal argument for player: ${player}`);
+      throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
     }
-    if (type.constructor.name !== 'PieceType') {
-      throw new Error(
-        `Illegal argument for type: ${type.constructor.name}: ${type}`,
-      );
+    if (type.constructor !== PieceType) {
+      throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
     }
-    if (orientation && orientation.constructor.name !== 'Orientation') {
+    if (orientation && orientation.constructor !== Orientation) {
       throw new Error(
-        `Illegal argument for orientation: ${orientation.constructor.name}: ${orientation}`,
+        `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
       );
     }
     this.player = player;

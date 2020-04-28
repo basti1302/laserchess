@@ -1,14 +1,13 @@
 import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
 import {KING} from '../PieceType';
+import Piece from '../Piece';
 import {ranks} from '../Board';
 import Move from './Move';
 import moveTo from './moveTo';
 
 export default function movesKing(board, moves, king, ignoreCastling) {
-  if (king.constructor.name !== 'Piece') {
-    throw new Error(
-      `Illegal argument for piece: ${king.constructor.name}: ${king}`,
-    );
+  if (king.constructor !== Piece) {
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(king)}`);
   }
   if (king.type !== KING) {
     throw new Error(`Not a king: ${king}`);

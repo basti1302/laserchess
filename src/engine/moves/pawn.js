@@ -1,12 +1,13 @@
+import Piece from '../Piece';
 import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
 import {ranks} from '../Board';
 import moveTo, {CAPTURE_MODE_MUST, CAPTURE_MODE_MUST_NOT} from './moveTo';
 import Move from './Move';
 
 export default function movesPawn(board, moves, pawn) {
-  if (pawn.constructor.name !== 'Piece') {
+  if (pawn.constructor !== Piece) {
     throw new Error(
-      `Illegal argument for piece: ${pawn.constructor.name}: ${pawn}`,
+      `Illegal argument for piece: ${JSON.stringify(pawn)}`,
     );
   }
   if (!pawn.type.isPawn()) {

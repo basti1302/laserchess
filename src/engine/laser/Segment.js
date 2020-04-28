@@ -1,5 +1,5 @@
-import {NORTH, EAST, SOUTH, WEST} from '../Orientation';
-import {
+import Orientation, {NORTH, EAST, SOUTH, WEST} from '../Orientation';
+import SegmentType, {
   START,
   STRAIGHT,
   REFLECTED_LEFT,
@@ -8,17 +8,16 @@ import {
   ABSORB,
   DESTROY,
 } from './SegmentType';
+import Square from '../Square';
 
 export default class Segment {
   constructor(square, orientation, type) {
-    if (square.constructor.name !== 'Square') {
-      throw new Error(
-        `Illegal argument for square: ${square.constructor.name}: ${square}`,
-      );
+    if (square.constructor !== Square) {
+      throw new Error(`Illegal argument for square: ${JSON.stringify(square)}`);
     }
-    if (orientation.constructor.name !== 'Orientation') {
+    if (orientation.constructor !== Orientation) {
       throw new Error(
-        `Illegal argument for orientation: ${orientation.constructor.name}: ${orientation}`,
+        `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
       );
     }
     if (
@@ -29,10 +28,8 @@ export default class Segment {
     ) {
       throw new Error(`Unknown orientation: ${orientation}`);
     }
-    if (type.constructor.name !== 'SegmentType') {
-      throw new Error(
-        `Illegal argument for type: ${type.constructor.name}: ${type}`,
-      );
+    if (type.constructor !== SegmentType) {
+      throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
     }
     if (
       type !== START &&

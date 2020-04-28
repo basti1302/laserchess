@@ -1,11 +1,10 @@
+import Piece from '../Piece';
 import {KNIGHT} from '../PieceType';
 import moveTo from './moveTo';
 
 export default function movesKnight(board, moves, knight) {
-  if (knight.constructor.name !== 'Piece') {
-    throw new Error(
-      `Illegal argument for piece: ${knight.constructor.name}: ${knight}`,
-    );
+  if (knight.constructor !== Piece) {
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(knight)}`);
   }
   if (knight.type !== KNIGHT) {
     throw new Error(`Not a knight: ${knight}`);
