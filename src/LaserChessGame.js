@@ -1,3 +1,5 @@
+import {INVALID_MOVE} from 'boardgame.io/core';
+
 import EngineBoard from './engine/Board';
 import {
   BOTH_KINGS_LOST,
@@ -39,7 +41,7 @@ function selectPiece(G, ctx, rank, file) {
       file,
       currentPlayer,
     );
-    return;
+    return INVALID_MOVE;
   }
 
   G.possibleMoves = [];
@@ -48,6 +50,7 @@ function selectPiece(G, ctx, rank, file) {
 
   G.board.deselectAll();
   square.selected = true;
+
   if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
     ctx.events.endStage();
   }
@@ -61,11 +64,11 @@ function rotatePieceLeft(G, ctx) {
       'No source square or no piece on source square.',
       sourceSquare,
     );
-    return;
+    return INVALID_MOVE;
   }
   if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
-    return;
+    return INVALID_MOVE;
   }
   sourceSquare.getPiece().rotateLeft();
   G.rotationPiece = sourceSquare.getPiece();
@@ -79,11 +82,11 @@ function rotatePieceRight(G, ctx) {
       'No source square or no piece on source square.',
       sourceSquare,
     );
-    return;
+    return INVALID_MOVE;
   }
   if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
-    return;
+    return INVALID_MOVE;
   }
   sourceSquare.getPiece().rotateRight();
   G.rotationPiece = sourceSquare.getPiece();
@@ -97,23 +100,23 @@ function moveSelectedPiece(G, ctx, rank, file) {
       'No source square or no piece on source square.',
       sourceSquare,
     );
-    return;
+    return INVALID_MOVE;
   }
   const targetSquare = G.board.getSquare(rank, file);
   if (!targetSquare) {
     console.warn('No target square:', rank, file);
-    return;
+    return INVALID_MOVE;
   }
   const targetPiece = targetSquare.getPiece();
   if (targetPiece && targetPiece.player.boardIoLabel === ctx.currentPlayer) {
     console.debug('selecting a different piece instead');
     selectPiece(G, ctx, rank, file);
-    return;
+    return INVALID_MOVE;
   }
 
   if (!G.possibleMoves || G.possibleMoves.length === 0) {
     console.log('this piece cannot move');
-    return;
+    return INVALID_MOVE;
   }
 
   let move;
@@ -122,14 +125,14 @@ function moveSelectedPiece(G, ctx, rank, file) {
   );
   if (moves.length === 0) {
     console.warn('illegal move');
-    return;
+    return INVALID_MOVE;
   } else if (moves.length === 1) {
     move = moves[0];
   } else if (moves.length > 1 && moves[0].promotion) {
     G.possiblePromotions = moves;
     ctx.events.setStage('promotionStage');
     G.rotationPiece = null;
-    return;
+    return INVALID_MOVE;
   } else if (moves.length > 1) {
     throw new Error(`Ambigious moves that are not promotions ${moves}`);
   }
@@ -162,12 +165,12 @@ function fireLaser(G, ctx) {
         'No source square or no piece on source square.',
         sourceSquare,
       );
-      return;
+      return INVALID_MOVE;
     }
     laser = sourceSquare.getPiece();
     if (laser.type !== LASER) {
       console.warn('Selected piece is not a laser.', sourceSquare);
-      return;
+      return INVALID_MOVE;
     }
   }
 
@@ -175,7 +178,7 @@ function fireLaser(G, ctx) {
     console.warn(
       'Firing this laser is not allowed (king in check after shot?)',
     );
-    return;
+    return INVALID_MOVE;
   }
 
   const shot = laser.fire(G.board);
