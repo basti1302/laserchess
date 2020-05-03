@@ -6,9 +6,7 @@ import Move from './Move';
 
 export default function movesPawn(board, moves, pawn) {
   if (pawn.constructor !== Piece) {
-    throw new Error(
-      `Illegal argument for piece: ${JSON.stringify(pawn)}`,
-    );
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(pawn)}`);
   }
   if (!pawn.type.isPawn()) {
     throw new Error(`Not a pawn: ${pawn}`);
@@ -23,13 +21,13 @@ export default function movesPawn(board, moves, pawn) {
   let enemyPawnHomeRank;
   let enemyEnPassantDestinationRank;
   let isPromotion;
-  if (pawn.player === PLAYER_WHITE) {
+  if (pawn.player.is(PLAYER_WHITE)) {
     direction = 1;
     homeRank = 2;
     enemyPawnHomeRank = ranks - 1;
     enemyEnPassantDestinationRank = ranks - 3;
     isPromotion = rank === ranks - 1;
-  } else if (pawn.player === PLAYER_BLACK) {
+  } else if (pawn.player.is(PLAYER_BLACK)) {
     direction = -1;
     homeRank = ranks - 1;
     enemyPawnHomeRank = 2;

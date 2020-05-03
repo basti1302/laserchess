@@ -11,7 +11,7 @@ import {
   SOUTH_WEST,
   WEST,
   NORTH_WEST,
-} from '../../../engine/moves/Direction';
+} from '../../../engine/moves/directions';
 
 import movesStraightLine from '../../../engine/moves/movesStraightLine';
 

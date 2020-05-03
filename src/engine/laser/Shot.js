@@ -1,6 +1,9 @@
+import {immerable} from 'immer';
+
 import Square from '../Square';
 
 export default class Shot {
+  [immerable] = true;
   constructor(segments, destroyedSquares) {
     if (!Array.isArray(segments)) {
       throw new Error(

@@ -1,6 +1,10 @@
+import {immerable} from 'immer';
+
 import Color, {WHITE, BLACK} from './Color';
 
 export default class Player {
+  [immerable] = true;
+
   constructor(boardIoLabel, color) {
     if (typeof boardIoLabel !== 'string' || boardIoLabel.length !== 1) {
       throw new Error(
@@ -15,13 +19,17 @@ export default class Player {
   }
 
   enemy() {
-    if (this === PLAYER_WHITE) {
+    if (this.is(PLAYER_WHITE)) {
       return PLAYER_BLACK;
-    } else if (this === PLAYER_BLACK) {
+    } else if (this.is(PLAYER_BLACK)) {
       return PLAYER_WHITE;
     } else {
       throw new Error(`Can't provide enemy for ${this}.`);
     }
+  }
+
+  is(other) {
+    return this.boardIoLabel === other.boardIoLabel;
   }
 }
 

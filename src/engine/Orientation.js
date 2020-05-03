@@ -1,6 +1,10 @@
+import {immerable} from 'immer';
+
 import modulo from './modulo';
 
 export default class Orientation {
+  [immerable] = true;
+
   constructor(label, orientationIndex, cssClass) {
     this.label = label;
     this.orientationIndex = orientationIndex;
@@ -13,6 +17,10 @@ export default class Orientation {
 
   rotateRight() {
     return BY_INDEX[modulo(this.orientationIndex + 1, 4)];
+  }
+
+  is(other) {
+    return this.label === other.label;
   }
 }
 

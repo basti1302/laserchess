@@ -1,8 +1,12 @@
+import {immerable} from 'immer';
+
 export default class Square {
+  [immerable] = true;
+
   constructor(rank, file) {
+    this.id = `${rank}-${file}`;
     this.rank = rank;
     this.file = file;
-    this.id = `${rank}-${file}`;
     this.piece = null;
   }
 
@@ -46,5 +50,9 @@ export default class Square {
       clonedSquare.piece = this.piece.clone();
     }
     return clonedSquare;
+  }
+
+  is(other) {
+    return this.id === other.id;
   }
 }

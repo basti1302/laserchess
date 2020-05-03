@@ -2,19 +2,19 @@ import React from 'react';
 import {Client} from 'boardgame.io/react';
 import {Local} from 'boardgame.io/multiplayer';
 
-import LaserChess from './LaserChessGame';
+import LaserChessGame from './LaserChessGame';
 import Board from './render/Board';
 
-const LaserChessClient = Client({
-  game: LaserChess,
+const GameClient = Client({
+  game: LaserChessGame,
   board: Board,
   multiplayer: Local(),
 });
 
 const App = () => (
   <div>
-    <LaserChessClient playerID="0" />
-    <LaserChessClient playerID="1" />
+    <GameClient playerID="0" />
+    <GameClient playerID="1" />
   </div>
 );
 

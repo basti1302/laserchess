@@ -1,7 +1,11 @@
+import {immerable} from 'immer';
+
 import Square from '../Square';
 import PieceType, {KING, ROOK} from '../PieceType';
 
 export default class Move {
+  [immerable] = true;
+
   constructor(from, to, from2, to2, promotionTo, enPassantCapture) {
     this.castling = false;
     this.from2 = null;
@@ -26,14 +30,14 @@ export default class Move {
       if (to2.constructor !== Square) {
         throw new Error(`Illegal argument for to2: ${JSON.stringify(to2)}`);
       }
-      if (from.getPiece().type !== KING) {
+      if (!from.getPiece().type.is(KING)) {
         throw new Error(
           `Only kings are allowed for argument from when from2 is also given, got: ${
             from.getPiece().type
           }`,
         );
       }
-      if (from2.getPiece().type !== ROOK) {
+      if (!from2.getPiece().type.is(ROOK)) {
         throw new Error(
           `Only rooks are allowed for argument from2, got: ${
             from.getPiece().type

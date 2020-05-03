@@ -4,11 +4,9 @@ import moveTo from './moveTo';
 
 export default function movesLaser(board, moves, laser) {
   if (laser.constructor !== Piece) {
-    throw new Error(
-      `Illegal argument for piece: ${JSON.stringify(laser)}`,
-    );
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(laser)}`);
   }
-  if (laser.type !== LASER) {
+  if (!laser.type.is(LASER)) {
     throw new Error(`Not a laser: ${laser}`);
   }
 

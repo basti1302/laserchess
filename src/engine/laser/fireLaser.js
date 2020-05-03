@@ -9,7 +9,7 @@ import {
   REFLECTED_STRAIGHT,
   START,
   STRAIGHT,
-} from './SegmentType';
+} from './segmentTypes';
 import {
   DEFAULT,
   REFLECT_LEFT,
@@ -18,7 +18,7 @@ import {
   RELAY,
   SHIELD,
   SPLIT,
-} from './Surface';
+} from './surfaces';
 import {LASER} from '../PieceType';
 import Square from '../Square';
 import Segment from './Segment';
@@ -46,7 +46,7 @@ export default function fireLaser(board, from, orientation) {
   }
 
   const laser = from.getPiece();
-  if (!laser || laser.type !== LASER) {
+  if (!laser || !laser.type.is(LASER)) {
     return new Shot([]);
   }
 
@@ -88,7 +88,9 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
           const current = nextSquare;
           if (
             segments.find(
-              (s) => s.square === current && s.type === REFLECTED_STRAIGHT,
+              (segment) =>
+                segment.square.is(current) &&
+                segment.type === REFLECTED_STRAIGHT,
             )
           ) {
             segments.push(new Segment(nextSquare, orientation, ABSORB));
@@ -135,13 +137,13 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
 }
 
 function oneStep(square, board, orientation) {
-  if (orientation === NORTH) {
+  if (orientation.is(NORTH)) {
     return board.getSquare(square.rank + 1, square.file);
-  } else if (orientation === EAST) {
+  } else if (orientation.is(EAST)) {
     return board.getSquare(square.rank, square.file + 1);
-  } else if (orientation === SOUTH) {
+  } else if (orientation.is(SOUTH)) {
     return board.getSquare(square.rank - 1, square.file);
-  } else if (orientation === WEST) {
+  } else if (orientation.is(WEST)) {
     return board.getSquare(square.rank, square.file - 1);
   }
 }

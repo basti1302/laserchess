@@ -8,7 +8,7 @@ import {
   KING_LOST,
   KING_SUICIDE,
   STALEMATE,
-} from './engine/GameState';
+} from './engine/gameStates';
 import {LASER} from './engine/PieceType';
 
 function doSetup(ctx) {
@@ -28,7 +28,13 @@ function doSetup(ctx) {
 
 function selectPiece(G, ctx, rank, file) {
   const currentPlayer = ctx.currentPlayer;
-  console.debug('selectPiece', rank, file, currentPlayer);
+  console.debug(
+    'selectPiece',
+    rank,
+    file,
+    currentPlayer,
+    JSON.stringify(G.possibleMoves),
+  );
   const square = G.board.getSquare(rank, file);
   if (
     !square ||
@@ -54,46 +60,23 @@ function selectPiece(G, ctx, rank, file) {
   if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
     ctx.events.endStage();
   }
-}
 
-function rotatePieceLeft(G, ctx) {
-  console.debug('rotate selected piece left');
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
-    console.warn(
-      'No source square or no piece on source square.',
-      sourceSquare,
-    );
-    return INVALID_MOVE;
-  }
-  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
-    console.warn('Player has already rotated a different piece.', sourceSquare);
-    return INVALID_MOVE;
-  }
-  sourceSquare.getPiece().rotateLeft();
-  G.rotationPiece = sourceSquare.getPiece();
-}
-
-function rotatePieceRight(G, ctx) {
-  console.debug('rotate selected piece right');
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
-    console.warn(
-      'No source square or no piece on source square.',
-      sourceSquare,
-    );
-    return INVALID_MOVE;
-  }
-  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
-    console.warn('Player has already rotated a different piece.', sourceSquare);
-    return INVALID_MOVE;
-  }
-  sourceSquare.getPiece().rotateRight();
-  G.rotationPiece = sourceSquare.getPiece();
+  console.debug(
+    'selectPiece done',
+    rank,
+    file,
+    currentPlayer,
+    JSON.stringify(G.possibleMoves),
+  );
 }
 
 function moveSelectedPiece(G, ctx, rank, file) {
-  console.debug('move selected piece', rank, file);
+  console.debug(
+    'move selected piece',
+    rank,
+    file,
+    JSON.stringify(G.possibleMoves),
+  );
   const sourceSquare = G.board.getSelectedSquare();
   if (!sourceSquare || !sourceSquare.getPiece()) {
     console.warn(
@@ -120,8 +103,8 @@ function moveSelectedPiece(G, ctx, rank, file) {
   }
 
   let move;
-  const moves = G.possibleMoves.filter(
-    (possibleMove) => possibleMove.to === targetSquare,
+  const moves = G.possibleMoves.filter((possibleMove) =>
+    possibleMove.to.is(targetSquare),
   );
   if (moves.length === 0) {
     console.warn('illegal move');
@@ -151,6 +134,42 @@ function applyPromotionMove(G, ctx, promotionMove) {
   endTurn(G, ctx);
 }
 
+function rotatePieceLeft(G, ctx) {
+  console.debug('rotate selected piece left');
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return INVALID_MOVE;
+  }
+  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
+    console.warn('Player has already rotated a different piece.', sourceSquare);
+    return INVALID_MOVE;
+  }
+  sourceSquare.getPiece().rotateLeft();
+  G.rotationPiece = sourceSquare.getPiece();
+}
+
+function rotatePieceRight(G, ctx) {
+  console.debug('rotate selected piece right');
+  const sourceSquare = G.board.getSelectedSquare();
+  if (!sourceSquare || !sourceSquare.getPiece()) {
+    console.warn(
+      'No source square or no piece on source square.',
+      sourceSquare,
+    );
+    return INVALID_MOVE;
+  }
+  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
+    console.warn('Player has already rotated a different piece.', sourceSquare);
+    return INVALID_MOVE;
+  }
+  sourceSquare.getPiece().rotateRight();
+  G.rotationPiece = sourceSquare.getPiece();
+}
+
 function fireLaser(G, ctx) {
   console.debug('fire laser');
   let laser;
@@ -168,7 +187,7 @@ function fireLaser(G, ctx) {
       return INVALID_MOVE;
     }
     laser = sourceSquare.getPiece();
-    if (laser.type !== LASER) {
+    if (!laser.type.is(LASER)) {
       console.warn('Selected piece is not a laser.', sourceSquare);
       return INVALID_MOVE;
     }

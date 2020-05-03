@@ -23,8 +23,8 @@ import {
   REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
-} from '../../../engine/laser/SegmentType';
-import {SHIELD} from '../../../engine/laser/Surface';
+} from '../../../engine/laser/segmentTypes';
+import {SHIELD} from '../../../engine/laser/surfaces';
 
 describe('fire laser', () => {
   let board;

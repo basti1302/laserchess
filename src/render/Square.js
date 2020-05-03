@@ -9,7 +9,7 @@ import {
   REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
-} from '../engine/laser/SegmentType';
+} from '../engine/laser/segmentTypes';
 
 import styles from './Square.module.css';
 

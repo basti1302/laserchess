@@ -9,16 +9,14 @@ import {
   SOUTH_WEST,
   WEST,
   NORTH_WEST,
-} from './Direction';
+} from './directions';
 import movesStraightLine from './movesStraightLine';
 
 export default function movesQueen(board, moves, queen) {
   if (queen.constructor !== Piece) {
-    throw new Error(
-      `Illegal argument for piece: ${JSON.stringify(queen)}`,
-    );
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(queen)}`);
   }
-  if (queen.type !== QUEEN) {
+  if (!queen.type.is(QUEEN)) {
     throw new Error(`Not a queen: ${queen}`);
   }
 
