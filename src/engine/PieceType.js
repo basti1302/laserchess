@@ -14,32 +14,33 @@ import {
   RELAY,
   SHIELD,
   SPLIT,
-} from './laser/Surface';
+} from './laser/surfaces';
 
 export default class PieceType {
-  constructor(whiteChar, blackChar, possibleMovesFunction, surfaces) {
-    this.whiteChar = whiteChar;
-    this.blackChar = blackChar;
+  constructor(id, possibleMovesFunction, surfaces) {
+    this.id = id;
+    this.whiteClass = `${id}-white`;
+    this.blackClass = `${id}-black`;
     this.possibleMovesFunction = possibleMovesFunction;
     this.surfaces = surfaces || [DEFAULT, DEFAULT, DEFAULT, DEFAULT];
   }
 
-  as(player) {
-    if (player === PLAYER_WHITE) {
-      return this.asWhite();
-    } else if (player === PLAYER_BLACK) {
-      return this.asBlack();
+  getClass(player) {
+    if (player.is(PLAYER_WHITE)) {
+      return this.getWhiteClass();
+    } else if (player.is(PLAYER_BLACK)) {
+      return this.getBlackClass();
     } else {
       throw new Error(`Unknown player: ${player}.`);
     }
   }
 
-  asWhite() {
-    return this.whiteChar;
+  getWhiteClass() {
+    return this.whiteClass;
   }
 
-  asBlack() {
-    return this.blackChar;
+  getBlackClass() {
+    return this.blackClass;
   }
 
   possibleMoves(board, moves, piece, ignoreCastling) {
@@ -48,52 +49,56 @@ export default class PieceType {
 
   isPawn() {
     return (
-      this === PAWN_SHIELD || this === PAWN_90_DEGREES || this === PAWN_THREEWAY
+      this.is(PAWN_SHIELD) || this.is(PAWN_90_DEGREES) || this.is(PAWN_THREEWAY)
     );
+  }
+
+  is(other) {
+    return this.id === other.id;
   }
 }
 
-export const PAWN_SHIELD = new PieceType(
-  'pawn-shield-white',
-  'pawn-shield-black',
-  movesPawn,
-  [SHIELD, DEFAULT, DEFAULT, DEFAULT],
-);
-export const PAWN_90_DEGREES = new PieceType(
-  'pawn-90-deg-white',
-  'pawn-90-deg-black',
-  movesPawn,
-  [REFLECT_LEFT, REFLECT_RIGHT, DEFAULT, DEFAULT],
-);
-export const PAWN_THREEWAY = new PieceType(
-  'pawn-threeway-white',
-  'pawn-threeway-black',
-  movesPawn,
-  [REFLECT_STRAIGHT, REFLECT_RIGHT, DEFAULT, REFLECT_LEFT],
-);
-export const BISHOP = new PieceType(
-  'bishop-white',
-  'bishop-black',
-  movesBishop,
-  [REFLECT_STRAIGHT, REFLECT_LEFT, DEFAULT, REFLECT_RIGHT],
-);
-export const KNIGHT = new PieceType(
-  'knight-white',
-  'knight-black',
-  movesKnight,
-  [SPLIT, DEFAULT, SPLIT, DEFAULT],
-);
-export const ROOK = new PieceType('rook-white', 'rook-black', movesRook, [
+export const PAWN_SHIELD = new PieceType('pawn-shield', movesPawn, [
+  SHIELD,
+  DEFAULT,
+  DEFAULT,
+  DEFAULT,
+]);
+export const PAWN_90_DEGREES = new PieceType('pawn-90-deg', movesPawn, [
+  REFLECT_LEFT,
+  REFLECT_RIGHT,
+  DEFAULT,
+  DEFAULT,
+]);
+export const PAWN_THREEWAY = new PieceType('pawn-threeway', movesPawn, [
+  REFLECT_STRAIGHT,
+  REFLECT_RIGHT,
+  DEFAULT,
+  REFLECT_LEFT,
+]);
+export const BISHOP = new PieceType('bishop', movesBishop, [
+  REFLECT_STRAIGHT,
+  REFLECT_LEFT,
+  DEFAULT,
+  REFLECT_RIGHT,
+]);
+export const KNIGHT = new PieceType('knight', movesKnight, [
+  SPLIT,
+  DEFAULT,
+  SPLIT,
+  DEFAULT,
+]);
+export const ROOK = new PieceType('rook', movesRook, [
   SHIELD,
   SHIELD,
   SHIELD,
   SHIELD,
 ]);
-export const QUEEN = new PieceType('queen-white', 'queen-black', movesQueen, [
+export const QUEEN = new PieceType('queen', movesQueen, [
   RELAY,
   DEFAULT,
   DEFAULT,
   DEFAULT,
 ]);
-export const KING = new PieceType('king-white', 'king-black', movesKing);
-export const LASER = new PieceType('laser-white', 'laser-black', movesLaser);
+export const KING = new PieceType('king', movesKing);
+export const LASER = new PieceType('laser', movesLaser);

@@ -1,5 +1,4 @@
 import Square from '../Square';
-import Direction from './Direction';
 import moveTo from './moveTo';
 import {
   NORTH,
@@ -10,13 +9,13 @@ import {
   SOUTH_WEST,
   WEST,
   NORTH_WEST,
-} from './Direction';
+} from './directions';
 
 export default function movesStraightLine(board, moves, from, direction) {
   if (from.constructor !== Square) {
     throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
   }
-  if (direction.constructor !== Direction) {
+  if (typeof direction !== 'string') {
     throw new Error(
       `Illegal argument for direction: ${JSON.stringify(direction)}`,
     );

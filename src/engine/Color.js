@@ -4,13 +4,17 @@ export default class Color {
   }
 
   other() {
-    if (this === WHITE) {
+    if (this.is(WHITE)) {
       return BLACK;
-    } else if (this === BLACK) {
+    } else if (this.is(BLACK)) {
       return WHITE;
     } else {
       throw new Error(`Can't provide other color for ${this}.`);
     }
+  }
+
+  is(other) {
+    return this.label === other.label;
   }
 }
 

@@ -5,7 +5,7 @@ import {
   KING_LOST,
   KING_SUICIDE,
   STALEMATE,
-} from './GameState';
+} from './gameStates';
 import {NORTH, EAST, SOUTH, WEST} from './Orientation';
 import Piece from './Piece';
 import {
@@ -492,8 +492,8 @@ export default class Board {
     return this.findFirstSquare(
       (square) =>
         square.hasPiece() &&
-        square.getPiece().type === KING &&
-        square.getPiece().player === player,
+        square.getPiece().type.is(KING) &&
+        square.getPiece().player.is(player),
     );
   }
 
@@ -610,9 +610,9 @@ function index(rank, file) {
 
 function hasPlayersPieceMovedFromHome(player, homeWhite, homeBlack) {
   let home;
-  if (player === PLAYER_WHITE) {
+  if (player.is(PLAYER_WHITE)) {
     home = homeWhite;
-  } else if (player === PLAYER_BLACK) {
+  } else if (player.is(PLAYER_BLACK)) {
     home = homeBlack;
   } else {
     throw new Error(`Unknown player ${player}.`);
@@ -626,9 +626,9 @@ function hasMovedFromHome(home) {
 }
 
 function getRook(player, homeWhite, homeBlack) {
-  if (player === PLAYER_WHITE) {
+  if (player.is(PLAYER_WHITE)) {
     return homeWhite.piece;
-  } else if (player === PLAYER_BLACK) {
+  } else if (player.is(PLAYER_BLACK)) {
     return homeBlack.piece;
   } else {
     throw new Error(`Unknown player ${player}.`);

@@ -63,12 +63,6 @@ export default function moveTo(
   return true;
 }
 
-export class CaptureMode {
-  constructor(label) {
-    this.label = label;
-  }
-}
-
-export const CAPTURE_MODE_CAN = new CaptureMode('can capture');
-export const CAPTURE_MODE_MUST = new CaptureMode('must capture');
-export const CAPTURE_MODE_MUST_NOT = new CaptureMode('must not capture');
+export const CAPTURE_MODE_CAN = 'can-capture';
+export const CAPTURE_MODE_MUST = 'must-capture';
+export const CAPTURE_MODE_MUST_NOT = 'must-not-capture';

@@ -19,14 +19,14 @@ import {
   KING_LOST,
   KING_SUICIDE,
   STALEMATE,
-} from '../../engine/GameState';
+} from '../../engine/gameStates';
 import Board, {ranks, files} from '../../engine/Board';
 import Piece from '../../engine/Piece';
 import Square from '../../engine/Square';
 import Move from '../../engine/moves/Move';
 import Shot from '../../engine/laser/Shot';
 import Segment from '../../engine/laser/Segment';
-import {START, STRAIGHT, DESTROY} from '../../engine/laser/SegmentType';
+import {START, STRAIGHT, DESTROY} from '../../engine/laser/segmentTypes';
 
 import checkMove from '../../testutil/checkMove';
 

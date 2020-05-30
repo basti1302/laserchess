@@ -15,13 +15,17 @@ export default class Player {
   }
 
   enemy() {
-    if (this === PLAYER_WHITE) {
+    if (this.is(PLAYER_WHITE)) {
       return PLAYER_BLACK;
-    } else if (this === PLAYER_BLACK) {
+    } else if (this.is(PLAYER_BLACK)) {
       return PLAYER_WHITE;
     } else {
       throw new Error(`Can't provide enemy for ${this}.`);
     }
+  }
+
+  is(other) {
+    return this.boardIoLabel === other.boardIoLabel;
   }
 }
 

@@ -1,15 +1,13 @@
 import Piece from '../Piece';
 import {ROOK} from '../PieceType';
-import {NORTH, EAST, SOUTH, WEST} from './Direction';
+import {NORTH, EAST, SOUTH, WEST} from './directions';
 import movesStraightLine from './movesStraightLine';
 
 export default function movesRook(board, moves, rook) {
   if (rook.constructor !== Piece) {
-    throw new Error(
-      `Illegal argument for piece: ${JSON.stringify(rook)}`,
-    );
+    throw new Error(`Illegal argument for piece: ${JSON.stringify(rook)}`);
   }
-  if (rook.type !== ROOK) {
+  if (!rook.type.is(ROOK)) {
     throw new Error(`Not a rook: ${rook}`);
   }
 

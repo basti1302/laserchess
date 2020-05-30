@@ -1,5 +1,5 @@
 import Orientation, {NORTH, EAST, SOUTH, WEST} from '../Orientation';
-import SegmentType, {
+import {
   START,
   STRAIGHT,
   REFLECTED_LEFT,
@@ -7,7 +7,7 @@ import SegmentType, {
   REFLECTED_STRAIGHT,
   ABSORB,
   DESTROY,
-} from './SegmentType';
+} from './segmentTypes';
 import Square from '../Square';
 
 export default class Segment {
@@ -28,7 +28,7 @@ export default class Segment {
     ) {
       throw new Error(`Unknown orientation: ${orientation}`);
     }
-    if (type.constructor !== SegmentType) {
+    if (typeof type !== 'string') {
       throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
     }
     if (

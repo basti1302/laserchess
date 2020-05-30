@@ -26,14 +26,14 @@ export default class Move {
       if (to2.constructor !== Square) {
         throw new Error(`Illegal argument for to2: ${JSON.stringify(to2)}`);
       }
-      if (from.getPiece().type !== KING) {
+      if (!from.getPiece().type.is(KING)) {
         throw new Error(
           `Only kings are allowed for argument from when from2 is also given, got: ${
             from.getPiece().type
           }`,
         );
       }
-      if (from2.getPiece().type !== ROOK) {
+      if (!from2.getPiece().type.is(ROOK)) {
         throw new Error(
           `Only rooks are allowed for argument from2, got: ${
             from.getPiece().type

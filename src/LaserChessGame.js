@@ -8,7 +8,7 @@ import {
   KING_LOST,
   KING_SUICIDE,
   STALEMATE,
-} from './engine/GameState';
+} from './engine/gameStates';
 import {LASER} from './engine/PieceType';
 
 function doSetup(ctx) {
@@ -66,7 +66,7 @@ function rotatePieceLeft(G, ctx) {
     );
     return INVALID_MOVE;
   }
-  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
+  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
     return INVALID_MOVE;
   }
@@ -84,7 +84,7 @@ function rotatePieceRight(G, ctx) {
     );
     return INVALID_MOVE;
   }
-  if (G.rotationPiece && G.rotationPiece !== sourceSquare.getPiece()) {
+  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
     return INVALID_MOVE;
   }
@@ -120,8 +120,8 @@ function moveSelectedPiece(G, ctx, rank, file) {
   }
 
   let move;
-  const moves = G.possibleMoves.filter(
-    (possibleMove) => possibleMove.to === targetSquare,
+  const moves = G.possibleMoves.filter((possibleMove) =>
+    possibleMove.to.is(targetSquare),
   );
   if (moves.length === 0) {
     console.warn('illegal move');
@@ -168,7 +168,7 @@ function fireLaser(G, ctx) {
       return INVALID_MOVE;
     }
     laser = sourceSquare.getPiece();
-    if (laser.type !== LASER) {
+    if (!laser.type.is(LASER)) {
       console.warn('Selected piece is not a laser.', sourceSquare);
       return INVALID_MOVE;
     }

@@ -6,7 +6,7 @@ export default function movesKnight(board, moves, knight) {
   if (knight.constructor !== Piece) {
     throw new Error(`Illegal argument for piece: ${JSON.stringify(knight)}`);
   }
-  if (knight.type !== KNIGHT) {
+  if (!knight.type.is(KNIGHT)) {
     throw new Error(`Not a knight: ${knight}`);
   }
 

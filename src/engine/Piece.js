@@ -8,7 +8,7 @@ export default class Piece {
     if (player.constructor !== Player) {
       throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
     }
-    if (player !== PLAYER_WHITE && player !== PLAYER_BLACK) {
+    if (!player.is(PLAYER_WHITE) && !player.is(PLAYER_BLACK)) {
       throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
     }
     if (type.constructor !== PieceType) {
@@ -24,9 +24,9 @@ export default class Piece {
     if (orientation) {
       this.orientation = orientation;
     } else {
-      if (player === PLAYER_WHITE) {
+      if (player.is(PLAYER_WHITE)) {
         this.orientation = NORTH;
-      } else if (player === PLAYER_BLACK) {
+      } else if (player.is(PLAYER_BLACK)) {
         this.orientation = SOUTH;
       }
     }
@@ -78,7 +78,7 @@ export default class Piece {
   }
 
   fire(board) {
-    if (this.type !== LASER) {
+    if (!this.type.is(LASER)) {
       throw new Error(`Only lasers can fire, this is a ${this.type}.`);
     }
     return fireLaser(board, this.getSquare(board), this.orientation);

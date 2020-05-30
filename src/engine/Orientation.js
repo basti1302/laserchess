@@ -14,6 +14,10 @@ export default class Orientation {
   rotateRight() {
     return BY_INDEX[modulo(this.orientationIndex + 1, 4)];
   }
+
+  is(other) {
+    return this.label === other.label;
+  }
 }
 
 export const NORTH = new Orientation('N', 0, 'facing-north');
