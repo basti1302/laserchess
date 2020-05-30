@@ -111,7 +111,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
   if (targetPiece && targetPiece.player.boardIoLabel === ctx.currentPlayer) {
     console.debug('selecting a different piece instead');
     selectPiece(G, ctx, rank, file);
-    return INVALID_MOVE;
+    return;
   }
 
   if (!G.possibleMoves || G.possibleMoves.length === 0) {
@@ -132,7 +132,7 @@ function moveSelectedPiece(G, ctx, rank, file) {
     G.possiblePromotions = moves;
     ctx.events.setStage('promotionStage');
     G.rotationPiece = null;
-    return INVALID_MOVE;
+    return;
   } else if (moves.length > 1) {
     throw new Error(`Ambigious moves that are not promotions ${moves}`);
   }
