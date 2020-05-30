@@ -82,10 +82,9 @@ export default class Board extends React.Component {
     let promotionControls = null;
     if (G.possiblePromotions && G.possiblePromotions.length > 0) {
       const promotionPieces = G.possiblePromotions.map((promotionMove, idx) => (
-        <li>
+        <li key={idx}>
           <button onClick={() => applyPromotionMove(moves, promotionMove)}>
             <Piece
-              key={idx}
               piece={
                 new EnginePiece(
                   promotionMove.from.getPiece().player,
