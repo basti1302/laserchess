@@ -2,6 +2,8 @@ import React from 'react';
 import classNames from 'classnames';
 
 import Piece from './Piece';
+import { rotateLeft, rotateRight } from '../engine/Orientation';
+
 import {
   START,
   REFLECTED_LEFT,
@@ -32,7 +34,7 @@ export default class Square extends React.Component {
 
     let markAsPossibleMove = false;
     if (this.props.G.possibleMoves) {
-      this.props.G.possibleMoves.forEach((mv) => {
+      this.props.G.possibleMoves.forEach(mv => {
         if (mv.to && mv.to === square) {
           markAsPossibleMove = true;
         }
@@ -57,7 +59,7 @@ export default class Square extends React.Component {
 
     if (this.props.G.shot && this.props.stage === 'renderShotStage') {
       const shotSegmentsOnThisSquare = this.props.G.shot.segments.filter(
-        (shotSegment) => shotSegment.square === square,
+        shotSegment => shotSegment.square === square,
       );
       for (let i = 0; i < shotSegmentsOnThisSquare.length; i++) {
         const segment = shotSegmentsOnThisSquare[i];
@@ -86,8 +88,8 @@ export default class Square extends React.Component {
         ) {
           const secondOrientation =
             segment.type === REFLECTED_LEFT
-              ? segment.orientation.rotateLeft()
-              : segment.orientation.rotateRight();
+              ? rotateLeft(segment.orientation)
+              : rotateRight(segment.orientation);
           overlays.push(
             <div
               key={`${i}-2`}
@@ -103,7 +105,7 @@ export default class Square extends React.Component {
     }
 
     const id = this.props.square.id;
-    const piece = this.props.square.getPiece();
+    const piece = this.props.square.piece;
     return (
       <td
         className={classNames({
@@ -112,10 +114,11 @@ export default class Square extends React.Component {
           [styles.light]: !this.props.darkSquare,
         })}
         key={id}
-        onClick={() => this.onClick()}>
+        onClick={() => this.onClick()}
+      >
         <div className={styles['square-div']}>
           {piece && <Piece piece={piece} />}
-          {overlays.map((shotDiv) => shotDiv)}
+          {overlays.map(shotDiv => shotDiv)}
         </div>
       </td>
     );

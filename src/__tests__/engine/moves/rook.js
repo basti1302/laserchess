@@ -1,7 +1,15 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {KNIGHT, ROOK} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+} from '../../../engine/Board';
+import {
+  create as createPiece,
+  possibleMovesIgnoringCheck,
+} from '../../../engine/Piece';
+import { KNIGHT, ROOK } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 import checkMove from '../../../testutil/checkMove';
 
 describe('rook moves', () => {
@@ -9,25 +17,25 @@ describe('rook moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should move vertically and horizontally', () => {
-    const from = board.getSquare(5, 'e');
-    const rook = new Piece(PLAYER_WHITE, ROOK);
-    from.setPiece(rook);
+    const from = getSquareFromBoard(board, 5, 'e');
+    const rook = createPiece(PLAYER_WHITE, ROOK);
+    setPieceOnSquare(from, rook);
 
     // Set up some pieces that block the rook's movement.
 
     // north: 3 moves
-    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, KNIGHT));
+    setPieceOnBoard(board, 8, 'e', createPiece(PLAYER_BLACK, KNIGHT));
     // east: no obstacle, 4 moves
     // south: no obstacle, 4 moves
     // west: 3 moves
-    board.setPiece(5, 1, new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 5, 1, createPiece(PLAYER_WHITE, KNIGHT));
 
-    rook.possibleMovesIgnoringCheck(board, moves);
+    possibleMovesIgnoringCheck(rook, board, moves);
 
     expect(moves.length).toEqual(14);
     checkMove(moves[0], from, 6, 'e');

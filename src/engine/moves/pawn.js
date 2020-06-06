@@ -1,18 +1,19 @@
-import Piece from '../Piece';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
-import {ranks} from '../Board';
-import moveTo, {CAPTURE_MODE_MUST, CAPTURE_MODE_MUST_NOT} from './moveTo';
-import Move from './Move';
+import { isPawn } from '../PieceType';
+import { getSquare as getSquareFromPiece } from '../Piece';
+import { is as playerIs, PLAYER_WHITE, PLAYER_BLACK } from '../Player';
+import { getSquare as getSquareFromBoard, getLastMove, ranks } from '../Board';
+import moveTo, { CAPTURE_MODE_MUST, CAPTURE_MODE_MUST_NOT } from './moveTo';
+import { create as createMove } from './Move';
 
 export default function movesPawn(board, moves, pawn) {
-  if (pawn.constructor !== Piece) {
-    throw new Error(`Illegal argument for piece: ${JSON.stringify(pawn)}`);
+  if (!pawn) {
+    throw new Error('Missing mandatory argument: pawn.');
   }
-  if (!pawn.type.isPawn()) {
+  if (!isPawn(pawn.type)) {
     throw new Error(`Not a pawn: ${pawn}`);
   }
 
-  const from = pawn.getSquare(board);
+  const from = getSquareFromPiece(pawn, board);
   const rank = from.rank;
   const file = from.file;
 
@@ -21,13 +22,13 @@ export default function movesPawn(board, moves, pawn) {
   let enemyPawnHomeRank;
   let enemyEnPassantDestinationRank;
   let isPromotion;
-  if (pawn.player.is(PLAYER_WHITE)) {
+  if (playerIs(pawn.player, PLAYER_WHITE)) {
     direction = 1;
     homeRank = 2;
     enemyPawnHomeRank = ranks - 1;
     enemyEnPassantDestinationRank = ranks - 3;
     isPromotion = rank === ranks - 1;
-  } else if (pawn.player.is(PLAYER_BLACK)) {
+  } else if (playerIs(pawn.player, PLAYER_BLACK)) {
     direction = -1;
     homeRank = ranks - 1;
     enemyPawnHomeRank = 2;
@@ -42,7 +43,7 @@ export default function movesPawn(board, moves, pawn) {
       board,
       moves,
       from,
-      board.getSquare(rank + direction, file),
+      getSquareFromBoard(board, rank + direction, file),
       CAPTURE_MODE_MUST_NOT,
       isPromotion,
     ) &&
@@ -52,7 +53,7 @@ export default function movesPawn(board, moves, pawn) {
       board,
       moves,
       from,
-      board.getSquare(rank + 2 * direction, file),
+      getSquareFromBoard(board, rank + 2 * direction, file),
       CAPTURE_MODE_MUST_NOT,
     );
   }
@@ -60,7 +61,7 @@ export default function movesPawn(board, moves, pawn) {
     board,
     moves,
     from,
-    board.getSquare(rank + direction, file + 1),
+    getSquareFromBoard(board, rank + direction, file + 1),
     CAPTURE_MODE_MUST,
     isPromotion,
   );
@@ -68,39 +69,39 @@ export default function movesPawn(board, moves, pawn) {
     board,
     moves,
     from,
-    board.getSquare(rank + direction, file - 1),
+    getSquareFromBoard(board, rank + direction, file - 1),
     CAPTURE_MODE_MUST,
     isPromotion,
   );
 
   if (rank === enemyEnPassantDestinationRank) {
-    const lastMove = board.getLastMove();
+    const lastMove = getLastMove(board);
     if (lastMove) {
       if (
-        lastMove.type.isPawn() &&
+        isPawn(lastMove.type) &&
         lastMove.from.rank === enemyPawnHomeRank &&
         lastMove.to.rank === enemyEnPassantDestinationRank
       ) {
         if (lastMove.from.file === file + 1) {
           moves.push(
-            new Move(
+            createMove(
               from,
-              board.getSquare(rank + direction, file + 1),
+              getSquareFromBoard(board, rank + direction, file + 1),
               null,
               null,
               null,
-              board.getSquare(rank, file + 1),
+              getSquareFromBoard(board, rank, file + 1),
             ),
           );
         } else if (lastMove.from.file === file - 1) {
           moves.push(
-            new Move(
+            createMove(
               from,
-              board.getSquare(rank + direction, file - 1),
+              getSquareFromBoard(board, rank + direction, file - 1),
               null,
               null,
               null,
-              board.getSquare(rank, file - 1),
+              getSquareFromBoard(board, rank, file - 1),
             ),
           );
         }

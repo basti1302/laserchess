@@ -1,25 +1,26 @@
-import Piece from '../Piece';
-import {KNIGHT} from '../PieceType';
+import { getSquare as getSquareFromBoard } from '../Board';
+import { is as isType, KNIGHT } from '../PieceType';
+import { getSquare as getSquareFromPiece } from '../Piece';
 import moveTo from './moveTo';
 
 export default function movesKnight(board, moves, knight) {
-  if (knight.constructor !== Piece) {
-    throw new Error(`Illegal argument for piece: ${JSON.stringify(knight)}`);
+  if (!knight) {
+    throw new Error('Missing mandatory argument: knight.');
   }
-  if (!knight.type.is(KNIGHT)) {
+  if (!isType(knight.type, KNIGHT)) {
     throw new Error(`Not a knight: ${knight}`);
   }
 
-  const from = knight.getSquare(board);
+  const from = getSquareFromPiece(knight, board);
   const rank = from.rank;
   const file = from.file;
 
-  moveTo(board, moves, from, board.getSquare(rank + 2, file - 1));
-  moveTo(board, moves, from, board.getSquare(rank + 2, file + 1));
-  moveTo(board, moves, from, board.getSquare(rank + 1, file + 2));
-  moveTo(board, moves, from, board.getSquare(rank - 1, file + 2));
-  moveTo(board, moves, from, board.getSquare(rank - 2, file + 1));
-  moveTo(board, moves, from, board.getSquare(rank - 2, file - 1));
-  moveTo(board, moves, from, board.getSquare(rank - 1, file - 2));
-  moveTo(board, moves, from, board.getSquare(rank + 1, file - 2));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 2, file - 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 2, file + 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 1, file + 2));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 1, file + 2));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 2, file + 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 2, file - 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 1, file - 2));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 1, file - 2));
 }

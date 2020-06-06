@@ -1,6 +1,8 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import { getClass } from '../engine/PieceType';
+
 import styles from './Piece.module.css';
 
 export default class Piece extends React.Component {
@@ -10,7 +12,7 @@ export default class Piece extends React.Component {
         className={classNames(
           styles.piece,
           styles[this.props.piece.player.color.label],
-          styles[this.props.piece.type.getClass(this.props.piece.player)],
+          styles[getClass(this.props.piece.type, this.props.piece.player)],
           styles[this.props.piece.orientation.cssClass],
         )}
       />

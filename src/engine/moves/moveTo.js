@@ -1,7 +1,6 @@
-import Board from '../Board';
-import Square from '../Square';
-import {LASER, QUEEN, ROOK, KNIGHT, BISHOP} from '../PieceType';
-import Move from './Move';
+import { LASER, QUEEN, ROOK, KNIGHT, BISHOP } from '../PieceType';
+import { is as isPlayer } from '../Player';
+import { create as createMove } from './Move';
 
 export default function moveTo(
   board,
@@ -11,54 +10,54 @@ export default function moveTo(
   captureMode = CAPTURE_MODE_CAN,
   isPawnPromotion = false,
 ) {
-  if (board.constructor !== Board) {
-    throw new Error(`Illegal argument for board: ${JSON.stringify(board)}`);
+  if (!board) {
+    throw new Error('Missing mandatory argument: board.');
   }
   if (!Array.isArray(moves)) {
     throw new Error(`moves is not an array, but ${typeof moves}, ${moves}.`);
   }
-  if (from.constructor !== Square) {
-    throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
+  if (!from) {
+    throw new Error('Missing mandatory argument: from.');
   }
 
   if (!to) {
     // tried to move off board
     return false;
   }
-  if (to.constructor !== Square) {
-    throw new Error(`Illegal argument for to: ${JSON.stringify(to)}`);
+  if (!to) {
+    throw new Error('Missing mandatory argument: to.');
   }
 
-  const movingPiece = from.getPiece();
+  const movingPiece = from.piece;
   if (!movingPiece) {
     return false;
   }
 
   if (
     captureMode === CAPTURE_MODE_MUST &&
-    (!to.hasPiece() || from.getPiece().player === to.getPiece().player)
+    (!to.piece || isPlayer(from.piece.player, to.piece.player))
   ) {
     return false;
   }
-  if (captureMode === CAPTURE_MODE_MUST_NOT && to.hasPiece()) {
+  if (captureMode === CAPTURE_MODE_MUST_NOT && to.piece) {
     return false;
   }
   if (
     captureMode === CAPTURE_MODE_CAN &&
-    to.hasPiece() &&
-    from.getPiece().player === to.getPiece().player
+    to.piece &&
+    isPlayer(from.piece.player, to.piece.player)
   ) {
     return false;
   }
 
   if (isPawnPromotion) {
-    moves.push(new Move(from, to, null, null, LASER));
-    moves.push(new Move(from, to, null, null, QUEEN));
-    moves.push(new Move(from, to, null, null, ROOK));
-    moves.push(new Move(from, to, null, null, KNIGHT));
-    moves.push(new Move(from, to, null, null, BISHOP));
+    moves.push(createMove(from, to, null, null, LASER));
+    moves.push(createMove(from, to, null, null, QUEEN));
+    moves.push(createMove(from, to, null, null, ROOK));
+    moves.push(createMove(from, to, null, null, KNIGHT));
+    moves.push(createMove(from, to, null, null, BISHOP));
   } else {
-    moves.push(new Move(from, to));
+    moves.push(createMove(from, to));
   }
   return true;
 }

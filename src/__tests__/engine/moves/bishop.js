@@ -1,7 +1,15 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {KNIGHT, BISHOP} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+} from '../../../engine/Board';
+import {
+  create as createPiece,
+  possibleMovesIgnoringCheck,
+} from '../../../engine/Piece';
+import { KNIGHT, BISHOP } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 import checkMove from '../../../testutil/checkMove';
 
 describe('bishop moves', () => {
@@ -9,26 +17,26 @@ describe('bishop moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should move diagonal', () => {
-    const from = board.getSquare(5, 'e');
-    const bishop = new Piece(PLAYER_WHITE, BISHOP);
-    from.setPiece(bishop);
+    const from = getSquareFromBoard(board, 5, 'e');
+    const bishop = createPiece(PLAYER_WHITE, BISHOP);
+    setPieceOnSquare(from, bishop);
 
     // Set up some pieces that block the bishop's movement.
 
     // north-east: 2 moves
-    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 8, 'h', createPiece(PLAYER_WHITE, KNIGHT));
     // south-east: 0 moves
-    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 4, 'f', createPiece(PLAYER_WHITE, KNIGHT));
     // south-west: 1 move
-    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, KNIGHT));
+    setPieceOnBoard(board, 4, 'd', createPiece(PLAYER_BLACK, KNIGHT));
     // north-east: no obstacle, 4 moves
 
-    bishop.possibleMovesIgnoringCheck(board, moves);
+    possibleMovesIgnoringCheck(bishop, board, moves);
 
     expect(moves.length).toEqual(7);
     checkMove(moves[0], from, 6, 'f');

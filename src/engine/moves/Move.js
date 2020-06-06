@@ -1,106 +1,62 @@
-import Square from '../Square';
-import PieceType, {KING, ROOK} from '../PieceType';
+import { is as isType, KING, ROOK } from '../PieceType';
+import { transferToBoard as transferSquareToBoard } from '../Square';
 
-export default class Move {
-  constructor(from, to, from2, to2, promotionTo, enPassantCapture) {
-    this.castling = false;
-    this.from2 = null;
-    this.to2 = null;
-    this.promotion = false;
-    this.promotionTo = null;
-    this.enPassantCapture = null;
+export function create(from, to, from2, to2, promotionTo, enPassantCapture) {
+  let castling = false;
+  let promotion = false;
 
-    if (from.constructor !== Square) {
-      throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
-    }
-    if (to.constructor !== Square) {
-      throw new Error(`Illegal argument for to: ${JSON.stringify(to)}`);
-    }
-    this.from = from;
-    this.to = to;
-
-    if (from2 && to2) {
-      if (from2.constructor !== Square) {
-        throw new Error(`Illegal argument for from2: ${JSON.stringify(from2)}`);
-      }
-      if (to2.constructor !== Square) {
-        throw new Error(`Illegal argument for to2: ${JSON.stringify(to2)}`);
-      }
-      if (!from.getPiece().type.is(KING)) {
-        throw new Error(
-          `Only kings are allowed for argument from when from2 is also given, got: ${
-            from.getPiece().type
-          }`,
-        );
-      }
-      if (!from2.getPiece().type.is(ROOK)) {
-        throw new Error(
-          `Only rooks are allowed for argument from2, got: ${
-            from.getPiece().type
-          }`,
-        );
-      }
-      this.castling = true;
-      this.from2 = from2;
-      this.to2 = to2;
-    }
-
-    if (promotionTo) {
-      if (promotionTo.constructor !== PieceType) {
-        throw new Error(
-          `Illegal argument for promotionTo: ${JSON.stringify(promotionTo)}`,
-        );
-      }
-      this.promotion = true;
-      this.promotionTo = promotionTo;
-    }
-
-    if (enPassantCapture) {
-      if (enPassantCapture.constructor !== Square) {
-        throw new Error(
-          `Illegal argument for enPassantCapture: ${JSON.stringify(
-            enPassantCapture,
-          )}`,
-        );
-      }
-      this.enPassantCapture = enPassantCapture;
-    }
+  if (!from) {
+    throw new Error('Missing mandatory argument: from.');
+  }
+  if (!to) {
+    throw new Error('Missing mandatory argument: to.');
   }
 
-  transferToClonedBoard(clonedBoard) {
-    const moveForClonedBoard = Object.assign(
-      Object.create(Move.prototype),
-      this,
-    );
-    moveForClonedBoard.from = clonedBoard.getSquare(
-      moveForClonedBoard.from.rank,
-      moveForClonedBoard.from.file,
-    );
-    moveForClonedBoard.to = clonedBoard.getSquare(this.to.rank, this.to.file);
-    if (moveForClonedBoard.from2) {
-      moveForClonedBoard.from2 = clonedBoard.getSquare(
-        moveForClonedBoard.from2.rank,
-        moveForClonedBoard.from2.file,
+  if (from2 && to2) {
+    if (!isType(from.piece.type, KING)) {
+      throw new Error(
+        `Only kings are allowed for argument from when from2 is also given, got: ${from.piece.type}`,
       );
     }
-    if (moveForClonedBoard.to2) {
-      moveForClonedBoard.to2 = clonedBoard.getSquare(
-        moveForClonedBoard.from2.rank,
-        moveForClonedBoard.from2.file,
+    if (!isType(from2.piece.type, ROOK)) {
+      throw new Error(
+        `Only rooks are allowed for argument from2, got: ${from.piece.type}`,
       );
     }
-    if (moveForClonedBoard.promotionTo) {
-      moveForClonedBoard.promotionTo = clonedBoard.getSquare(
-        moveForClonedBoard.promotionTo.rank,
-        moveForClonedBoard.promotionTo.file,
-      );
-    }
-    if (moveForClonedBoard.enPassantCapture) {
-      moveForClonedBoard.enPassantCapture = clonedBoard.getSquare(
-        moveForClonedBoard.enPassantCapture.rank,
-        moveForClonedBoard.enPassantCapture.file,
-      );
-    }
-    return moveForClonedBoard;
+    castling = true;
   }
+
+  if (promotionTo) {
+    promotion = true;
+  }
+
+  return {
+    from,
+    to,
+    castling,
+    from2,
+    to2,
+    promotion,
+    promotionTo,
+    enPassantCapture,
+  };
+}
+
+export function transferToBoard(move, board) {
+  const moveForBoard = { ...move };
+  moveForBoard.from = transferSquareToBoard(moveForBoard.from, board);
+  moveForBoard.to = transferSquareToBoard(moveForBoard.to, board);
+  if (moveForBoard.from2) {
+    moveForBoard.from2 = transferSquareToBoard(moveForBoard.from2, board);
+  }
+  if (moveForBoard.to2) {
+    moveForBoard.to2 = transferSquareToBoard(moveForBoard.to2, board);
+  }
+  if (moveForBoard.enPassantCapture) {
+    moveForBoard.enPassantCapture = transferSquareToBoard(
+      moveForBoard.enPassantCapture,
+      board,
+    );
+  }
+  return moveForBoard;
 }

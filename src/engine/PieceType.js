@@ -1,4 +1,4 @@
-import {PLAYER_WHITE, PLAYER_BLACK} from './Player';
+import { is as playerIs, PLAYER_WHITE, PLAYER_BLACK } from './Player';
 import movesPawn from './moves/pawn';
 import movesRook from './moves/rook';
 import movesKnight from './moves/knight';
@@ -16,89 +16,78 @@ import {
   SPLIT,
 } from './laser/surfaces';
 
-export default class PieceType {
-  constructor(id, possibleMovesFunction, surfaces) {
-    this.id = id;
-    this.whiteClass = `${id}-white`;
-    this.blackClass = `${id}-black`;
-    this.possibleMovesFunction = possibleMovesFunction;
-    this.surfaces = surfaces || [DEFAULT, DEFAULT, DEFAULT, DEFAULT];
-  }
+function create(id, possibleMovesFunction, surfaces) {
+  return {
+    id,
+    whiteClass: `${id}-white`,
+    blackClass: `${id}-black`,
+    possibleMovesFunction,
+    surfaces: surfaces || [DEFAULT, DEFAULT, DEFAULT, DEFAULT],
+  };
+}
 
-  getClass(player) {
-    if (player.is(PLAYER_WHITE)) {
-      return this.getWhiteClass();
-    } else if (player.is(PLAYER_BLACK)) {
-      return this.getBlackClass();
-    } else {
-      throw new Error(`Unknown player: ${player}.`);
-    }
-  }
-
-  getWhiteClass() {
-    return this.whiteClass;
-  }
-
-  getBlackClass() {
-    return this.blackClass;
-  }
-
-  possibleMoves(board, moves, piece, ignoreCastling) {
-    this.possibleMovesFunction(board, moves, piece, ignoreCastling);
-  }
-
-  isPawn() {
-    return (
-      this.is(PAWN_SHIELD) || this.is(PAWN_90_DEGREES) || this.is(PAWN_THREEWAY)
-    );
-  }
-
-  is(other) {
-    return this.id === other.id;
+export function getClass(pieceType, player) {
+  if (playerIs(player, PLAYER_WHITE)) {
+    return pieceType.whiteClass;
+  } else if (playerIs(player, PLAYER_BLACK)) {
+    return pieceType.blackClass;
+  } else {
+    throw new Error(`Unknown player: ${player}.`);
   }
 }
 
-export const PAWN_SHIELD = new PieceType('pawn-shield', movesPawn, [
+export function possibleMoves(pieceType, board, moves, piece, ignoreCastling) {
+  pieceType.possibleMovesFunction(board, moves, piece, ignoreCastling);
+}
+
+export function isPawn(pieceType) {
+  return (
+    is(pieceType, PAWN_SHIELD) ||
+    is(pieceType, PAWN_90_DEGREES) ||
+    is(pieceType, PAWN_THREEWAY)
+  );
+}
+
+export function is(pieceType, other) {
+  return pieceType.id === other.id;
+}
+
+export const PAWN_SHIELD = create('pawn-shield', movesPawn, [
   SHIELD,
   DEFAULT,
   DEFAULT,
   DEFAULT,
 ]);
-export const PAWN_90_DEGREES = new PieceType('pawn-90-deg', movesPawn, [
+export const PAWN_90_DEGREES = create('pawn-90-deg', movesPawn, [
   REFLECT_LEFT,
   REFLECT_RIGHT,
   DEFAULT,
   DEFAULT,
 ]);
-export const PAWN_THREEWAY = new PieceType('pawn-threeway', movesPawn, [
+export const PAWN_THREEWAY = create('pawn-threeway', movesPawn, [
   REFLECT_STRAIGHT,
   REFLECT_RIGHT,
   DEFAULT,
   REFLECT_LEFT,
 ]);
-export const BISHOP = new PieceType('bishop', movesBishop, [
+export const BISHOP = create('bishop', movesBishop, [
   REFLECT_STRAIGHT,
   REFLECT_LEFT,
   DEFAULT,
   REFLECT_RIGHT,
 ]);
-export const KNIGHT = new PieceType('knight', movesKnight, [
+export const KNIGHT = create('knight', movesKnight, [
   SPLIT,
   DEFAULT,
   SPLIT,
   DEFAULT,
 ]);
-export const ROOK = new PieceType('rook', movesRook, [
-  SHIELD,
-  SHIELD,
-  SHIELD,
-  SHIELD,
-]);
-export const QUEEN = new PieceType('queen', movesQueen, [
+export const ROOK = create('rook', movesRook, [SHIELD, SHIELD, SHIELD, SHIELD]);
+export const QUEEN = create('queen', movesQueen, [
   RELAY,
   DEFAULT,
   DEFAULT,
   DEFAULT,
 ]);
-export const KING = new PieceType('king', movesKing);
-export const LASER = new PieceType('laser', movesLaser);
+export const KING = create('king', movesKing);
+export const LASER = create('laser', movesLaser);

@@ -1,19 +1,24 @@
-import {NORTH, EAST, SOUTH, WEST} from '../../engine/Orientation';
+import {
+  rotateLeft,
+  rotateRight,
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
+} from '../../engine/Orientation';
 
 describe('Orientation', () => {
-  let orientation;
-
   test('should rotate left', () => {
-    expect(NORTH.rotateLeft()).toBe(WEST);
-    expect(WEST.rotateLeft()).toBe(SOUTH);
-    expect(SOUTH.rotateLeft()).toBe(EAST);
-    expect(EAST.rotateLeft()).toBe(NORTH);
+    expect(rotateLeft(NORTH)).toBe(WEST);
+    expect(rotateLeft(WEST)).toBe(SOUTH);
+    expect(rotateLeft(SOUTH)).toBe(EAST);
+    expect(rotateLeft(EAST)).toBe(NORTH);
   });
 
   test('should rotate right', () => {
-    expect(NORTH.rotateRight()).toBe(EAST);
-    expect(EAST.rotateRight()).toBe(SOUTH);
-    expect(SOUTH.rotateRight()).toBe(WEST);
-    expect(WEST.rotateRight()).toBe(NORTH);
+    expect(rotateRight(NORTH)).toBe(EAST);
+    expect(rotateRight(EAST)).toBe(SOUTH);
+    expect(rotateRight(SOUTH)).toBe(WEST);
+    expect(rotateRight(WEST)).toBe(NORTH);
   });
 });

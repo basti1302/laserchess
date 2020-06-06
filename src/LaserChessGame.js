@@ -1,6 +1,6 @@
-import {INVALID_MOVE} from 'boardgame.io/core';
+import { INVALID_MOVE } from 'boardgame.io/core';
 
-import EngineBoard from './engine/Board';
+import * as engineBoard from './engine/Board';
 import {
   BOTH_KINGS_LOST,
   CHECKMATE,
@@ -9,18 +9,27 @@ import {
   KING_SUICIDE,
   STALEMATE,
 } from './engine/gameStates';
-import {LASER} from './engine/PieceType';
+import {
+  fire,
+  is as isPiece,
+  possibleMoves,
+  rotateLeft,
+  rotateRight,
+} from './engine/Piece';
+import { LASER, is as isType } from './engine/PieceType';
+import { enemy } from './engine/Player';
+import { is as isSquare } from './engine/Square';
 
 function doSetup(ctx) {
   console.debug('board setup');
-  const board = new EngineBoard('0', '1');
-  board.setup();
-  // board.testSetupCastling();
-  // board.testSetupPromotion();
-  // board.testSetupEnPassant();
-  // board.testSetupCheckmate();
-  // board.testSetupLaser();
-  // board.testSetupKnightSplitLaser();
+  const board = engineBoard.create('0', '1');
+  engineBoard.setup(board);
+  // engineBoard.testSetupCastling(board);
+  // engineBoard.testSetupPromotion(board);
+  // engineBoard.testSetupEnPassant(board);
+  // engineBoard.testSetupCheckmate(board);
+  // engineBoard.testSetupLaser(board);
+  // engineBoard.testSetupKnightSplitLaser(board);
   return {
     board,
   };
@@ -29,11 +38,11 @@ function doSetup(ctx) {
 function selectPiece(G, ctx, rank, file) {
   const currentPlayer = ctx.currentPlayer;
   console.debug('selectPiece', rank, file, currentPlayer);
-  const square = G.board.getSquare(rank, file);
+  const square = engineBoard.getSquare(G.board, rank, file);
   if (
     !square ||
-    !square.getPiece() ||
-    square.getPiece().player.boardIoLabel !== currentPlayer
+    !square.piece ||
+    square.piece.player.boardIoLabel !== currentPlayer
   ) {
     console.warn(
       "No square or no piece to select, or opponent's piece selected:",
@@ -45,10 +54,10 @@ function selectPiece(G, ctx, rank, file) {
   }
 
   G.possibleMoves = [];
-  square.getPiece().possibleMoves(G.board, G.possibleMoves);
+  possibleMoves(square.piece, G.board, G.possibleMoves);
   G.possiblePromotions = [];
 
-  G.board.deselectAll();
+  engineBoard.deselectAll(G.board);
   square.selected = true;
 
   if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
@@ -58,56 +67,56 @@ function selectPiece(G, ctx, rank, file) {
 
 function rotatePieceLeft(G, ctx) {
   console.debug('rotate selected piece left');
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
+  const sourceSquare = engineBoard.getSelectedSquare(G.board);
+  if (!sourceSquare || !sourceSquare.piece) {
     console.warn(
       'No source square or no piece on source square.',
       sourceSquare,
     );
     return INVALID_MOVE;
   }
-  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
+  if (G.rotationPiece && !isPiece(sourceSquare.piece, G.rotationPiece)) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
     return INVALID_MOVE;
   }
-  sourceSquare.getPiece().rotateLeft();
-  G.rotationPiece = sourceSquare.getPiece();
+  rotateLeft(sourceSquare.piece);
+  G.rotationPiece = sourceSquare.piece;
 }
 
 function rotatePieceRight(G, ctx) {
   console.debug('rotate selected piece right');
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
+  const sourceSquare = engineBoard.getSelectedSquare(G.board);
+  if (!sourceSquare || !sourceSquare.piece) {
     console.warn(
       'No source square or no piece on source square.',
       sourceSquare,
     );
     return INVALID_MOVE;
   }
-  if (G.rotationPiece && !sourceSquare.getPiece().is(G.rotationPiece)) {
+  if (G.rotationPiece && !isPiece(sourceSquare.piece, G.rotationPiece)) {
     console.warn('Player has already rotated a different piece.', sourceSquare);
     return INVALID_MOVE;
   }
-  sourceSquare.getPiece().rotateRight();
-  G.rotationPiece = sourceSquare.getPiece();
+  rotateRight(sourceSquare.piece);
+  G.rotationPiece = sourceSquare.piece;
 }
 
 function moveSelectedPiece(G, ctx, rank, file) {
   console.debug('move selected piece', rank, file);
-  const sourceSquare = G.board.getSelectedSquare();
-  if (!sourceSquare || !sourceSquare.getPiece()) {
+  const sourceSquare = engineBoard.getSelectedSquare(G.board);
+  if (!sourceSquare || !sourceSquare.piece) {
     console.warn(
       'No source square or no piece on source square.',
       sourceSquare,
     );
     return INVALID_MOVE;
   }
-  const targetSquare = G.board.getSquare(rank, file);
+  const targetSquare = engineBoard.getSquare(G.board, rank, file);
   if (!targetSquare) {
     console.warn('No target square:', rank, file);
     return INVALID_MOVE;
   }
-  const targetPiece = targetSquare.getPiece();
+  const targetPiece = targetSquare.piece;
   if (targetPiece && targetPiece.player.boardIoLabel === ctx.currentPlayer) {
     console.debug('selecting a different piece instead');
     selectPiece(G, ctx, rank, file);
@@ -120,8 +129,8 @@ function moveSelectedPiece(G, ctx, rank, file) {
   }
 
   let move;
-  const moves = G.possibleMoves.filter((possibleMove) =>
-    possibleMove.to.is(targetSquare),
+  const moves = G.possibleMoves.filter(possibleMove =>
+    isSquare(possibleMove.to, targetSquare),
   );
   if (moves.length === 0) {
     console.warn('illegal move');
@@ -141,57 +150,60 @@ function moveSelectedPiece(G, ctx, rank, file) {
     console.log('captured', targetPiece);
   }
 
-  G.board.applyMove(move);
+  engineBoard.applyMove(G.board, move);
   endTurn(G, ctx);
 }
 
 function applyPromotionMove(G, ctx, promotionMove) {
   console.debug('apply promotion move');
-  G.board.applyPromotionMove(promotionMove);
+  engineBoard.applyPromotionMove(G.board, promotionMove);
   endTurn(G, ctx);
 }
 
 function fireLaser(G, ctx) {
   console.debug('fire laser');
   let laser;
-  const player = G.board.getPlayerByBoardIoLabel(ctx.currentPlayer);
-  const allLaserPieces = G.board.getLaserPieces(player);
+  const player = engineBoard.getPlayerByBoardIoLabel(
+    G.board,
+    ctx.currentPlayer,
+  );
+  const allLaserPieces = engineBoard.getLaserPieces(G.board, player);
   if (allLaserPieces.length === 1) {
     laser = allLaserPieces[0];
   } else {
-    const sourceSquare = G.board.getSelectedSquare();
-    if (!sourceSquare || !sourceSquare.getPiece()) {
+    const sourceSquare = engineBoard.getSelectedSquare(G.board);
+    if (!sourceSquare || !sourceSquare.piece) {
       console.warn(
         'No source square or no piece on source square.',
         sourceSquare,
       );
       return INVALID_MOVE;
     }
-    laser = sourceSquare.getPiece();
-    if (!laser.type.is(LASER)) {
+    laser = sourceSquare.piece;
+    if (!isType(laser.type, LASER)) {
       console.warn('Selected piece is not a laser.', sourceSquare);
       return INVALID_MOVE;
     }
   }
 
-  if (!G.board.laserCanFire(laser)) {
+  if (!engineBoard.laserCanFire(G.board, laser)) {
     console.warn(
       'Firing this laser is not allowed (king in check after shot?)',
     );
     return INVALID_MOVE;
   }
 
-  const shot = laser.fire(G.board);
+  const shot = fire(laser, G.board);
   G.shot = shot;
   G.possibleMoves = [];
   G.possiblePromotions = [];
-  G.board.deselectAll();
+  engineBoard.deselectAll(G.board);
   ctx.events.setStage('renderShotStage');
 }
 
 function endRenderShotStage(G, ctx) {
   console.debug('end render shot stage');
-  G.board.applyShot(G.shot);
+  engineBoard.applyShot(G.board, G.shot);
   endTurn(G, ctx);
 }
 
@@ -199,7 +211,7 @@ function endTurn(G, ctx) {
   console.debug('end turn');
   G.possibleMoves = [];
   G.possiblePromotions = [];
-  G.board.deselectAll();
+  engineBoard.deselectAll(G.board);
   G.shot = null;
   G.rotationPiece = null;
   ctx.events.endTurn();
@@ -262,18 +274,21 @@ export default {
       // only check at the start of the turn for each player
       return null;
     }
-    const player = G.board.getPlayerByBoardIoLabel(ctx.currentPlayer);
-    const gameState = G.board.computeGameState(player);
+    const player = engineBoard.getPlayerByBoardIoLabel(
+      G.board,
+      ctx.currentPlayer,
+    );
+    const gameState = engineBoard.computeGameState(G.board, player);
     if (gameState === KING_LOST) {
       return {
-        winner: player.enemy(),
+        winner: enemy(player),
         result: `The ${player.color.label} king has been shot.`,
       };
     } else if (gameState === KING_SUICIDE) {
       return {
         winner: player,
         result: `The ${
-          player.enemy().color.label
+          enemy(player).color.label
         } king has been shot by its own troops.`,
       };
     } else if (gameState === BOTH_KINGS_LOST) {
@@ -283,13 +298,13 @@ export default {
       };
     } else if (gameState === CHECKMATE) {
       return {
-        winner: player.enemy(),
-        result: `Player ${player.color.label} is in checkmate.`,
+        winner: enemy(player),
+        result: `Player ${player.color} is in checkmate.`,
       };
     } else if (gameState === STALEMATE) {
       return {
         draw: true,
-        result: `Player ${player.color.label} is in stalemate.`,
+        result: `Player ${player.color} is in stalemate.`,
       };
     } else if (gameState === IN_PROGRESS) {
       return null;

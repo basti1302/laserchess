@@ -1,95 +1,114 @@
-import Player, {PLAYER_WHITE, PLAYER_BLACK} from './Player';
-import PieceType, {LASER} from './PieceType';
-import Orientation, {NORTH, SOUTH} from './Orientation';
+import {
+  getSquare as getSquareFromBoard,
+  pruneMovesThatLeadToCheckFor,
+} from './Board';
+import { is as playerIs, PLAYER_WHITE, PLAYER_BLACK } from './Player';
+import {
+  is as isType,
+  possibleMoves as possibleMovesForType,
+  LASER,
+} from './PieceType';
+import {
+  rotateLeft as rotateOrientationLeft,
+  rotateRight as rotateOrientationRight,
+  NORTH,
+  SOUTH,
+} from './Orientation';
 import fireLaser from './laser/fireLaser';
 
-export default class Piece {
-  constructor(player, type, orientation) {
-    if (player.constructor !== Player) {
-      throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
-    }
-    if (!player.is(PLAYER_WHITE) && !player.is(PLAYER_BLACK)) {
-      throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
-    }
-    if (type.constructor !== PieceType) {
-      throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
-    }
-    if (orientation && orientation.constructor !== Orientation) {
-      throw new Error(
-        `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
-      );
-    }
-    this.player = player;
-    this.type = type;
-    if (orientation) {
-      this.orientation = orientation;
-    } else {
-      if (player.is(PLAYER_WHITE)) {
-        this.orientation = NORTH;
-      } else if (player.is(PLAYER_BLACK)) {
-        this.orientation = SOUTH;
-      }
-    }
-    this.rank = null;
-    this.file = null;
-    this.hasMoved = false;
-  }
+let idx = 0;
 
-  setPosition(rank, file) {
-    this.rank = rank;
-    this.file = file;
+export function create(player, type, orientation) {
+  if (!player) {
+    throw new Error('Missing mandatory argument: player.');
   }
-
-  clearPosition() {
-    this.rank = null;
-    this.file = null;
+  if (!playerIs(player, PLAYER_WHITE) && !playerIs(player, PLAYER_BLACK)) {
+    throw new Error(`Illegal argument for player: ${JSON.stringify(player)}`);
   }
-
-  getPosition() {
-    if (this.rank && this.file) {
-      return {
-        rank: this.rank,
-        file: this.file,
-      };
-    } else {
-      return null;
+  if (!type) {
+    throw new Error('Missing mandatory argument: type');
+  }
+  if (!orientation) {
+    if (playerIs(player, PLAYER_WHITE)) {
+      orientation = NORTH;
+    } else if (playerIs(player, PLAYER_BLACK)) {
+      orientation = SOUTH;
     }
   }
 
-  getSquare(board) {
-    return board.getSquare(this.rank, this.file);
-  }
+  return {
+    id: `${player.boardIoLabel}:${type.id}:${idx++}`,
+    player,
+    type,
+    orientation,
+    rank: null,
+    file: null,
+    hasMoved: false,
+  };
+}
 
-  possibleMovesIgnoringCheck(board, moves, ignoreCastling = false) {
-    this.type.possibleMoves(board, moves, this, ignoreCastling);
-  }
+export function setPosition(piece, rank, file) {
+  piece.rank = rank;
+  piece.file = file;
+}
 
-  possibleMoves(board, moves) {
-    this.possibleMovesIgnoringCheck(board, moves);
-    board.pruneMovesThatLeadToCheckFor(moves, this.player);
-  }
+export function clearPosition(piece) {
+  piece.rank = null;
+  piece.file = null;
+}
 
-  rotateLeft() {
-    this.orientation = this.orientation.rotateLeft();
+export function getPosition(piece) {
+  if (piece.rank && piece.file) {
+    return {
+      rank: piece.rank,
+      file: piece.file,
+    };
+  } else {
+    return null;
   }
+}
 
-  rotateRight() {
-    this.orientation = this.orientation.rotateRight();
-  }
+export function getSquare(piece, board) {
+  return getSquareFromBoard(board, piece.rank, piece.file);
+}
 
-  fire(board) {
-    if (!this.type.is(LASER)) {
-      throw new Error(`Only lasers can fire, this is a ${this.type}.`);
-    }
-    return fireLaser(board, this.getSquare(board), this.orientation);
-  }
+export function possibleMovesIgnoringCheck(
+  piece,
+  board,
+  moves,
+  ignoreCastling = false,
+) {
+  possibleMovesForType(piece.type, board, moves, piece, ignoreCastling);
+}
 
-  clone() {
-    const clonedPiece = new Piece(this.player, this.type);
-    clonedPiece.rank = this.rank;
-    clonedPiece.file = this.file;
-    clonedPiece.orientation = this.orientation;
-    clonedPiece.hasMoved = this.hasMoved;
-    return clonedPiece;
+export function possibleMoves(piece, board, moves) {
+  possibleMovesIgnoringCheck(piece, board, moves);
+  pruneMovesThatLeadToCheckFor(board, moves, piece.player);
+}
+
+export function rotateLeft(piece) {
+  piece.orientation = rotateOrientationLeft(piece.orientation);
+}
+
+export function rotateRight(piece) {
+  piece.orientation = rotateOrientationRight(piece.orientation);
+}
+
+export function fire(piece, board) {
+  if (!isType(piece.type, LASER)) {
+    throw new Error(`Only lasers can fire, this is a ${piece.type}.`);
   }
+  return fireLaser(board, getSquare(piece, board), piece.orientation);
+}
+
+export function clone(piece) {
+  const clonedPiece = create(piece.player, piece.type, piece.orientation);
+  clonedPiece.rank = piece.rank;
+  clonedPiece.file = piece.file;
+  clonedPiece.hasMoved = piece.hasMoved;
+  return clonedPiece;
+}
+
+export function is(piece, other) {
+  return piece.id === other.id;
 }

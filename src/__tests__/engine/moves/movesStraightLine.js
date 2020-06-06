@@ -1,7 +1,14 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {QUEEN} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+  ranks,
+  files,
+} from '../../../engine/Board';
+import { create as createPiece } from '../../../engine/Piece';
+import { QUEEN } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 import {
   NORTH,
   NORTH_EAST,
@@ -20,18 +27,18 @@ describe('straight line moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should not move without a source piece', () => {
-    movesStraightLine(board, moves, board.getSquare(1, 'a'), NORTH);
+    movesStraightLine(board, moves, getSquareFromBoard(board, 1, 'a'), NORTH);
     expect(moves.length).toEqual(0);
   });
 
   test('should move north', () => {
-    const from = board.getSquare(1, 'c');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 1, 'c');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, NORTH);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -42,8 +49,8 @@ describe('straight line moves', () => {
   });
 
   test('should move north-east', () => {
-    const from = board.getSquare(1, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 1, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, NORTH_EAST);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -54,8 +61,8 @@ describe('straight line moves', () => {
   });
 
   test('should move east', () => {
-    const from = board.getSquare(4, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 4, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, EAST);
     expect(moves.length).toEqual(files - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -66,8 +73,8 @@ describe('straight line moves', () => {
   });
 
   test('should move south-east', () => {
-    const from = board.getSquare(ranks, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, ranks, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, SOUTH_EAST);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -78,8 +85,8 @@ describe('straight line moves', () => {
   });
 
   test('should move south', () => {
-    const from = board.getSquare(ranks, 'c');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, ranks, 'c');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, SOUTH);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -90,8 +97,8 @@ describe('straight line moves', () => {
   });
 
   test('should move south-west', () => {
-    const from = board.getSquare(ranks, files);
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, ranks, files);
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, SOUTH_WEST);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -102,8 +109,8 @@ describe('straight line moves', () => {
   });
 
   test('should move west', () => {
-    const from = board.getSquare(4, files);
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 4, files);
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, WEST);
     expect(moves.length).toEqual(files - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -114,8 +121,8 @@ describe('straight line moves', () => {
   });
 
   test('should move north-west', () => {
-    const from = board.getSquare(1, files);
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 1, files);
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, NORTH_WEST);
     expect(moves.length).toEqual(ranks - 1);
     for (let i = 0; i < moves.length; i++) {
@@ -126,9 +133,9 @@ describe('straight line moves', () => {
   });
 
   test('should be blocked by friendly piece', () => {
-    const from = board.getSquare(1, 'c');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
-    board.setPiece(5, 'c', new Piece(PLAYER_WHITE, QUEEN));
+    const from = getSquareFromBoard(board, 1, 'c');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
+    setPieceOnBoard(board, 5, 'c', createPiece(PLAYER_WHITE, QUEEN));
     movesStraightLine(board, moves, from, NORTH);
     expect(moves.length).toEqual(3);
     for (let i = 0; i < moves.length; i++) {
@@ -139,9 +146,9 @@ describe('straight line moves', () => {
   });
 
   test('should be stopped by enemy piece', () => {
-    const from = board.getSquare(1, 'c');
-    from.setPiece(new Piece(PLAYER_WHITE, QUEEN));
-    board.setPiece(5, 'c', new Piece(PLAYER_BLACK, QUEEN));
+    const from = getSquareFromBoard(board, 1, 'c');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, QUEEN));
+    setPieceOnBoard(board, 5, 'c', createPiece(PLAYER_BLACK, QUEEN));
     movesStraightLine(board, moves, from, NORTH);
     expect(moves.length).toEqual(4);
     for (let i = 0; i < moves.length; i++) {

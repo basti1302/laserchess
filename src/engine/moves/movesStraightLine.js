@@ -1,4 +1,5 @@
-import Square from '../Square';
+import { getSquare as getSquareFromBoard } from '../Board';
+import { is as isPlayer } from '../Player';
 import moveTo from './moveTo';
 import {
   NORTH,
@@ -12,8 +13,8 @@ import {
 } from './directions';
 
 export default function movesStraightLine(board, moves, from, direction) {
-  if (from.constructor !== Square) {
-    throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
+  if (!from) {
+    throw new Error('Missing mandatory argument: from.');
   }
   if (typeof direction !== 'string') {
     throw new Error(
@@ -21,7 +22,7 @@ export default function movesStraightLine(board, moves, from, direction) {
     );
   }
 
-  const movingPiece = from.getPiece();
+  const movingPiece = from.piece;
   if (!movingPiece) {
     return;
   }
@@ -34,12 +35,12 @@ export default function movesStraightLine(board, moves, from, direction) {
       stop = true;
     } else {
       if (
-        !nextSquare.hasPiece() ||
-        from.getPiece().player !== nextSquare.getPiece().player
+        !nextSquare.piece ||
+        !isPlayer(from.piece.player, nextSquare.piece.player)
       ) {
         moveTo(board, moves, from, nextSquare);
       }
-      if (nextSquare.hasPiece()) {
+      if (nextSquare.piece) {
         stop = true;
       }
     }
@@ -48,20 +49,20 @@ export default function movesStraightLine(board, moves, from, direction) {
 
 function oneStep(square, board, direction) {
   if (direction === NORTH) {
-    return board.getSquare(square.rank + 1, square.file);
+    return getSquareFromBoard(board, square.rank + 1, square.file);
   } else if (direction === NORTH_EAST) {
-    return board.getSquare(square.rank + 1, square.file + 1);
+    return getSquareFromBoard(board, square.rank + 1, square.file + 1);
   } else if (direction === EAST) {
-    return board.getSquare(square.rank, square.file + 1);
+    return getSquareFromBoard(board, square.rank, square.file + 1);
   } else if (direction === SOUTH_EAST) {
-    return board.getSquare(square.rank - 1, square.file + 1);
+    return getSquareFromBoard(board, square.rank - 1, square.file + 1);
   } else if (direction === SOUTH) {
-    return board.getSquare(square.rank - 1, square.file);
+    return getSquareFromBoard(board, square.rank - 1, square.file);
   } else if (direction === SOUTH_WEST) {
-    return board.getSquare(square.rank - 1, square.file - 1);
+    return getSquareFromBoard(board, square.rank - 1, square.file - 1);
   } else if (direction === WEST) {
-    return board.getSquare(square.rank, square.file - 1);
+    return getSquareFromBoard(board, square.rank, square.file - 1);
   } else if (direction === NORTH_WEST) {
-    return board.getSquare(square.rank + 1, square.file - 1);
+    return getSquareFromBoard(board, square.rank + 1, square.file - 1);
   }
 }

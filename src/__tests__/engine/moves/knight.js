@@ -1,7 +1,15 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {BISHOP, KNIGHT} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+} from '../../../engine/Board';
+import {
+  create as createPiece,
+  possibleMovesIgnoringCheck,
+} from '../../../engine/Piece';
+import { BISHOP, KNIGHT } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 import checkMove from '../../../testutil/checkMove';
 
 describe('knight moves', () => {
@@ -9,23 +17,23 @@ describe('knight moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should move, well, as the knight moves', () => {
-    const from = board.getSquare(5, 'b');
-    const knight = new Piece(PLAYER_WHITE, KNIGHT);
-    from.setPiece(knight);
+    const from = getSquareFromBoard(board, 5, 'b');
+    const knight = createPiece(PLAYER_WHITE, KNIGHT);
+    setPieceOnSquare(from, knight);
 
     // Set up some pieces that block the knight's movement.
 
     // block
-    board.setPiece(6, 'd', new Piece(PLAYER_WHITE, BISHOP));
+    setPieceOnBoard(board, 6, 'd', createPiece(PLAYER_WHITE, BISHOP));
     // capture
-    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, BISHOP));
+    setPieceOnBoard(board, 4, 'd', createPiece(PLAYER_BLACK, BISHOP));
 
-    knight.possibleMovesIgnoringCheck(board, moves);
+    possibleMovesIgnoringCheck(knight, board, moves);
 
     expect(moves.length).toEqual(5);
     checkMove(moves[0], from, 7, 'a');

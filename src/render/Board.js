@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {ranks, files} from '../engine/Board';
-import EnginePiece from '../engine/Piece';
+import { ranks, files, getSquare as getSquareFromBoard } from '../engine/Board';
+import { create as createEnginePiece } from '../engine/Piece';
 
 import Piece from './Piece';
 import Square from './Square';
@@ -14,8 +14,8 @@ export default class Board extends React.Component {
   }
 
   render() {
-    const {ctx, G, moves, events} = this.props;
-    const {activePlayers, currentPlayer, gameover} = ctx;
+    const { ctx, G, moves, events } = this.props;
+    const { activePlayers, currentPlayer, gameover } = ctx;
 
     if (!currentPlayer) {
       throw new Error('No current player.');
@@ -58,7 +58,7 @@ export default class Board extends React.Component {
       let squaresForOneRank = [];
       let darkSquare = rank % 2 !== 0;
       for (let file = 1; file <= files; file++) {
-        const square = board.getSquare(rank, file);
+        const square = getSquareFromBoard(board, rank, file);
         squaresForOneRank.push(
           <Square
             key={square.id}
@@ -85,12 +85,10 @@ export default class Board extends React.Component {
         <li key={idx}>
           <button onClick={() => applyPromotionMove(moves, promotionMove)}>
             <Piece
-              piece={
-                new EnginePiece(
-                  promotionMove.from.getPiece().player,
-                  promotionMove.promotionTo,
-                )
-              }
+              piece={createEnginePiece(
+                promotionMove.from.piece.player,
+                promotionMove.promotionTo,
+              )}
             />
           </button>
         </li>

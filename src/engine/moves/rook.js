@@ -1,17 +1,17 @@
-import Piece from '../Piece';
-import {ROOK} from '../PieceType';
-import {NORTH, EAST, SOUTH, WEST} from './directions';
+import { is as isType, ROOK } from '../PieceType';
+import { getSquare as getSquareFromPiece } from '../Piece';
+import { NORTH, EAST, SOUTH, WEST } from './directions';
 import movesStraightLine from './movesStraightLine';
 
 export default function movesRook(board, moves, rook) {
-  if (rook.constructor !== Piece) {
-    throw new Error(`Illegal argument for piece: ${JSON.stringify(rook)}`);
+  if (!rook) {
+    throw new Error('Missing mandatory argument: rook.');
   }
-  if (!rook.type.is(ROOK)) {
+  if (!isType(rook.type, ROOK)) {
     throw new Error(`Not a rook: ${rook}`);
   }
 
-  const from = rook.getSquare(board);
+  const from = getSquareFromPiece(rook, board);
   movesStraightLine(board, moves, from, NORTH);
   movesStraightLine(board, moves, from, EAST);
   movesStraightLine(board, moves, from, SOUTH);

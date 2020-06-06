@@ -1,5 +1,15 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
+import {
+  applyMove,
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+  ranks,
+  files,
+} from '../../../engine/Board';
+import {
+  create as createPiece,
+  possibleMovesIgnoringCheck,
+} from '../../../engine/Piece';
 import {
   BISHOP,
   KING,
@@ -8,8 +18,9 @@ import {
   QUEEN,
   ROOK,
 } from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
-import Move from '../../../engine/moves/Move';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
+import { create as createMove } from '../../../engine/moves/Move';
 import checkMove from '../../../testutil/checkMove';
 
 describe('king moves', () => {
@@ -17,23 +28,23 @@ describe('king moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should move one square in each direction', () => {
-    const from = board.getSquare(1, 'c');
-    const king = new Piece(PLAYER_WHITE, KING);
-    from.setPiece(king);
+    const from = getSquareFromBoard(board, 1, 'c');
+    const king = createPiece(PLAYER_WHITE, KING);
+    setPieceOnSquare(from, king);
 
     // Set up some pieces that block the king's movement.
 
     // block
-    board.setPiece(2, 4, new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 2, 4, createPiece(PLAYER_WHITE, KNIGHT));
     // capture
-    board.setPiece(2, 2, new Piece(PLAYER_BLACK, KNIGHT));
+    setPieceOnBoard(board, 2, 2, createPiece(PLAYER_BLACK, KNIGHT));
 
-    king.possibleMovesIgnoringCheck(board, moves);
+    possibleMovesIgnoringCheck(king, board, moves);
 
     expect(moves.length).toEqual(4);
     checkMove(moves[0], from, 2, 'c');
@@ -63,41 +74,41 @@ describe('king moves', () => {
     let blackRookQueenSideDestination;
 
     beforeEach(() => {
-      whiteKing = new Piece(PLAYER_WHITE, KING);
-      const whiteKingSideRook = new Piece(PLAYER_WHITE, ROOK);
-      const whiteQueenSideRook = new Piece(PLAYER_WHITE, ROOK);
-      blackKing = new Piece(PLAYER_BLACK, KING);
-      const blackKingSideRook = new Piece(PLAYER_BLACK, ROOK);
-      const blackQueenSideRook = new Piece(PLAYER_BLACK, ROOK);
-      whiteKingHome = board.getSquare(1, 'e');
-      whiteKingHome.setPiece(whiteKing);
-      whiteRookKingSideHome = board.getSquare(1, 'a');
-      whiteRookKingSideHome.setPiece(whiteKingSideRook);
-      whiteRookQueenSideHome = board.getSquare(1, files);
-      whiteRookQueenSideHome.setPiece(whiteQueenSideRook);
-      blackKingHome = board.getSquare(ranks, 'e');
-      blackKingHome.setPiece(blackKing);
-      blackRookKingSideHome = board.getSquare(ranks, files);
-      blackRookKingSideHome.setPiece(blackKingSideRook);
-      blackRookQueenSideHome = board.getSquare(ranks, 'a');
-      blackRookQueenSideHome.setPiece(blackQueenSideRook);
+      whiteKing = createPiece(PLAYER_WHITE, KING);
+      const whiteKingSideRook = createPiece(PLAYER_WHITE, ROOK);
+      const whiteQueenSideRook = createPiece(PLAYER_WHITE, ROOK);
+      blackKing = createPiece(PLAYER_BLACK, KING);
+      const blackKingSideRook = createPiece(PLAYER_BLACK, ROOK);
+      const blackQueenSideRook = createPiece(PLAYER_BLACK, ROOK);
+      whiteKingHome = getSquareFromBoard(board, 1, 'e');
+      setPieceOnSquare(whiteKingHome, whiteKing);
+      whiteRookKingSideHome = getSquareFromBoard(board, 1, 'a');
+      setPieceOnSquare(whiteRookKingSideHome, whiteKingSideRook);
+      whiteRookQueenSideHome = getSquareFromBoard(board, 1, files);
+      setPieceOnSquare(whiteRookQueenSideHome, whiteQueenSideRook);
+      blackKingHome = getSquareFromBoard(board, ranks, 'e');
+      setPieceOnSquare(blackKingHome, blackKing);
+      blackRookKingSideHome = getSquareFromBoard(board, ranks, files);
+      setPieceOnSquare(blackRookKingSideHome, blackKingSideRook);
+      blackRookQueenSideHome = getSquareFromBoard(board, ranks, 'a');
+      setPieceOnSquare(blackRookQueenSideHome, blackQueenSideRook);
 
-      whiteKingKingSideDestination = board.getSquare(1, 'c');
-      whiteRookKingSideDestination = board.getSquare(1, 'd');
+      whiteKingKingSideDestination = getSquareFromBoard(board, 1, 'c');
+      whiteRookKingSideDestination = getSquareFromBoard(board, 1, 'd');
 
-      whiteKingQueenSideDestination = board.getSquare(1, 'g');
-      whiteRookQueenSideDestination = board.getSquare(1, 'f');
+      whiteKingQueenSideDestination = getSquareFromBoard(board, 1, 'g');
+      whiteRookQueenSideDestination = getSquareFromBoard(board, 1, 'f');
 
-      blackKingKingSideDestination = board.getSquare(ranks, 'g');
-      blackRookKingSideDestination = board.getSquare(ranks, 'f');
+      blackKingKingSideDestination = getSquareFromBoard(board, ranks, 'g');
+      blackRookKingSideDestination = getSquareFromBoard(board, ranks, 'f');
 
-      blackKingQueenSideDestination = board.getSquare(ranks, 'c');
-      blackRookQueenSideDestination = board.getSquare(ranks, 'd');
+      blackKingQueenSideDestination = getSquareFromBoard(board, ranks, 'c');
+      blackRookQueenSideDestination = getSquareFromBoard(board, ranks, 'd');
     });
 
     describe('white can castle both sides', () => {
       test('should add castling moves', () => {
-        whiteKing.possibleMovesIgnoringCheck(board, moves);
+        possibleMovesIgnoringCheck(whiteKing, board, moves);
         expect(moves.length).toBe(7);
         checkNoCastlingMoveUntil(5);
         checkWhiteKingSideCastling(5);
@@ -107,124 +118,124 @@ describe('king moves', () => {
 
     describe('white cannot castle king side', () => {
       test('rook has moved', () => {
-        const square = board.getSquare(2, 'a');
-        board.applyMove(new Move(whiteRookKingSideHome, square));
+        const square = getSquareFromBoard(board, 2, 'a');
+        applyMove(board, createMove(whiteRookKingSideHome, square));
         checkWhiteCanOnlyCastleQueenSide();
       });
 
       test('rook has moved and returned', () => {
-        const square = board.getSquare(2, 'a');
-        board.applyMove(new Move(whiteRookKingSideHome, square));
-        board.applyMove(new Move(square, whiteRookKingSideHome));
+        const square = getSquareFromBoard(board, 2, 'a');
+        applyMove(board, createMove(whiteRookKingSideHome, square));
+        applyMove(board, createMove(square, whiteRookKingSideHome));
         checkWhiteCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #1', () => {
-        const square = board.getSquare(1, 'b');
-        square.setPiece(new Piece(PLAYER_WHITE, KNIGHT));
+        const square = getSquareFromBoard(board, 1, 'b');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, KNIGHT));
         checkWhiteCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #2', () => {
-        const square = board.getSquare(1, 'c');
-        square.setPiece(new Piece(PLAYER_WHITE, BISHOP));
+        const square = getSquareFromBoard(board, 1, 'c');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, BISHOP));
         checkWhiteCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #3', () => {
-        const square = board.getSquare(1, 'd');
-        square.setPiece(new Piece(PLAYER_WHITE, LASER));
-        whiteKing.possibleMovesIgnoringCheck(board, moves);
+        const square = getSquareFromBoard(board, 1, 'd');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, LASER));
+        possibleMovesIgnoringCheck(whiteKing, board, moves);
         expect(moves.length).toBe(5);
         checkNoCastlingMoveUntil(4);
         checkWhiteQueenSideCastling(4);
       });
 
       test('the square the king travels over is under attack', () => {
-        const square = board.getSquare(5, 'd');
-        square.setPiece(new Piece(PLAYER_BLACK, ROOK));
+        const square = getSquareFromBoard(board, 5, 'd');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, ROOK));
         checkWhiteCanOnlyCastleQueenSide();
       });
 
       test("the king's destination square is under attack", () => {
-        const square = board.getSquare(5, 'c');
-        square.setPiece(new Piece(PLAYER_BLACK, ROOK));
+        const square = getSquareFromBoard(board, 5, 'c');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, ROOK));
         checkWhiteCanOnlyCastleQueenSide();
       });
     });
 
     describe('white cannot castle queen side', () => {
       test('rook has moved', () => {
-        const square = board.getSquare(2, 'i');
-        board.applyMove(new Move(whiteRookQueenSideHome, square));
+        const square = getSquareFromBoard(board, 2, 'i');
+        applyMove(board, createMove(whiteRookQueenSideHome, square));
         checkWhiteCanOnlyCastleKingSide();
       });
 
       test('rook has moved and returned', () => {
-        const square = board.getSquare(2, 'i');
-        board.applyMove(new Move(whiteRookQueenSideHome, square));
-        board.applyMove(new Move(square, whiteRookQueenSideHome));
+        const square = getSquareFromBoard(board, 2, 'i');
+        applyMove(board, createMove(whiteRookQueenSideHome, square));
+        applyMove(board, createMove(square, whiteRookQueenSideHome));
         checkWhiteCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #1', () => {
-        const square = board.getSquare(1, 'h');
-        square.setPiece(new Piece(PLAYER_WHITE, KNIGHT));
+        const square = getSquareFromBoard(board, 1, 'h');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, KNIGHT));
         checkWhiteCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #2', () => {
-        const square = board.getSquare(1, 'g');
-        square.setPiece(new Piece(PLAYER_WHITE, BISHOP));
+        const square = getSquareFromBoard(board, 1, 'g');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, BISHOP));
         checkWhiteCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #3', () => {
-        const square = board.getSquare(1, 'f');
-        square.setPiece(new Piece(PLAYER_WHITE, QUEEN));
-        whiteKing.possibleMovesIgnoringCheck(board, moves);
+        const square = getSquareFromBoard(board, 1, 'f');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, QUEEN));
+        possibleMovesIgnoringCheck(whiteKing, board, moves);
         expect(moves.length).toBe(5);
         checkNoCastlingMoveUntil(4);
         checkWhiteKingSideCastling(4);
       });
 
       test('the square the king travels over is under attack', () => {
-        const square = board.getSquare(5, 'f');
-        square.setPiece(new Piece(PLAYER_BLACK, ROOK));
+        const square = getSquareFromBoard(board, 5, 'f');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, ROOK));
         checkWhiteCanOnlyCastleKingSide();
       });
 
       test("the king's destination square is under attack", () => {
-        const square = board.getSquare(5, 'g');
-        square.setPiece(new Piece(PLAYER_BLACK, ROOK));
+        const square = getSquareFromBoard(board, 5, 'g');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, ROOK));
         checkWhiteCanOnlyCastleKingSide();
       });
     });
 
     describe('white cannot castle', () => {
       test('king has moved', () => {
-        const square = board.getSquare(1, 'd');
-        board.applyMove(new Move(whiteKingHome, square));
+        const square = getSquareFromBoard(board, 1, 'd');
+        applyMove(board, createMove(whiteKingHome, square));
         checkWhiteCantCastle();
       });
 
       test('king has moved and returned', () => {
-        const square = board.getSquare(1, 'd');
-        board.applyMove(new Move(whiteKingHome, square));
-        board.applyMove(new Move(square, whiteKingHome));
+        const square = getSquareFromBoard(board, 1, 'd');
+        applyMove(board, createMove(whiteKingHome, square));
+        applyMove(board, createMove(square, whiteKingHome));
         checkWhiteCantCastle();
       });
 
       test('the king is in check', () => {
-        const square = board.getSquare(5, 'e');
-        square.setPiece(new Piece(PLAYER_BLACK, ROOK));
+        const square = getSquareFromBoard(board, 5, 'e');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, ROOK));
         checkWhiteCantCastle();
       });
     });
 
     describe('black can castle both sides', () => {
       test('should add castling moves', () => {
-        blackKing.possibleMovesIgnoringCheck(board, moves);
+        possibleMovesIgnoringCheck(blackKing, board, moves);
         expect(moves.length).toBe(7);
         checkNoCastlingMoveUntil(5);
         checkBlackKingSideCastling(5);
@@ -234,129 +245,129 @@ describe('king moves', () => {
 
     describe('black cannot castle king side', () => {
       test('rook has moved', () => {
-        const square = board.getSquare(ranks - 1, 'i');
-        board.applyMove(new Move(blackRookKingSideHome, square));
+        const square = getSquareFromBoard(board, ranks - 1, 'i');
+        applyMove(board, createMove(blackRookKingSideHome, square));
         checkBlackCanOnlyCastleQueenSide();
       });
 
       test('rook has moved and returned', () => {
-        const square = board.getSquare(ranks - 1, 'i');
-        board.applyMove(new Move(blackRookKingSideHome, square));
-        board.applyMove(new Move(square, blackRookKingSideHome));
+        const square = getSquareFromBoard(board, ranks - 1, 'i');
+        applyMove(board, createMove(blackRookKingSideHome, square));
+        applyMove(board, createMove(square, blackRookKingSideHome));
         checkBlackCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #1', () => {
-        const square = board.getSquare(ranks, 'h');
-        square.setPiece(new Piece(PLAYER_BLACK, KNIGHT));
+        const square = getSquareFromBoard(board, ranks, 'h');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, KNIGHT));
         checkBlackCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #2', () => {
-        const square = board.getSquare(ranks, 'g');
-        square.setPiece(new Piece(PLAYER_BLACK, BISHOP));
+        const square = getSquareFromBoard(board, ranks, 'g');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, BISHOP));
         checkBlackCanOnlyCastleQueenSide();
       });
 
       test('there is a piece on a square that needs to be empty #3', () => {
-        const square = board.getSquare(ranks, 'f');
-        square.setPiece(new Piece(PLAYER_BLACK, LASER));
-        blackKing.possibleMovesIgnoringCheck(board, moves);
+        const square = getSquareFromBoard(board, ranks, 'f');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, LASER));
+        possibleMovesIgnoringCheck(blackKing, board, moves);
         expect(moves.length).toBe(5);
         checkNoCastlingMoveUntil(4);
         checkBlackQueenSideCastling(4);
       });
 
       test('the square the king travels over is under attack', () => {
-        const square = board.getSquare(5, 'f');
-        square.setPiece(new Piece(PLAYER_WHITE, ROOK));
+        const square = getSquareFromBoard(board, 5, 'f');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, ROOK));
         checkBlackCanOnlyCastleQueenSide();
       });
 
       test("the king's destination square is under attack", () => {
-        const square = board.getSquare(5, 'g');
-        square.setPiece(new Piece(PLAYER_WHITE, ROOK));
+        const square = getSquareFromBoard(board, 5, 'g');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, ROOK));
         checkBlackCanOnlyCastleQueenSide();
       });
     });
 
     describe('black cannot castle queen side', () => {
       test('rook has moved', () => {
-        const square = board.getSquare(ranks - 1, 'a');
-        board.applyMove(new Move(blackRookQueenSideHome, square));
+        const square = getSquareFromBoard(board, ranks - 1, 'a');
+        applyMove(board, createMove(blackRookQueenSideHome, square));
         checkBlackCanOnlyCastleKingSide();
       });
 
       test('rook has moved and returned', () => {
-        const square = board.getSquare(ranks - 1, 'a');
-        board.applyMove(new Move(blackRookQueenSideHome, square));
-        board.applyMove(new Move(square, blackRookQueenSideHome));
+        const square = getSquareFromBoard(board, ranks - 1, 'a');
+        applyMove(board, createMove(blackRookQueenSideHome, square));
+        applyMove(board, createMove(square, blackRookQueenSideHome));
         checkBlackCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #1', () => {
-        const square = board.getSquare(ranks, 'b');
-        square.setPiece(new Piece(PLAYER_BLACK, KNIGHT));
+        const square = getSquareFromBoard(board, ranks, 'b');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, KNIGHT));
         checkBlackCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #2', () => {
-        const square = board.getSquare(ranks, 'c');
-        square.setPiece(new Piece(PLAYER_BLACK, BISHOP));
+        const square = getSquareFromBoard(board, ranks, 'c');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, BISHOP));
         checkBlackCanOnlyCastleKingSide();
       });
 
       test('there is a piece on a square that needs to be empty #3', () => {
-        const square = board.getSquare(ranks, 'd');
-        square.setPiece(new Piece(PLAYER_BLACK, QUEEN));
-        blackKing.possibleMovesIgnoringCheck(board, moves);
+        const square = getSquareFromBoard(board, ranks, 'd');
+        setPieceOnSquare(square, createPiece(PLAYER_BLACK, QUEEN));
+        possibleMovesIgnoringCheck(blackKing, board, moves);
         expect(moves.length).toBe(5);
         checkNoCastlingMoveUntil(4);
         checkBlackKingSideCastling(4);
       });
 
       test('the square the king travels over is under attack', () => {
-        const square = board.getSquare(5, 'd');
-        square.setPiece(new Piece(PLAYER_WHITE, ROOK));
+        const square = getSquareFromBoard(board, 5, 'd');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, ROOK));
         checkBlackCanOnlyCastleKingSide();
       });
 
       test("the king's destination square is under attack", () => {
-        const square = board.getSquare(5, 'c');
-        square.setPiece(new Piece(PLAYER_WHITE, ROOK));
+        const square = getSquareFromBoard(board, 5, 'c');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, ROOK));
         checkBlackCanOnlyCastleKingSide();
       });
     });
 
     describe('black cannot castle', () => {
       test('king has moved', () => {
-        const square = board.getSquare(ranks, 'd');
-        board.applyMove(new Move(blackKingHome, square));
+        const square = getSquareFromBoard(board, ranks, 'd');
+        applyMove(board, createMove(blackKingHome, square));
         checkBlackCantCastle();
       });
 
       test('king has moved and returned', () => {
-        const square = board.getSquare(ranks, 'd');
-        board.applyMove(new Move(blackKingHome, square));
-        board.applyMove(new Move(square, blackKingHome));
+        const square = getSquareFromBoard(board, ranks, 'd');
+        applyMove(board, createMove(blackKingHome, square));
+        applyMove(board, createMove(square, blackKingHome));
         checkBlackCantCastle();
       });
 
       test('the king is in check', () => {
-        const square = board.getSquare(5, 'e');
-        square.setPiece(new Piece(PLAYER_WHITE, ROOK));
+        const square = getSquareFromBoard(board, 5, 'e');
+        setPieceOnSquare(square, createPiece(PLAYER_WHITE, ROOK));
         checkBlackCantCastle();
       });
     });
 
     function checkWhiteCantCastle() {
-      whiteKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(whiteKing, board, moves);
       expect(moves.length).toBe(5);
       checkNoCastlingMoveUntil(5);
     }
 
     function checkBlackCantCastle() {
-      blackKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(blackKing, board, moves);
       expect(moves.length).toBe(5);
       checkNoCastlingMoveUntil(5);
     }
@@ -372,28 +383,28 @@ describe('king moves', () => {
     }
 
     function checkWhiteCanOnlyCastleQueenSide() {
-      whiteKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(whiteKing, board, moves);
       expect(moves.length).toBe(6);
       checkNoCastlingMoveUntil(5);
       checkWhiteQueenSideCastling(5);
     }
 
     function checkWhiteCanOnlyCastleKingSide() {
-      whiteKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(whiteKing, board, moves);
       expect(moves.length).toBe(6);
       checkNoCastlingMoveUntil(5);
       checkWhiteKingSideCastling(5);
     }
 
     function checkBlackCanOnlyCastleQueenSide() {
-      blackKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(blackKing, board, moves);
       expect(moves.length).toBe(6);
       checkNoCastlingMoveUntil(5);
       checkBlackQueenSideCastling(5);
     }
 
     function checkBlackCanOnlyCastleKingSide() {
-      blackKing.possibleMovesIgnoringCheck(board, moves);
+      possibleMovesIgnoringCheck(blackKing, board, moves);
       expect(moves.length).toBe(6);
       checkNoCastlingMoveUntil(5);
       checkBlackKingSideCastling(5);

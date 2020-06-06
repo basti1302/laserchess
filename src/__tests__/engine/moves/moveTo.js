@@ -1,48 +1,54 @@
-import Board from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {LASER, KNIGHT, PAWN_90_DEGREES} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+} from '../../../engine/Board';
+import { create as createPiece } from '../../../engine/Piece';
+import { LASER, KNIGHT, PAWN_90_DEGREES } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 
-import moveTo, {
-  CAPTURE_MODE_MUST,
-  CAPTURE_MODE_MUST_NOT,
-} from '../../../engine/moves/moveTo';
+import moveTo, { CAPTURE_MODE_MUST_NOT } from '../../../engine/moves/moveTo';
 
 describe('moveTo util', () => {
   let board;
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should not move without a source piece', () => {
     // the board is empty, so 1-a has no piece
-    moveTo(board, moves, board.getSquare(1, 'a'), board.getSquare(2, 'b'));
+    moveTo(
+      board,
+      moves,
+      getSquareFromBoard(board, 1, 'a'),
+      getSquareFromBoard(board, 2, 'b'),
+    );
     expect(moves.length).toEqual(0);
   });
 
   test('should not move off board', () => {
-    const from = board.getSquare(1, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    const to = board.getSquare(0, 'a');
+    const from = getSquareFromBoard(board, 1, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, LASER));
+    const to = getSquareFromBoard(board, 0, 'a');
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(0);
   });
 
   test('should not move off board 2', () => {
-    const from = board.getSquare(1, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    const to = board.getSquare(9, 'j');
+    const from = getSquareFromBoard(board, 1, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, LASER));
+    const to = getSquareFromBoard(board, 9, 'j');
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(0);
   });
 
   test('should move to empty square', () => {
-    const from = board.getSquare(1, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    const to = board.getSquare(2, 'b');
+    const from = getSquareFromBoard(board, 1, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, LASER));
+    const to = getSquareFromBoard(board, 2, 'b');
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(1);
     expect(moves[0].from).toBe(from);
@@ -50,19 +56,19 @@ describe('moveTo util', () => {
   });
 
   test('should not move to an square occupied by a friendly piece', () => {
-    const from = board.getSquare(1, 'a');
-    const to = board.getSquare(2, 'b');
-    from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    to.setPiece(new Piece(PLAYER_WHITE, KNIGHT));
+    const from = getSquareFromBoard(board, 1, 'a');
+    const to = getSquareFromBoard(board, 2, 'b');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, LASER));
+    setPieceOnSquare(to, createPiece(PLAYER_WHITE, KNIGHT));
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(0);
   });
 
   test('should capture', () => {
-    const from = board.getSquare(1, 'a');
-    const to = board.getSquare(2, 'b');
-    from.setPiece(new Piece(PLAYER_WHITE, LASER));
-    to.setPiece(new Piece(PLAYER_BLACK, KNIGHT));
+    const from = getSquareFromBoard(board, 1, 'a');
+    const to = getSquareFromBoard(board, 2, 'b');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, LASER));
+    setPieceOnSquare(to, createPiece(PLAYER_BLACK, KNIGHT));
     moveTo(board, moves, from, to);
     expect(moves.length).toEqual(1);
     expect(moves[0].from).toBe(from);
@@ -70,10 +76,10 @@ describe('moveTo util', () => {
   });
 
   test('pawn should not capture straight', () => {
-    const from = board.getSquare(2, 'a');
-    const to = board.getSquare(3, 'a');
-    from.setPiece(new Piece(PLAYER_WHITE, PAWN_90_DEGREES));
-    to.setPiece(new Piece(PLAYER_BLACK, LASER));
+    const from = getSquareFromBoard(board, 2, 'a');
+    const to = getSquareFromBoard(board, 3, 'a');
+    setPieceOnSquare(from, createPiece(PLAYER_WHITE, PAWN_90_DEGREES));
+    setPieceOnSquare(to, createPiece(PLAYER_BLACK, LASER));
     moveTo(board, moves, from, to, CAPTURE_MODE_MUST_NOT);
     expect(moves.length).toEqual(0);
   });

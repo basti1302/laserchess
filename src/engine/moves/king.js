@@ -1,30 +1,40 @@
-import {PLAYER_WHITE, PLAYER_BLACK} from '../Player';
-import {KING} from '../PieceType';
-import Piece from '../Piece';
-import {ranks} from '../Board';
-import Move from './Move';
+import {
+  getKingSideRook,
+  getSquare as getSquareFromBoard,
+  hasKingMoved,
+  hasKingSideRookMoved,
+  hasQueenSideRookMoved,
+  allMovesIgnoringCheckAndCastling,
+  isAttackedByMoves,
+  getQueenSideRook,
+  ranks,
+} from '../Board';
+import { enemy, is as playerIs, PLAYER_WHITE, PLAYER_BLACK } from '../Player';
+import { getSquare as getSquareFromPiece } from '../Piece';
+import { is as isType, KING } from '../PieceType';
+import { create as createMove } from './Move';
 import moveTo from './moveTo';
 
 export default function movesKing(board, moves, king, ignoreCastling) {
-  if (king.constructor !== Piece) {
-    throw new Error(`Illegal argument for piece: ${JSON.stringify(king)}`);
+  if (!king) {
+    throw new Error('Missing mandatory argument: king.');
   }
-  if (!king.type.is(KING)) {
+  if (!isType(king.type, KING)) {
     throw new Error(`Not a king: ${king}`);
   }
 
-  const from = king.getSquare(board);
+  const from = getSquareFromPiece(king, board);
   const rank = from.rank;
   const file = from.file;
 
-  moveTo(board, moves, from, board.getSquare(rank + 1, file));
-  moveTo(board, moves, from, board.getSquare(rank + 1, file + 1));
-  moveTo(board, moves, from, board.getSquare(rank, file + 1));
-  moveTo(board, moves, from, board.getSquare(rank - 1, file + 1));
-  moveTo(board, moves, from, board.getSquare(rank - 1, file));
-  moveTo(board, moves, from, board.getSquare(rank - 1, file - 1));
-  moveTo(board, moves, from, board.getSquare(rank, file - 1));
-  moveTo(board, moves, from, board.getSquare(rank + 1, file - 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 1, file));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 1, file + 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank, file + 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 1, file + 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 1, file));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank - 1, file - 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank, file - 1));
+  moveTo(board, moves, from, getSquareFromBoard(board, rank + 1, file - 1));
 
   if (ignoreCastling) {
     return;
@@ -40,38 +50,38 @@ export default function movesKing(board, moves, king, ignoreCastling) {
 
 function canCastleKingSide(board, king) {
   if (
-    board.hasKingMoved(king.player) ||
-    board.hasKingSideRookMoved(king.player)
+    hasKingMoved(board, king.player) ||
+    hasKingSideRookMoved(board, king.player)
   ) {
     return false;
   }
 
   const requiredEmpty = [];
   const requiredUnattacked = [];
-  if (king.player.is(PLAYER_WHITE)) {
-    requiredEmpty.push(board.getSquare(1, 'b'));
-    requiredEmpty.push(board.getSquare(1, 'c'));
-    requiredEmpty.push(board.getSquare(1, 'd'));
-    requiredUnattacked.push(board.getSquare(1, 'c'));
-    requiredUnattacked.push(board.getSquare(1, 'd'));
+  if (playerIs(king.player, PLAYER_WHITE)) {
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'b'));
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'c'));
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'd'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'c'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'd'));
     // 1-e is the white king's square, adding it to requiredUnattacked makes
     // sure the white king is not in check.
-    requiredUnattacked.push(board.getSquare(1, 'e'));
-  } else if (king.player.is(PLAYER_BLACK)) {
-    requiredEmpty.push(board.getSquare(ranks, 'f'));
-    requiredEmpty.push(board.getSquare(ranks, 'g'));
-    requiredEmpty.push(board.getSquare(ranks, 'h'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'e'));
+  } else if (playerIs(king.player, PLAYER_BLACK)) {
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'f'));
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'g'));
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'h'));
     // ranks-e is the black king's square, adding it to requiredUnattacked makes
     // sure the black king is not in check.
-    requiredUnattacked.push(board.getSquare(ranks, 'e'));
-    requiredUnattacked.push(board.getSquare(ranks, 'f'));
-    requiredUnattacked.push(board.getSquare(ranks, 'g'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'e'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'f'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'g'));
   } else {
     throw new Error(`Unknown player: ${king.player}.`);
   }
   return canCastle(
     board,
-    king.player.enemy(),
+    enemy(king.player),
     requiredEmpty,
     requiredUnattacked,
   );
@@ -79,38 +89,38 @@ function canCastleKingSide(board, king) {
 
 function canCastleQueenSide(board, king) {
   if (
-    board.hasKingMoved(king.player) ||
-    board.hasQueenSideRookMoved(king.player)
+    hasKingMoved(board, king.player) ||
+    hasQueenSideRookMoved(board, king.player)
   ) {
     return false;
   }
 
   const requiredEmpty = [];
   const requiredUnattacked = [];
-  if (king.player.is(PLAYER_WHITE)) {
-    requiredEmpty.push(board.getSquare(1, 'f'));
-    requiredEmpty.push(board.getSquare(1, 'g'));
-    requiredEmpty.push(board.getSquare(1, 'h'));
+  if (playerIs(king.player, PLAYER_WHITE)) {
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'f'));
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'g'));
+    requiredEmpty.push(getSquareFromBoard(board, 1, 'h'));
     // 1-e is the white king's square, adding it to requiredUnattacked makes
     // sure the white king is not in check.
-    requiredUnattacked.push(board.getSquare(1, 'e'));
-    requiredUnattacked.push(board.getSquare(1, 'f'));
-    requiredUnattacked.push(board.getSquare(1, 'g'));
-  } else if (king.player.is(PLAYER_BLACK)) {
-    requiredEmpty.push(board.getSquare(ranks, 'b'));
-    requiredEmpty.push(board.getSquare(ranks, 'c'));
-    requiredEmpty.push(board.getSquare(ranks, 'd'));
-    requiredUnattacked.push(board.getSquare(ranks, 'c'));
-    requiredUnattacked.push(board.getSquare(ranks, 'd'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'e'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'f'));
+    requiredUnattacked.push(getSquareFromBoard(board, 1, 'g'));
+  } else if (playerIs(king.player, PLAYER_BLACK)) {
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'b'));
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'c'));
+    requiredEmpty.push(getSquareFromBoard(board, ranks, 'd'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'c'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'd'));
     // ranks-e is the black king's square, adding it to requiredUnattacked makes
     // sure the black king is not in check.
-    requiredUnattacked.push(board.getSquare(ranks, 'e'));
+    requiredUnattacked.push(getSquareFromBoard(board, ranks, 'e'));
   } else {
     throw new Error(`Unknown player: ${king.player}.`);
   }
   return canCastle(
     board,
-    king.player.enemy(),
+    enemy(king.player),
     requiredEmpty,
     requiredUnattacked,
   );
@@ -118,13 +128,13 @@ function canCastleQueenSide(board, king) {
 
 function canCastle(board, enemy, requiredEmpty, requiredUnattacked) {
   for (let i = 0; i < requiredEmpty.length; i++) {
-    if (requiredEmpty[i].hasPiece()) {
+    if (requiredEmpty[i].piece) {
       return false;
     }
   }
-  const enemyMoves = board.allMovesIgnoringCheckAndCastling(enemy);
+  const enemyMoves = allMovesIgnoringCheckAndCastling(board, enemy);
   for (let i = 0; i < requiredUnattacked.length; i++) {
-    if (board.isAttackedByMoves(requiredUnattacked[i], enemyMoves)) {
+    if (isAttackedByMoves(board, requiredUnattacked[i], enemyMoves)) {
       return false;
     }
   }
@@ -132,21 +142,21 @@ function canCastle(board, enemy, requiredEmpty, requiredUnattacked) {
 }
 
 function addCastleKingSide(board, moves, king) {
-  const rook = board.getKingSideRook(king.player);
+  const rook = getKingSideRook(board, king.player);
   let castling;
-  if (king.player.is(PLAYER_WHITE)) {
-    castling = new Move(
-      king.getSquare(board),
-      board.getSquare(1, 'c'),
-      rook.getSquare(board),
-      board.getSquare(1, 'd'),
+  if (playerIs(king.player, PLAYER_WHITE)) {
+    castling = createMove(
+      getSquareFromPiece(king, board),
+      getSquareFromBoard(board, 1, 'c'),
+      getSquareFromPiece(rook, board),
+      getSquareFromBoard(board, 1, 'd'),
     );
-  } else if (king.player.is(PLAYER_BLACK)) {
-    castling = new Move(
-      king.getSquare(board),
-      board.getSquare(ranks, 'g'),
-      rook.getSquare(board),
-      board.getSquare(ranks, 'f'),
+  } else if (playerIs(king.player, PLAYER_BLACK)) {
+    castling = createMove(
+      getSquareFromPiece(king, board),
+      getSquareFromBoard(board, ranks, 'g'),
+      getSquareFromPiece(rook, board),
+      getSquareFromBoard(board, ranks, 'f'),
     );
   } else {
     throw new Error(`Unknown player: ${king.player}.`);
@@ -155,21 +165,21 @@ function addCastleKingSide(board, moves, king) {
 }
 
 function addCastleQueenSide(board, moves, king) {
-  const rook = board.getQueenSideRook(king.player);
+  const rook = getQueenSideRook(board, king.player);
   let castling;
-  if (king.player.is(PLAYER_WHITE)) {
-    castling = new Move(
-      king.getSquare(board),
-      board.getSquare(1, 'g'),
-      rook.getSquare(board),
-      board.getSquare(1, 'f'),
+  if (playerIs(king.player, PLAYER_WHITE)) {
+    castling = createMove(
+      getSquareFromPiece(king, board),
+      getSquareFromBoard(board, 1, 'g'),
+      getSquareFromPiece(rook, board),
+      getSquareFromBoard(board, 1, 'f'),
     );
-  } else if (king.player.is(PLAYER_BLACK)) {
-    castling = new Move(
-      king.getSquare(board),
-      board.getSquare(ranks, 'c'),
-      rook.getSquare(board),
-      board.getSquare(ranks, 'd'),
+  } else if (playerIs(king.player, PLAYER_BLACK)) {
+    castling = createMove(
+      getSquareFromPiece(king, board),
+      getSquareFromBoard(board, ranks, 'c'),
+      getSquareFromPiece(rook, board),
+      getSquareFromBoard(board, ranks, 'd'),
     );
   } else {
     throw new Error(`Unknown player: ${king.player}.`);

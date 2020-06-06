@@ -1,5 +1,5 @@
-import Piece from '../Piece';
-import {QUEEN} from '../PieceType';
+import { is as isType, QUEEN } from '../PieceType';
+import { getSquare as getSquareFromPiece } from '../Piece';
 import {
   NORTH,
   NORTH_EAST,
@@ -13,14 +13,14 @@ import {
 import movesStraightLine from './movesStraightLine';
 
 export default function movesQueen(board, moves, queen) {
-  if (queen.constructor !== Piece) {
-    throw new Error(`Illegal argument for piece: ${JSON.stringify(queen)}`);
+  if (!queen) {
+    throw new Error('Missing mandatory argument: queen.');
   }
-  if (!queen.type.is(QUEEN)) {
+  if (!isType(queen.type, QUEEN)) {
     throw new Error(`Not a queen: ${queen}`);
   }
 
-  const from = queen.getSquare(board);
+  const from = getSquareFromPiece(queen, board);
   movesStraightLine(board, moves, from, NORTH);
   movesStraightLine(board, moves, from, NORTH_EAST);
   movesStraightLine(board, moves, from, EAST);

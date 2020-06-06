@@ -1,4 +1,4 @@
-import Orientation, {NORTH, EAST, SOUTH, WEST} from '../Orientation';
+import { is as isOrientation, NORTH, EAST, SOUTH, WEST } from '../Orientation';
 import {
   START,
   STRAIGHT,
@@ -8,43 +8,47 @@ import {
   ABSORB,
   DESTROY,
 } from './segmentTypes';
-import Square from '../Square';
+import { transferToBoard as transferSquareToBoard } from '../Square';
 
-export default class Segment {
-  constructor(square, orientation, type) {
-    if (square.constructor !== Square) {
-      throw new Error(`Illegal argument for square: ${JSON.stringify(square)}`);
-    }
-    if (orientation.constructor !== Orientation) {
-      throw new Error(
-        `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
-      );
-    }
-    if (
-      orientation !== NORTH &&
-      orientation !== EAST &&
-      orientation !== SOUTH &&
-      orientation !== WEST
-    ) {
-      throw new Error(`Unknown orientation: ${orientation}`);
-    }
-    if (typeof type !== 'string') {
-      throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
-    }
-    if (
-      type !== START &&
-      type !== STRAIGHT &&
-      type !== REFLECTED_LEFT &&
-      type !== REFLECTED_RIGHT &&
-      type !== REFLECTED_STRAIGHT &&
-      type !== ABSORB &&
-      type !== DESTROY
-    ) {
-      throw new Error(`Unknown type: ${JSON.stringify(type)}`);
-    }
-
-    this.square = square;
-    this.orientation = orientation;
-    this.type = type;
+export function create(square, orientation, type) {
+  if (!square) {
+    throw new Error('Missing mandatory argument: square.');
   }
+  if (!orientation) {
+    throw new Error('Missing mandatory argument: orientation.');
+  }
+  if (
+    !isOrientation(orientation, NORTH) &&
+    !isOrientation(orientation, EAST) &&
+    !isOrientation(orientation, SOUTH) &&
+    !isOrientation(orientation, WEST)
+  ) {
+    throw new Error(`Unknown orientation: ${orientation}`);
+  }
+  if (typeof type !== 'string') {
+    throw new Error(`Illegal argument for type: ${JSON.stringify(type)}`);
+  }
+  if (
+    type !== START &&
+    type !== STRAIGHT &&
+    type !== REFLECTED_LEFT &&
+    type !== REFLECTED_RIGHT &&
+    type !== REFLECTED_STRAIGHT &&
+    type !== ABSORB &&
+    type !== DESTROY
+  ) {
+    throw new Error(`Unknown type: ${JSON.stringify(type)}`);
+  }
+
+  return {
+    square,
+    orientation,
+    type,
+  };
+}
+
+export function transferToBoard(segment, board) {
+  const segmentForBoard = { ...segment };
+  segmentForBoard.square = transferSquareToBoard(segment.square, board);
+  return segmentForBoard;
 }

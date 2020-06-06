@@ -1,6 +1,15 @@
+import { getSquare as getSquareFromBoard } from '../Board';
 import modulo from '../modulo';
 
-import Orientation, {NORTH, EAST, SOUTH, WEST} from '../Orientation';
+import {
+  is as isOrientation,
+  rotateLeft,
+  rotateRight,
+  NORTH,
+  EAST,
+  SOUTH,
+  WEST,
+} from '../Orientation';
 import {
   ABSORB,
   DESTROY,
@@ -19,41 +28,39 @@ import {
   SHIELD,
   SPLIT,
 } from './surfaces';
-import {LASER} from '../PieceType';
-import Square from '../Square';
-import Segment from './Segment';
-import Shot from './Shot';
+import { is as isType, LASER } from '../PieceType';
+import { is as isSquare } from '../Square';
+import { create as createSegment } from './Segment';
+import { create as createShot } from './Shot';
 
 /**
  * Starts the laser shot from the firing laser piece.
  */
 export default function fireLaser(board, from, orientation) {
-  if (from.constructor !== Square) {
-    throw new Error(`Illegal argument for from: ${JSON.stringify(from)}`);
+  if (!from) {
+    throw new Error('Missing mandatory argument: from.');
   }
-  if (orientation.constructor !== Orientation) {
-    throw new Error(
-      `Illegal argument for orientation: ${JSON.stringify(orientation)}`,
-    );
+  if (!orientation) {
+    throw new Error('Missing mandatory argument: orientation.');
   }
   if (
-    orientation !== NORTH &&
-    orientation !== EAST &&
-    orientation !== SOUTH &&
-    orientation !== WEST
+    !isOrientation(orientation, NORTH) &&
+    !isOrientation(orientation, EAST) &&
+    !isOrientation(orientation, SOUTH) &&
+    !isOrientation(orientation, WEST)
   ) {
     throw new Error(`Unknown orientation: ${orientation}`);
   }
 
-  const laser = from.getPiece();
-  if (!laser || !laser.type.is(LASER)) {
-    return new Shot([]);
+  const laser = from.piece;
+  if (!laser || !isType(laser.type, LASER)) {
+    return createShot([]);
   }
 
   const segments = [];
   const destroyedSquares = [];
   startShotLeg(board, from, orientation, segments, destroyedSquares);
-  return new Shot(segments, destroyedSquares);
+  return createShot(segments, destroyedSquares);
 }
 
 /**
@@ -61,7 +68,7 @@ export default function fireLaser(board, from, orientation) {
  * two individual legs after a split at a knight piece.
  */
 function startShotLeg(board, from, orientation, segments, destroyedSquares) {
-  segments.push(new Segment(from, orientation, START));
+  segments.push(createSegment(from, orientation, START));
   let nextSquare = from;
   do {
     nextSquare = oneStep(nextSquare, board, orientation);
@@ -69,18 +76,20 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
       // end of board reached
       return;
     } else {
-      if (nextSquare.hasPiece()) {
-        const surface = getSurfaceFromPiece(nextSquare.getPiece(), orientation);
+      if (nextSquare.piece) {
+        const surface = getSurfaceFromPiece(nextSquare.piece, orientation);
         if (surface === DEFAULT) {
           addToDestroyedSquares(destroyedSquares, nextSquare);
-          segments.push(new Segment(nextSquare, orientation, DESTROY));
+          segments.push(createSegment(nextSquare, orientation, DESTROY));
           return;
         } else if (surface === REFLECT_LEFT) {
-          segments.push(new Segment(nextSquare, orientation, REFLECTED_LEFT));
-          orientation = orientation.rotateLeft();
+          segments.push(createSegment(nextSquare, orientation, REFLECTED_LEFT));
+          orientation = rotateLeft(orientation);
         } else if (surface === REFLECT_RIGHT) {
-          segments.push(new Segment(nextSquare, orientation, REFLECTED_RIGHT));
-          orientation = orientation.rotateRight();
+          segments.push(
+            createSegment(nextSquare, orientation, REFLECTED_RIGHT),
+          );
+          orientation = rotateRight(orientation);
         } else if (surface === REFLECT_STRAIGHT) {
           // Check for infinetly reflected shots: Check whether the current
           // square is already contained with type reflected-straight, if so,
@@ -88,29 +97,30 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
           const current = nextSquare;
           if (
             segments.find(
-              (segment) =>
-                segment.square.is(current) &&
+              segment =>
+                isSquare(segment.square, current) &&
                 segment.type === REFLECTED_STRAIGHT,
             )
           ) {
-            segments.push(new Segment(nextSquare, orientation, ABSORB));
+            segments.push(createSegment(nextSquare, orientation, ABSORB));
             return;
           } else {
             segments.push(
-              new Segment(nextSquare, orientation, REFLECTED_STRAIGHT),
+              createSegment(nextSquare, orientation, REFLECTED_STRAIGHT),
             );
-            orientation = orientation.rotateRight().rotateRight();
+            // U-turn
+            orientation = rotateRight(rotateRight(orientation));
           }
         } else if (surface === RELAY) {
-          segments.push(new Segment(nextSquare, orientation, ABSORB));
-          segments.push(new Segment(nextSquare, orientation, START));
+          segments.push(createSegment(nextSquare, orientation, ABSORB));
+          segments.push(createSegment(nextSquare, orientation, START));
         } else if (surface === SHIELD) {
-          segments.push(new Segment(nextSquare, orientation, ABSORB));
+          segments.push(createSegment(nextSquare, orientation, ABSORB));
           return;
         } else if (surface === SPLIT) {
-          const splitOrientation1 = orientation.rotateRight();
-          const splitOrientation2 = orientation.rotateLeft();
-          segments.push(new Segment(nextSquare, orientation, ABSORB));
+          const splitOrientation1 = rotateRight(orientation);
+          const splitOrientation2 = rotateLeft(orientation);
+          segments.push(createSegment(nextSquare, orientation, ABSORB));
           startShotLeg(
             board,
             nextSquare,
@@ -130,21 +140,21 @@ function startShotLeg(board, from, orientation, segments, destroyedSquares) {
           throw new Error(`Surface type is not implemented yet: ${surface}`);
         }
       } else {
-        segments.push(new Segment(nextSquare, orientation, STRAIGHT));
+        segments.push(createSegment(nextSquare, orientation, STRAIGHT));
       }
     }
   } while (true);
 }
 
 function oneStep(square, board, orientation) {
-  if (orientation.is(NORTH)) {
-    return board.getSquare(square.rank + 1, square.file);
-  } else if (orientation.is(EAST)) {
-    return board.getSquare(square.rank, square.file + 1);
-  } else if (orientation.is(SOUTH)) {
-    return board.getSquare(square.rank - 1, square.file);
-  } else if (orientation.is(WEST)) {
-    return board.getSquare(square.rank, square.file - 1);
+  if (isOrientation(orientation, NORTH)) {
+    return getSquareFromBoard(board, square.rank + 1, square.file);
+  } else if (isOrientation(orientation, EAST)) {
+    return getSquareFromBoard(board, square.rank, square.file + 1);
+  } else if (isOrientation(orientation, SOUTH)) {
+    return getSquareFromBoard(board, square.rank - 1, square.file);
+  } else if (isOrientation(orientation, WEST)) {
+    return getSquareFromBoard(board, square.rank, square.file - 1);
   }
 }
 
@@ -186,7 +196,9 @@ function addToDestroyedSquares(destroyedSquares, square) {
   // Due to shots being split by knights a piece may be hit by multiple legs of
   // a shot. We only add it to destroyedSquares once, that is, before we add it,
   // we check if it is already listed as a destroyed square.
-  const alreadyListedAsDestroyed = !!destroyedSquares.find((s) => s === square);
+  const alreadyListedAsDestroyed = !!destroyedSquares.find(s =>
+    isSquare(s, square),
+  );
   if (!alreadyListedAsDestroyed) {
     destroyedSquares.push(square);
   }

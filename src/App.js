@@ -1,4 +1,4 @@
-import {Client} from 'boardgame.io/react';
+import { Client } from 'boardgame.io/react';
 
 import LaserChessGame from './LaserChessGame';
 import Board from './render/Board';

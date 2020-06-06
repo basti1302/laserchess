@@ -1,7 +1,15 @@
-import Board, {ranks, files} from '../../../engine/Board';
-import Piece from '../../../engine/Piece';
-import {KNIGHT, QUEEN} from '../../../engine/PieceType';
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../../engine/Player';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  setPiece as setPieceOnBoard,
+} from '../../../engine/Board';
+import {
+  create as createPiece,
+  possibleMovesIgnoringCheck,
+} from '../../../engine/Piece';
+import { KNIGHT, QUEEN } from '../../../engine/PieceType';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../../engine/Player';
+import { setPiece as setPieceOnSquare } from '../../../engine/Square';
 import checkMove from '../../../testutil/checkMove';
 
 describe('queen moves', () => {
@@ -9,32 +17,32 @@ describe('queen moves', () => {
   let moves;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
     moves = [];
   });
 
   test('should move in all directions', () => {
-    const from = board.getSquare(5, 'e');
-    const queen = new Piece(PLAYER_WHITE, QUEEN);
-    from.setPiece(queen);
+    const from = getSquareFromBoard(board, 5, 'e');
+    const queen = createPiece(PLAYER_WHITE, QUEEN);
+    setPieceOnSquare(from, queen);
 
     // Set up some pieces that block the queen's movement.
 
     // north: 3 moves
-    board.setPiece(8, 'e', new Piece(PLAYER_BLACK, KNIGHT));
+    setPieceOnBoard(board, 8, 'e', createPiece(PLAYER_BLACK, KNIGHT));
     // north-east: 2 moves
-    board.setPiece(8, 'h', new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 8, 'h', createPiece(PLAYER_WHITE, KNIGHT));
     // east: no obstacle, 4 moves
     // south-east: 0 moves
-    board.setPiece(4, 'f', new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 4, 'f', createPiece(PLAYER_WHITE, KNIGHT));
     // south: no obstacle, 4 moves
     // south-west: 1 move
-    board.setPiece(4, 'd', new Piece(PLAYER_BLACK, KNIGHT));
+    setPieceOnBoard(board, 4, 'd', createPiece(PLAYER_BLACK, KNIGHT));
     // west: 3 moves
-    board.setPiece(5, 'a', new Piece(PLAYER_WHITE, KNIGHT));
+    setPieceOnBoard(board, 5, 'a', createPiece(PLAYER_WHITE, KNIGHT));
     // north-east: no obstacle, 4 moves
 
-    queen.possibleMovesIgnoringCheck(board, moves);
+    possibleMovesIgnoringCheck(queen, board, moves);
 
     expect(moves.length).toEqual(21);
     checkMove(moves[0], from, 6, 'e');

@@ -1,5 +1,6 @@
-import {PLAYER_WHITE, PLAYER_BLACK} from '../../engine/Player';
+import { PLAYER_WHITE, PLAYER_BLACK } from '../../engine/Player';
 import {
+  isPawn,
   KING,
   LASER,
   QUEEN,
@@ -10,38 +11,43 @@ import {
   PAWN_90_DEGREES,
   PAWN_THREEWAY,
 } from '../../engine/PieceType';
-import Board, {ranks, files} from '../../engine/Board';
-import Piece from '../../engine/Piece';
+import {
+  create as createBoard,
+  getSquare as getSquareFromBoard,
+  ranks,
+  setPiece as setPieceOnBoard,
+} from '../../engine/Board';
+import { create as createPiece, possibleMoves } from '../../engine/Piece';
 import checkMove from '../../testutil/checkMove';
 
 describe('Piece', () => {
   let board;
 
   beforeEach(() => {
-    board = new Board();
+    board = createBoard();
   });
 
   test('pawn types are pawns', () => {
-    expect(KING.isPawn()).toBe(false);
-    expect(LASER.isPawn()).toBe(false);
-    expect(QUEEN.isPawn()).toBe(false);
-    expect(ROOK.isPawn()).toBe(false);
-    expect(KNIGHT.isPawn()).toBe(false);
-    expect(BISHOP.isPawn()).toBe(false);
-    expect(PAWN_SHIELD.isPawn()).toBe(true);
-    expect(PAWN_90_DEGREES.isPawn()).toBe(true);
-    expect(PAWN_THREEWAY.isPawn()).toBe(true);
+    expect(isPawn(KING)).toBe(false);
+    expect(isPawn(LASER)).toBe(false);
+    expect(isPawn(QUEEN)).toBe(false);
+    expect(isPawn(ROOK)).toBe(false);
+    expect(isPawn(KNIGHT)).toBe(false);
+    expect(isPawn(BISHOP)).toBe(false);
+    expect(isPawn(PAWN_SHIELD)).toBe(true);
+    expect(isPawn(PAWN_90_DEGREES)).toBe(true);
+    expect(isPawn(PAWN_THREEWAY)).toBe(true);
   });
 
   describe('possible moves', () => {
     test('should calculate possible moves', () => {
-      const king = new Piece(PLAYER_BLACK, KING);
-      const kingsHome = board.getSquare(ranks - 1, 'e');
-      board.setPiece(kingsHome.rank, kingsHome.file, king);
-      board.setPiece(ranks - 2, 'd', new Piece(PLAYER_WHITE, ROOK));
+      const king = createPiece(PLAYER_BLACK, KING);
+      const kingsHome = getSquareFromBoard(board, ranks - 1, 'e');
+      setPieceOnBoard(board, kingsHome.rank, kingsHome.file, king);
+      setPieceOnBoard(board, ranks - 2, 'd', createPiece(PLAYER_WHITE, ROOK));
 
       const moves = [];
-      king.possibleMoves(board, moves);
+      possibleMoves(king, board, moves);
 
       expect(moves.length).toBe(4);
       checkMove(moves[0], kingsHome, ranks, 'e');
