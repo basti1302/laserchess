@@ -1,8 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import LocalPassAndPlay from './LocalPassAndPlay';
+import LocalMultiplayer from './LocalMultiplayer';
 import * as serviceWorker from './serviceWorker';
+
+let App = LocalPassAndPlay;
+
+if (process.env.REACT_APP_MULTIPLAYER_MODE === 'local-multiplayer') {
+  App = LocalMultiplayer;
+  console.log('Mode: Local Multiplayer');
+} else {
+  console.log('Mode: Local Pass-and-Play');
+}
 
 ReactDOM.render(
   <React.StrictMode>

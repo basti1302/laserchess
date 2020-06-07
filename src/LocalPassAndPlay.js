@@ -3,9 +3,9 @@ import { Client } from 'boardgame.io/react';
 import LaserChessGame from './LaserChessGame';
 import Board from './render/Board';
 
-const App = Client({
+const LaserChessClient = Client({
   game: LaserChessGame,
   board: Board,
 });
 
-export default App;
+export default LaserChessClient;
