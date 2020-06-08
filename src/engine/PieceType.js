@@ -16,12 +16,14 @@ import {
   SPLIT,
 } from './laser/surfaces';
 
+const possibleMovesFunctionRegistry = {};
+
 function create(id, possibleMovesFunction, surfaces) {
+  possibleMovesFunctionRegistry[id] = possibleMovesFunction;
   return {
     id,
     whiteClass: `${id}-white`,
     blackClass: `${id}-black`,
-    possibleMovesFunction,
     surfaces: surfaces || [DEFAULT, DEFAULT, DEFAULT, DEFAULT],
   };
 }
@@ -37,7 +39,12 @@ export function getClass(pieceType, player) {
 }
 
 export function possibleMoves(pieceType, board, moves, piece, ignoreCastling) {
-  pieceType.possibleMovesFunction(board, moves, piece, ignoreCastling);
+  possibleMovesFunctionRegistry[pieceType.id](
+    board,
+    moves,
+    piece,
+    ignoreCastling,
+  );
 }
 
 export function isPawn(pieceType) {

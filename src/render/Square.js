@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import Piece from './Piece';
 import { rotateLeft, rotateRight } from '../engine/Orientation';
+import { is as isSquare } from '../engine/Square';
 
 import {
   START,
@@ -35,7 +36,7 @@ export default class Square extends React.Component {
     let markAsPossibleMove = false;
     if (this.props.G.possibleMoves) {
       this.props.G.possibleMoves.forEach(mv => {
-        if (mv.to && mv.to === square) {
+        if (mv.to && isSquare(mv.to, square)) {
           markAsPossibleMove = true;
         }
       });
@@ -59,7 +60,7 @@ export default class Square extends React.Component {
 
     if (this.props.G.shot && this.props.stage === 'renderShotStage') {
       const shotSegmentsOnThisSquare = this.props.G.shot.segments.filter(
-        shotSegment => shotSegment.square === square,
+        shotSegment => isSquare(shotSegment.square, square),
       );
       for (let i = 0; i < shotSegmentsOnThisSquare.length; i++) {
         const segment = shotSegmentsOnThisSquare[i];

@@ -38,6 +38,9 @@ export function getFileAsLetter(square) {
 }
 
 export function clone(square) {
+  if (!square) {
+    return null;
+  }
   const clonedSquare = createSquare(square.rank, square.file);
   if (square.piece) {
     clonedSquare.piece = clonePiece(square.piece);

@@ -3,15 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import LocalPassAndPlay from './LocalPassAndPlay';
 import LocalMultiplayer from './LocalMultiplayer';
+import RemoteMultiplayer from './RemoteMultiplayer';
+
 import * as serviceWorker from './serviceWorker';
 
+const mode = process.env.REACT_APP_MULTIPLAYER_MODE;
 let App = LocalPassAndPlay;
 
-if (process.env.REACT_APP_MULTIPLAYER_MODE === 'local-multiplayer') {
+if (mode === 'local-multiplayer') {
   App = LocalMultiplayer;
   console.log('Mode: Local Multiplayer');
-} else {
+} else if (mode === 'remote-multiplayer') {
+  App = RemoteMultiplayer;
+  console.log('Mode: Remote Multiplayer');
+} else if (mode === 'local-pass-and-play' || mode === '' || mode == null) {
   console.log('Mode: Local Pass-and-Play');
+} else {
+  throw new Error(`Unknown mode: ${mode}`);
 }
 
 ReactDOM.render(
