@@ -1,0 +1,128 @@
+@use 'mixins/_media.queries.scss' as mq;
+
+.dark {
+  background-image: url('img/dark_square.png');
+}
+
+.light {
+  background-image: url('img/light_square.png');
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.selected {
+  border: 0.25rem solid red;
+}
+
+.possible-move {
+  border: 0.25rem solid green;
+}
+
+.square-div {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.square-td {
+  text-align: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  padding: 0;
+}
+
+.shot-segment {
+  position: absolute;
+  background: yellow;
+  z-index: 1;
+}
+
+/*
+When https://caniuse.com/#search=max() and https://caniuse.com/#search=min()
+have landed in more browsers, we might be able to ditch the media queries and
+SASS stuff to calculate this more elegantly:
+.square-div {
+  width: min(min(100vw, 100vh) / 9, 100px);
+  height: min(min(100vw, 100vh) / 9, 100px);
+}
+and similarly for the shot segments.
+*/
+
+@include mq.all-mqs using ($step, $squareSize) {
+  .square-div {
+    width: #{$squareSize}px;
+    height: #{$squareSize}px;
+  }
+
+  .shot-segment-facing-north,
+  .shot-segment-facing-south {
+    top: -1px;
+    left: #{$squareSize / 2 - 3}px;
+    height: #{$squareSize}px;
+    width: 4px;
+
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+  }
+
+  .shot-segment-facing-east,
+  .shot-segment-facing-west {
+    left: -1px;
+    top: #{$squareSize / 2 - 3}px;
+    height: 4px;
+    width: #{$squareSize}px;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+  }
+
+  .shot-segment-facing-north.shot-segment-reflection-leg-one,
+  .shot-segment-facing-south.shot-segment-reflection-leg-two {
+    height: #{$squareSize / 2 + 2}px;
+    top: #{$squareSize / 2 - 3}px;
+  }
+
+  .shot-segment-facing-south.shot-segment-reflection-leg-one,
+  .shot-segment-facing-north.shot-segment-reflection-leg-two {
+    height: #{$squareSize / 2 + 2}px;
+  }
+
+  .shot-segment-facing-east.shot-segment-reflection-leg-one,
+  .shot-segment-facing-west.shot-segment-reflection-leg-two {
+    width: #{$squareSize / 2 + 2}px;
+  }
+
+  .shot-segment-facing-west.shot-segment-reflection-leg-one,
+  .shot-segment-facing-east.shot-segment-reflection-leg-two {
+    width: #{$squareSize / 2 + 2}px;
+    left: #{$squareSize / 2 - 3}px;
+  }
+
+  .shot-segment-facing-north.shot-segment-start,
+  .shot-segment-facing-south.shot-segment-end {
+    height: #{$squareSize / 5}px;
+  }
+
+  .shot-segment-facing-south.shot-segment-start,
+  .shot-segment-facing-north.shot-segment-end {
+    top: #{$squareSize - $squareSize / 5}px;
+    height: #{$squareSize / 5}px;
+  }
+
+  .shot-segment-facing-west.shot-segment-start,
+  .shot-segment-facing-east.shot-segment-end {
+    width: #{$squareSize / 5}px;
+  }
+
+  .shot-segment-facing-east.shot-segment-start,
+  .shot-segment-facing-west.shot-segment-end {
+    left: #{$squareSize - $squareSize / 5}px;
+    width: #{$squareSize / 5}px;
+  }
+}

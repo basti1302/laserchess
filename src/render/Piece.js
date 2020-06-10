@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import { getClass } from '../engine/PieceType';
 
-import styles from './Piece.module.css';
+import styles from './Piece.module.scss';
 
 export default class Piece extends React.Component {
   render() {

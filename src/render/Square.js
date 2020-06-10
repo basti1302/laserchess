@@ -14,7 +14,7 @@ import {
   DESTROY,
 } from '../engine/laser/segmentTypes';
 
-import styles from './Square.module.css';
+import styles from './Square.module.scss';
 
 export default class Square extends React.Component {
   onClick() {
@@ -110,7 +110,7 @@ export default class Square extends React.Component {
     return (
       <td
         className={classNames({
-          [styles.square]: true,
+          [styles['square-td']]: true,
           [styles.dark]: this.props.darkSquare,
           [styles.light]: !this.props.darkSquare,
         })}

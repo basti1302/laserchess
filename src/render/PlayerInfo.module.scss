@@ -1,0 +1,16 @@
+.player-info {
+  width: 100vw;
+  max-width: 500px;
+  height: 2rem;
+  border: 1px solid grey;
+  margin: 0;
+  padding: .25rem;
+  text-align: center;
+}
+
+@media only screen and (min-width: 500px) {
+  .player-info {
+    border: 1px solid grey;
+    border-radius: 1px ;
+  }
+}

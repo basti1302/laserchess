@@ -265,6 +265,9 @@ export default {
     },
   },
 
+  minPlayers: 2,
+  maxPlayers: 2,
+
   endIf: (G, ctx) => {
     if (
       ctx.activePlayers == null ||

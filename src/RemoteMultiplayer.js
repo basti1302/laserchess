@@ -2,7 +2,7 @@ import React from 'react';
 import { Lobby } from 'boardgame.io/react';
 
 import LaserChessGame from './LaserChessGame';
-import Board from './render/Board';
+import Content from './render/Content';
 
 export default function App() {
   return (
@@ -10,7 +10,7 @@ export default function App() {
       <Lobby
         gameServer={'http://localhost:8000'}
         lobbyServer={'http://localhost:8000'}
-        gameComponents={[{ game: LaserChessGame, board: Board }]}
+        gameComponents={[{ game: LaserChessGame, board: Content }]}
       />{' '}
     </div>
   );

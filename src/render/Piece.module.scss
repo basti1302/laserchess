@@ -1,7 +1,16 @@
+@use 'mixins/_media.queries.scss' as mq;
+
 .piece {
-  width: 76px;
-  height: 76px;
-  font-size: 48px;
+  width: 33.25px;
+  height: 33.25px;
+  background-size: contain;
+}
+
+@include mq.all-mqs using ($step, $squareSize) {
+  .piece {
+    width: #{$squareSize * 0.95}px;
+    height: #{$squareSize * 0.95}px;
+  }
 }
 
 .facing-north {

@@ -1,0 +1,23 @@
+@use '../mixins/_list.reset.scss' as lr;
+
+.button-row {
+  @include lr.list-reset;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
+  background: #f3f3f3;
+  padding: 0.1rem;
+
+  width: 100vw;
+  max-width: 500px;
+}
+
+@media only screen and (min-width: 500px) {
+  .button-row {
+    border: 1px solid grey;
+    border-radius: 1px ;
+  }
+}

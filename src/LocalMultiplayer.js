@@ -3,12 +3,13 @@ import { Client } from 'boardgame.io/react';
 import { Local } from 'boardgame.io/multiplayer';
 
 import LaserChessGame from './LaserChessGame';
-import Board from './render/Board';
+import Content from './render/Content';
 
 const LaserChessClient = Client({
   game: LaserChessGame,
-  board: Board,
+  board: Content,
   multiplayer: Local(),
+  debug: false,
 });
 
 const App = () => (

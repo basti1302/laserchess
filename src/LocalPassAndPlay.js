@@ -1,11 +1,12 @@
 import { Client } from 'boardgame.io/react';
 
 import LaserChessGame from './LaserChessGame';
-import Board from './render/Board';
+import Content from './render/Content';
 
 const LaserChessClient = Client({
   game: LaserChessGame,
-  board: Board,
+  board: Content,
+  debug: false,
 });
 
 export default LaserChessClient;

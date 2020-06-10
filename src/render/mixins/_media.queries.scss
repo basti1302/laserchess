@@ -1,0 +1,42 @@
+$minSquareSizeForSteps: 34;
+$maxSquareSize: 80;
+$squareSizeStep: 2;
+
+/**
+ * Adds the given content block multiple times for different screen sizes.
+ */
+@mixin all-mqs {
+  @for $step
+    from 0
+    through (($maxSquareSize - $minSquareSizeForSteps) / $squareSizeStep)
+  {
+    $squareSize: $minSquareSizeForSteps + $step * $squareSizeStep;
+    @include _mqs($step, $squareSize) using ($_step, $_squareSize) {
+      @content ($_step, $_squareSize);
+    }
+  }
+}
+
+/**
+ * Adds the given content block with a media query matching the given
+ * square size. For step == 0, the content is added without a media query to
+ * establish a base line for the minimal supported screen size.
+ */
+@mixin _mqs($step, $squareSize) {
+  @if $step == 0 {
+    /*
+     * Establish a base line for all devices by adding the content without a
+     * media query. This will apply when the width < 324 or height < 324.
+     */
+    @content ($step, $squareSize);
+  } @else {
+    /*
+     * Add media queries for different screen sizes.
+     */
+    @media only screen
+    and (min-width: #{$squareSize * 9}px)
+    and (min-height: #{$squareSize * 9}px) {
+      @content ($step, $squareSize);
+    }
+  }
+}

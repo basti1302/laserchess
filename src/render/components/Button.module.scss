@@ -1,0 +1,13 @@
+@use '../mixins/_media.queries.scss' as mq;
+
+.button-outer {
+  display: inline;
+  padding: 0.25rem 0.5rem;
+}
+
+@include mq.all-mqs using ($step, $squareSize) {
+  .button {
+    width: #{$squareSize}px;
+    height: #{$squareSize}px;
+  }
+}
