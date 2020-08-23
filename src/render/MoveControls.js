@@ -12,6 +12,6 @@ export default function MoveControls({ ctx, G, moves }) {
       />
     );
   } else {
-    return <PieceControls ctx={ctx} moves={moves} />;
+    return <PieceControls G={G} ctx={ctx} moves={moves} />;
   }
 }

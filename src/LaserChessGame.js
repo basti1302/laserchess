@@ -24,12 +24,6 @@ function doSetup(ctx) {
   console.debug('board setup');
   const board = engineBoard.create('0', '1');
   engineBoard.setup(board);
-  // engineBoard.testSetupCastling(board);
-  // engineBoard.testSetupPromotion(board);
-  // engineBoard.testSetupEnPassant(board);
-  // engineBoard.testSetupCheckmate(board);
-  // engineBoard.testSetupLaser(board);
-  // engineBoard.testSetupKnightSplitLaser(board);
   return {
     board,
   };
@@ -60,45 +54,55 @@ function selectPiece(G, ctx, rank, file) {
   engineBoard.deselectAll(G.board);
   square.selected = true;
 
+  recalcCanRotate(G, ctx);
+  recalcLaserCanFire(G, ctx);
   if (ctx.activePlayers[currentPlayer] === 'selectPieceStage') {
     ctx.events.endStage();
   }
 }
 
-function rotatePieceLeft(G, ctx) {
-  console.debug('rotate selected piece left');
+function recalcCanRotate(G, ctx) {
   const sourceSquare = engineBoard.getSelectedSquare(G.board);
   if (!sourceSquare || !sourceSquare.piece) {
-    console.warn(
-      'No source square or no piece on source square.',
-      sourceSquare,
-    );
-    return INVALID_MOVE;
+    G.canRotate = false;
+    G.reasonCannotRotate = 'No piece selected, select a piece to rotate it.';
+    return null;
   }
   if (G.rotationPiece && !isPiece(sourceSquare.piece, G.rotationPiece)) {
-    console.warn('Player has already rotated a different piece.', sourceSquare);
-    return INVALID_MOVE;
+    G.canRotate = false;
+    G.reasonCannotRotate = 'You have already rotated a different piece.';
+    return null;
   }
-  rotateLeft(sourceSquare.piece);
-  G.rotationPiece = sourceSquare.piece;
+
+  G.canRotate = true;
+  G.reasonCannotRotate = null;
+  return sourceSquare;
+}
+
+function rotatePieceLeft(G, ctx) {
+  console.debug('rotate selected piece left');
+  rotatePiece(G, ctx, rotateLeft);
 }
 
 function rotatePieceRight(G, ctx) {
   console.debug('rotate selected piece right');
-  const sourceSquare = engineBoard.getSelectedSquare(G.board);
-  if (!sourceSquare || !sourceSquare.piece) {
-    console.warn(
-      'No source square or no piece on source square.',
-      sourceSquare,
-    );
+  rotatePiece(G, ctx, rotateRight);
+}
+
+function rotatePiece(G, ctx, rotateFunction) {
+  const sourceSquare = recalcCanRotate(G, ctx);
+  if (!G.canRotate) {
+    if (G.reasonCannotRotate) {
+      console.warn(G.reasonCannotRotate);
+    } else {
+      console.warn('Cannot rotate.');
+    }
     return INVALID_MOVE;
   }
-  if (G.rotationPiece && !isPiece(sourceSquare.piece, G.rotationPiece)) {
-    console.warn('Player has already rotated a different piece.', sourceSquare);
-    return INVALID_MOVE;
-  }
-  rotateRight(sourceSquare.piece);
+
+  rotateFunction(sourceSquare.piece);
   G.rotationPiece = sourceSquare.piece;
+  recalcLaserCanFire(G, ctx);
 }
 
 function moveSelectedPiece(G, ctx, rank, file) {
@@ -160,36 +164,65 @@ function applyPromotionMove(G, ctx, promotionMove) {
   endTurn(G, ctx);
 }
 
-function fireLaser(G, ctx) {
-  console.debug('fire laser');
-  let laser;
+function recalcLaserCanFire(G, ctx) {
   const player = engineBoard.getPlayerByBoardIoLabel(
     G.board,
     ctx.currentPlayer,
   );
+  if (!player) {
+    G.laserCanFire = false;
+    G.reasonLaserCannotFire =
+      "Laser can't fire because there is no active player.";
+    return null;
+  }
   const allLaserPieces = engineBoard.getLaserPieces(G.board, player);
+  if (allLaserPieces.length === 0) {
+    G.laserCanFire = false;
+    G.reasonLaserCannotFire =
+      'You cannot fire because you do not have a laser piece.';
+    return null;
+  }
+  let laser;
   if (allLaserPieces.length === 1) {
     laser = allLaserPieces[0];
   } else {
     const sourceSquare = engineBoard.getSelectedSquare(G.board);
     if (!sourceSquare || !sourceSquare.piece) {
-      console.warn(
-        'No source square or no piece on source square.',
-        sourceSquare,
-      );
-      return INVALID_MOVE;
+      G.laserCanFire = false;
+      G.reasonLaserCannotFire =
+        'You have multiple laser pieces and need to select one of them to fire it.';
+      return null;
     }
     laser = sourceSquare.piece;
     if (!isType(laser.type, LASER)) {
-      console.warn('Selected piece is not a laser.', sourceSquare);
-      return INVALID_MOVE;
+      G.laserCanFire = false;
+      G.reasonLaserCannotFire =
+        'You have multiple laser pieces and need to select one of them to fire it. (The currently selected piece is not a laser.)';
+      return null;
     }
   }
 
   if (!engineBoard.laserCanFire(G.board, laser)) {
-    console.warn(
-      'Firing this laser is not allowed (king in check after shot?)',
-    );
+    G.laserCanFire = false;
+    G.reasonLaserCannotFire =
+      'You cannot fire the laser because your king would be in check after the shot.';
+    return null;
+  }
+
+  G.laserCanFire = true;
+  G.reasonLaserCannotFire = null;
+  return laser;
+}
+
+function fireLaser(G, ctx) {
+  console.debug('fire laser');
+  const laser = recalcLaserCanFire(G, ctx);
+  if (!G.laserCanFire) {
+    if (G.reasonLaserCannotFire) {
+      console.warn(G.reasonLaserCannotFire);
+    } else {
+      console.warn('The laser cannot fire.');
+    }
     return INVALID_MOVE;
   }
 
@@ -234,6 +267,8 @@ export default {
   turn: {
     onBegin: (G, ctx) => {
       ctx.events.setStage('selectPieceStage');
+      recalcCanRotate(G, ctx);
+      recalcLaserCanFire(G, ctx);
       return G;
     },
     stages: {

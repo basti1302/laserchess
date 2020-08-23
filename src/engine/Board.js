@@ -97,6 +97,16 @@ export function deselectAll(board) {
 }
 
 export function setup(board) {
+  setupGame(board);
+  // testSetupCastling(board);
+  // testSetupPromotion(board);
+  // testSetupEnPassant(board);
+  // testSetupCheckmate(board);
+  // testSetupLaser(board);
+  // testSetupKnightSplitLaser(board);
+}
+
+function setupGame(board) {
   setPiece(board, 1, 'a', createPiece(PLAYER_WHITE, ROOK));
   setPiece(board, 1, 'b', createPiece(PLAYER_WHITE, KNIGHT));
   setPiece(board, 1, 'c', createPiece(PLAYER_WHITE, BISHOP));
@@ -158,7 +168,8 @@ export function setup(board) {
   setPiece(board, ranks - 1, 'i', createPiece(PLAYER_BLACK, PAWN_SHIELD));
 }
 
-export function testSetupCastling(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupCastling(board) {
   setPiece(board, 1, 'a', createPiece(PLAYER_WHITE, ROOK));
   setPiece(board, 2, 'e', createPiece(PLAYER_WHITE, LASER));
   setPiece(board, 1, 'e', createPiece(PLAYER_WHITE, KING));
@@ -170,7 +181,8 @@ export function testSetupCastling(board) {
   setPiece(board, ranks, 'i', createPiece(PLAYER_BLACK, ROOK));
 }
 
-export function testSetupPromotion(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupPromotion(board) {
   setPiece(board, 1, 'b', createPiece(PLAYER_WHITE, KNIGHT));
   setPiece(board, 1, 'h', createPiece(PLAYER_WHITE, KNIGHT));
   setPiece(board, ranks, 'b', createPiece(PLAYER_BLACK, KNIGHT));
@@ -185,7 +197,8 @@ export function testSetupPromotion(board) {
   }
 }
 
-export function testSetupEnPassant(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupEnPassant(board) {
   setPiece(board, 1, 'a', createPiece(PLAYER_WHITE, KING));
   setPiece(board, 9, 'a', createPiece(PLAYER_BLACK, KING));
 
@@ -203,7 +216,8 @@ export function testSetupEnPassant(board) {
   }
 }
 
-export function testSetupCheckmate(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupCheckmate(board) {
   setPiece(board, 2, 'b', createPiece(PLAYER_WHITE, ROOK));
   setPiece(board, 3, 'c', createPiece(PLAYER_WHITE, ROOK));
   setPiece(board, 1, 'i', createPiece(PLAYER_WHITE, KING));
@@ -212,29 +226,33 @@ export function testSetupCheckmate(board) {
   setPiece(board, ranks, 'h', createPiece(PLAYER_BLACK, ROOK));
 }
 
-export function testSetupLaser(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupLaser(board) {
   setPiece(board, 1, 'c', createPiece(PLAYER_WHITE, LASER, NORTH));
   setPiece(board, 7, 'b', createPiece(PLAYER_WHITE, LASER, EAST));
   setPiece(board, 6, 'g', createPiece(PLAYER_WHITE, LASER, SOUTH));
   setPiece(board, 3, 'h', createPiece(PLAYER_WHITE, LASER, WEST));
+  setPiece(board, 3, 'i', createPiece(PLAYER_WHITE, QUEEN, EAST));
 
-  setPiece(board, 9, 'c', createPiece(PLAYER_BLACK, KING, NORTH));
-  setPiece(board, 7, 'h', createPiece(PLAYER_BLACK, KING, EAST));
-  setPiece(board, 2, 'g', createPiece(PLAYER_BLACK, KING, SOUTH));
-  setPiece(board, 3, 'b', createPiece(PLAYER_BLACK, KING, WEST));
+  setPiece(board, 9, 'c', createPiece(PLAYER_BLACK, KING));
+  setPiece(board, 7, 'e', createPiece(PLAYER_BLACK, PAWN_SHIELD));
+  setPiece(board, 2, 'g', createPiece(PLAYER_BLACK, PAWN_SHIELD));
+  setPiece(board, 3, 'b', createPiece(PLAYER_BLACK, PAWN_SHIELD));
 
   setPiece(board, 1, 'f', createPiece(PLAYER_BLACK, LASER, NORTH));
   setPiece(board, 5, 'a', createPiece(PLAYER_BLACK, LASER, EAST));
   setPiece(board, 9, 'd', createPiece(PLAYER_BLACK, LASER, SOUTH));
   setPiece(board, 4, 'i', createPiece(PLAYER_BLACK, LASER, WEST));
+  setPiece(board, 7, 'h', createPiece(PLAYER_BLACK, LASER, WEST));
 
   setPiece(board, 9, 'f', createPiece(PLAYER_WHITE, KING, NORTH));
-  setPiece(board, 5, 'i', createPiece(PLAYER_WHITE, KING, EAST));
-  setPiece(board, 1, 'd', createPiece(PLAYER_WHITE, KING, SOUTH));
-  setPiece(board, 4, 'a', createPiece(PLAYER_WHITE, KING, WEST));
+  setPiece(board, 5, 'i', createPiece(PLAYER_WHITE, PAWN_SHIELD));
+  setPiece(board, 1, 'd', createPiece(PLAYER_WHITE, PAWN_SHIELD));
+  setPiece(board, 4, 'a', createPiece(PLAYER_WHITE, PAWN_SHIELD));
 }
 
-export function testSetupKnightSplitLaser(board) {
+// eslint-disable-next-line no-unused-vars
+function testSetupKnightSplitLaser(board) {
   setPiece(board, 1, 'i', createPiece(PLAYER_WHITE, KING, NORTH));
   setPiece(board, 9, 'i', createPiece(PLAYER_BLACK, KING, NORTH));
 

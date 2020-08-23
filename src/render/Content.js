@@ -10,8 +10,6 @@ import styles from './Content.module.scss';
 export default function Content({ ctx, G, moves, events }) {
   const { activePlayers, currentPlayer, gameover } = ctx;
 
-  console.log(JSON.stringify(ctx, null, 2));
-
   if (!currentPlayer) {
     throw new Error('No current player.');
   }
