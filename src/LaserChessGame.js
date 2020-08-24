@@ -24,6 +24,7 @@ function doSetup(ctx) {
   console.debug('board setup');
   const board = engineBoard.create('0', '1');
   engineBoard.setup(board);
+
   return {
     board,
   };

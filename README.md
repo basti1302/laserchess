@@ -72,9 +72,9 @@ This is for playing games online. A game and lobby server needs to be started fi
 yarn server
 ```
 
-Then go to <http://localhost:8000/> or <http://127.0.0.1:8000/> to play. This will bring you to the default lobby. One player needs to create a room, then both players need to join the room. A convenient way to simulate two players is to indeed open one tabe on <http://localhost:8000/> and another one at <http://127.0.0.1:8000/>. The player names are stored in a cookie, so using two different host names helps. You can also get creative with `/etc/hosts` entries to have different host names.
+Then go to <http://localhost:1604/> or <http://127.0.0.1:1604/> to play. This will bring you to the default lobby. One player needs to create a room, then both players need to join the room. A convenient way to simulate two players is to indeed open one tabe on <http://localhost:1604/> and another one at <http://127.0.0.1:1604/>. The player names are stored in a cookie, so using two different host names helps. You can also get creative with `/etc/hosts` entries to have different host names.
 
-The server will use port 8000 by default. You can set a custom port via
+The server will use port 1604 by default. You can set a custom port via
 
 ```
 PORT=1234 yarn server
