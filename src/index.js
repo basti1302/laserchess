@@ -10,14 +10,15 @@ import * as serviceWorker from './serviceWorker';
 const mode = process.env.REACT_APP_MULTIPLAYER_MODE;
 let App = LocalPassAndPlay;
 
-if (mode === 'local-multiplayer') {
+
+if (mode === 'local-pass-and-play') {
+  console.log('Mode: Local Pass-and-Play');
+} else if (mode === 'local-multiplayer') {
   App = LocalMultiplayer;
   console.log('Mode: Local Multiplayer');
-} else if (mode === 'remote-multiplayer') {
+} else if (mode === 'remote-multiplayer' || mode === '' || mode == null) {
   App = RemoteMultiplayer;
   console.log('Mode: Remote Multiplayer');
-} else if (mode === 'local-pass-and-play' || mode === '' || mode == null) {
-  console.log('Mode: Local Pass-and-Play');
 } else {
   throw new Error(`Unknown mode: ${mode}`);
 }
