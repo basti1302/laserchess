@@ -4,17 +4,23 @@ import { Lobby } from 'boardgame.io/react';
 import LaserChessGame from './LaserChessGame';
 import Content from './render/Content';
 
-const gameServerPort = process.env.REACT_APP_GAME_SERVER_PORT || 1604;
-const lobbyServerPort = process.env.REACT_APP_LOBBY_SERVER_PORT || 1604;
+let baseUrl;
+try {
+  const url = new URL(window.location.href);
+  baseUrl = `${url.protocol}//${url.host}`;
+} catch (e) {
+  const url = window.URL(window.location.href);
+  baseUrl = `${url.protocol}//${url.host}`;
+}
 
 export default function App() {
   return (
     <div className="App">
       <Lobby
-        gameServer={`http://localhost:${gameServerPort}`}
-        lobbyServer={`http://localhost:${lobbyServerPort}`}
+        gameServer={baseUrl}
+        lobbyServer={baseUrl}
         gameComponents={[{ game: LaserChessGame, board: Content }]}
-      />{' '}
+      />
     </div>
   );
 }
