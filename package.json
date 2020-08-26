@@ -12,11 +12,14 @@
     "server": "node --require esm server"
   },
   "dependencies": {
+    "@formatjs/intl": "^1.2.1",
     "boardgame.io": "^0.39.4",
+    "classnames": "^2.2.6",
     "esm": "^3.2.25",
     "koa-static": "^5.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-intl": "^5.7.1",
     "react-scripts": "3.4.1",
     "sass": "^1.26.8"
   },
@@ -24,7 +27,6 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "classnames": "^2.2.6",
     "prettier": "^2.0.5"
   },
   "eslintConfig": {

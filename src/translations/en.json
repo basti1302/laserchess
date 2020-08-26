@@ -1,0 +1,21 @@
+{
+  "blue": "blue",
+  "red": "red",
+  "button.fire": "Fire",
+  "rotate.cannot.needtoselect": "No piece selected, select a piece to rotate it.",
+  "rotate.cannot.alreadyrotated": "You have already rotated a different piece.",
+  "laser.cannotfire.noplayer": "Laser can't fire because there is no active player.",
+  "laser.cannotfire.nolaser": "You cannot fire because you do not have a laser piece.",
+  "laser.cannotfire.needtoselect": "You have multiple laser pieces and need to select one of them to fire it.",
+  "laser.cannotfire.needtoselect.current": "You have multiple laser pieces and need to select one of them to fire it. (The currently selected piece is not a laser.)",
+  "laser.cannotfire.check": "You cannot fire the laser because your king would be in check after the shot.",
+  "game.ended.won": "Game has ended, player {color} has won.",
+  "game.ended.draw": "Game has ended in draw.",
+  "game.ended.king.shot": "The {color} king has been shot.",
+  "game.ended.king.suicide": "The {color} king has been shot by its own troops.",
+  "game.ended.king.both": "Both kings have been shot.",
+  "game.ended.checkmate": "Player {color} is in checkmate.",
+  "game.ended.stalemate": "Player {color} is in stalemate.",
+  "player.info.title": "Player: {color}",
+  "promote.to": "To which piece do you want to promote this pawn?"
+}

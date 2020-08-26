@@ -1,5 +1,7 @@
 import { INVALID_MOVE } from 'boardgame.io/core';
 
+import { createIntl, createIntlCache } from '@formatjs/intl';
+
 import * as engineBoard from './engine/Board';
 import {
   BOTH_KINGS_LOST,
@@ -19,6 +21,28 @@ import {
 import { LASER, is as isType } from './engine/PieceType';
 import { enemy } from './engine/Player';
 import { is as isSquare } from './engine/Square';
+
+import messages_de from './translations/de.json';
+import messages_en from './translations/en.json';
+
+let locale = 'de-DE'; // TODO (use from browser)
+locale = locale.split(/[-_]/)[0];
+if (!locale.startsWith('en') && !locale.startsWith('de')) {
+  locale = 'en';
+}
+
+const messages = {
+  de: messages_de,
+  en: messages_en,
+};
+const cache = createIntlCache();
+const intl = createIntl(
+  {
+    locale,
+    messages,
+  },
+  cache,
+);
 
 function doSetup(ctx) {
   console.debug('board setup');
@@ -66,12 +90,12 @@ function recalcCanRotate(G, ctx) {
   const sourceSquare = engineBoard.getSelectedSquare(G.board);
   if (!sourceSquare || !sourceSquare.piece) {
     G.canRotate = false;
-    G.reasonCannotRotate = 'No piece selected, select a piece to rotate it.';
+    G.reasonCannotRotate = 'rotate.cannot.needtoselect';
     return null;
   }
   if (G.rotationPiece && !isPiece(sourceSquare.piece, G.rotationPiece)) {
     G.canRotate = false;
-    G.reasonCannotRotate = 'You have already rotated a different piece.';
+    G.reasonCannotRotate = 'rotate.cannot.alreadyrotated';
     return null;
   }
 
@@ -172,15 +196,13 @@ function recalcLaserCanFire(G, ctx) {
   );
   if (!player) {
     G.laserCanFire = false;
-    G.reasonLaserCannotFire =
-      "Laser can't fire because there is no active player.";
+    G.reasonLaserCannotFire = 'laser.cannotfire.noplayer';
     return null;
   }
   const allLaserPieces = engineBoard.getLaserPieces(G.board, player);
   if (allLaserPieces.length === 0) {
     G.laserCanFire = false;
-    G.reasonLaserCannotFire =
-      'You cannot fire because you do not have a laser piece.';
+    G.reasonLaserCannotFire = 'laser.cannotfire.nolaser';
     return null;
   }
   let laser;
@@ -190,23 +212,20 @@ function recalcLaserCanFire(G, ctx) {
     const sourceSquare = engineBoard.getSelectedSquare(G.board);
     if (!sourceSquare || !sourceSquare.piece) {
       G.laserCanFire = false;
-      G.reasonLaserCannotFire =
-        'You have multiple laser pieces and need to select one of them to fire it.';
+      G.reasonLaserCannotFire = 'laser.cannotfire.needtoselect';
       return null;
     }
     laser = sourceSquare.piece;
     if (!isType(laser.type, LASER)) {
       G.laserCanFire = false;
-      G.reasonLaserCannotFire =
-        'You have multiple laser pieces and need to select one of them to fire it. (The currently selected piece is not a laser.)';
+      G.reasonLaserCannotFire = 'laser.cannotfire.needtoselect.current';
       return null;
     }
   }
 
   if (!engineBoard.laserCanFire(G.board, laser)) {
     G.laserCanFire = false;
-    G.reasonLaserCannotFire =
-      'You cannot fire the laser because your king would be in check after the shot.';
+    G.reasonLaserCannotFire = 'laser.cannotfire.check';
     return null;
   }
 
@@ -321,29 +340,31 @@ export default {
     if (gameState === KING_LOST) {
       return {
         winner: enemy(player),
-        result: `The ${player.color.label} king has been shot.`,
+        result: 'game.ended.king.shot',
+        msgArgs: { color: intl.formatMessage(player.color) },
       };
     } else if (gameState === KING_SUICIDE) {
       return {
         winner: player,
-        result: `The ${
-          enemy(player).color.label
-        } king has been shot by its own troops.`,
+        result: `game.ended.king.suicide`,
+        msgArgs: { color: intl.formatMessage(enemy(player).color) },
       };
     } else if (gameState === BOTH_KINGS_LOST) {
       return {
         draw: true,
-        result: 'Both kings have been shot.',
+        result: 'game.ended.king.both',
       };
     } else if (gameState === CHECKMATE) {
       return {
         winner: enemy(player),
-        result: `Player ${player.color} is in checkmate.`,
+        result: 'game.ended.checkmate',
+        msgArgs: { color: intl.formatMessage(player.color) },
       };
     } else if (gameState === STALEMATE) {
       return {
         draw: true,
-        result: `Player ${player.color} is in stalemate.`,
+        result: 'game.ended.stalemate',
+        msgArgs: { color: intl.formatMessage(player.color) },
       };
     } else if (gameState === IN_PROGRESS) {
       return null;

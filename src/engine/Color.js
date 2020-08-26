@@ -9,8 +9,8 @@ export function other(color) {
 }
 
 export function is(color, other) {
-  return color.label === other.label;
+  return color === other;
 }
 
-export const WHITE = 'white';
-export const BLACK = 'black';
+export const WHITE = 'blue';
+export const BLACK = 'red';

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import { create as createEnginePiece } from '../engine/Piece';
 
@@ -23,7 +24,7 @@ export default function PromotionControls({ possiblePromotions, moves }) {
     ));
     return (
       <>
-        Promote this pawn to?
+        <FormattedMessage id="promote.to" />
         <ButtonRow>{promotionButtons}</ButtonRow>
       </>
     );

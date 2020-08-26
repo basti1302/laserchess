@@ -224,6 +224,7 @@ function testSetupCheckmate(board) {
 
   setPiece(board, ranks, 'a', createPiece(PLAYER_BLACK, KING));
   setPiece(board, ranks, 'h', createPiece(PLAYER_BLACK, ROOK));
+  setPiece(board, ranks, 'g', createPiece(PLAYER_BLACK, ROOK));
 }
 
 // eslint-disable-next-line no-unused-vars
@@ -474,10 +475,10 @@ export function laserCanFire(board, laser) {
   const resultingBoard = simulateShot(board, laser);
   const kingsSquare = getKingsSquare(resultingBoard, player);
   if (!kingsSquare) {
-    console.warn(
-      `laserCanFire: Couldn't find king for player ${player.label.color}.`,
-    );
-    return;
+    // This can happen if the laser aims at its own king. After simulating the
+    // shot, the king is gone on the resulting board. However, this shot is
+    // allowed (the laser is allowed to shoot its own king).
+    return true;
   }
 
   return !isAttackedBy(resultingBoard, kingsSquare, enemy(player));

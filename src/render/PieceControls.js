@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import ButtonRow from './components/ButtonRow';
 import Button from './components/Button';
@@ -31,7 +32,7 @@ export default function PieceControls({ G, ctx, moves }) {
         disabled={fireDisabled}
         title={fireTooltip}
       >
-        Fire
+        <FormattedMessage id="button.fire" />
       </Button>
       <Button
         onClick={() => moves.rotatePieceRight()}

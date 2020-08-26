@@ -1,16 +1,27 @@
 import React from 'react';
+import { FormattedMessage } from 'react-intl';
 
 export default function GameHasEndedMessage({ gameover }) {
   if (gameover) {
     if (gameover.winner) {
       return (
         <div>
-          Game has ended, player {gameover.winner.color.label} has won.{' '}
-          {gameover.result}
+          <FormattedMessage
+            id="game.ended.won"
+            values={{
+              color: <FormattedMessage id={gameover.winner.color} />,
+            }}
+          />{' '}
+          <FormattedMessage id={gameover.result} values={gameover.msgArgs} />
         </div>
       );
     } else {
-      return <div>Game has ended in draw. {gameover.result}</div>;
+      return (
+        <div>
+          <FormattedMessage id="game.ended.draw" />{' '}
+          <FormattedMessage id={gameover.result} values={gameover.msgArgs} />
+        </div>
+      );
     }
   }
   return null;
