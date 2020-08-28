@@ -27,11 +27,11 @@ export default function Content({ ctx, G, moves, events }) {
 
   return (
     <div className={styles.content}>
-      <PlayerInfo color="red" />
+      <PlayerInfo color="player.red" />
       <GameHasEndedMessage gameover={gameover} />
       <MoveControls ctx={ctx} G={G} moves={moves} />
       <Board G={G} ctx={ctx} stage={stage} moves={moves} events={events} />
-      <PlayerInfo color="blue" />
+      <PlayerInfo color="player.blue" />
     </div>
   );
 }

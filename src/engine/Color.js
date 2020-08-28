@@ -12,5 +12,5 @@ export function is(color, other) {
   return color === other;
 }
 
-export const WHITE = 'blue';
-export const BLACK = 'red';
+export const WHITE = 'player.blue';
+export const BLACK = 'player.red';

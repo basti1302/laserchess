@@ -25,16 +25,18 @@ import { is as isSquare } from './engine/Square';
 import messages_de from './translations/de.json';
 import messages_en from './translations/en.json';
 
-let locale = 'de-DE'; // TODO (use from browser)
-locale = locale.split(/[-_]/)[0];
-if (!locale.startsWith('en') && !locale.startsWith('de')) {
+const supportedLocales = ['en', 'de'];
+
+let locale = 'de-DE';
+locale = locale.split(/[-_]/)[0].toLowerCase();
+if (supportedLocales.indexOf(locale) < 0) {
   locale = 'en';
 }
 
 const messages = {
   de: messages_de,
   en: messages_en,
-};
+}[locale];
 const cache = createIntlCache();
 const intl = createIntl(
   {
@@ -341,13 +343,13 @@ export default {
       return {
         winner: enemy(player),
         result: 'game.ended.king.shot',
-        msgArgs: { color: intl.formatMessage(player.color) },
+        msgArgs: { color: intl.formatMessage({ id: player.color }) },
       };
     } else if (gameState === KING_SUICIDE) {
       return {
         winner: player,
         result: `game.ended.king.suicide`,
-        msgArgs: { color: intl.formatMessage(enemy(player).color) },
+        msgArgs: { color: intl.formatMessage({ id: enemy(player).color }) },
       };
     } else if (gameState === BOTH_KINGS_LOST) {
       return {
@@ -358,13 +360,13 @@ export default {
       return {
         winner: enemy(player),
         result: 'game.ended.checkmate',
-        msgArgs: { color: intl.formatMessage(player.color) },
+        msgArgs: { color: intl.formatMessage({ id: player.color }) },
       };
     } else if (gameState === STALEMATE) {
       return {
         draw: true,
         result: 'game.ended.stalemate',
-        msgArgs: { color: intl.formatMessage(player.color) },
+        msgArgs: { color: intl.formatMessage({ id: player.color }) },
       };
     } else if (gameState === IN_PROGRESS) {
       return null;
