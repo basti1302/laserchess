@@ -9,11 +9,13 @@
     "eject": "react-scripts eject",
     "postinstall": "yarn run build",
     "prettier": "prettier --write 'src/**/*.js'",
-    "rebuild-restart": "npm run build && npm run server",
-    "server": "node --require esm --icu-data-dir=node_modules/full-icu/icudt67l.dat server"
+    "rebuild-restart": "yarn build && yarn server-dev",
+    "server": "node --require esm --icu-data-dir=node_modules/full-icu/icudt67l.dat server",
+    "server-dev": "NODE_ENV=development yarn server"
   },
   "dependencies": {
     "@formatjs/intl": "^1.2.1",
+    "@instana/collector": "^1.105.1",
     "boardgame.io": "^0.39.4",
     "classnames": "^2.2.6",
     "esm": "^3.2.25",
