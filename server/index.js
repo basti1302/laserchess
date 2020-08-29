@@ -1,3 +1,9 @@
+const env = process.env.NODE_ENV || 'production';
+console.log(`Environment: ${env}`);
+if (env !== 'development') {
+  require('@instana/collector')();
+}
+
 const Server = require('boardgame.io/server').Server;
 const LaserChessGame = require('../src/LaserChessGame');
 

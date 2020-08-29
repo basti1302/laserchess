@@ -3,7 +3,8 @@ set -eEuo pipefail
 
 cd `dirname $BASH_SOURCE`/..
 
-forever start \
+NODE_ENV=production \
+  forever start \
   -m 1 \
   -l /opt/laserchess/out.log \
   -e /opt/laserchess/error.log \
